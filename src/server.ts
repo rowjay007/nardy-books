@@ -1,24 +1,13 @@
-import express, { Request, Response, NextFunction, Express } from "express";
-const app: Express = express();
+// server.ts
+import app from "./app";
+import connectDB from "./config/database.config";
 
-app.use(express.json());
+const PORT = process.env.PORT || 8080;
 
-const port = process.env.PORT || 8080;
+// Connect to the database
+connectDB();
 
-app.get(
-  "/",
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      res.status(200).json({
-        message: "Hurray!! we create our first server on bun js",
-        success: true,
-      });
-    } catch (error: unknown) {
-      next(new Error((error as Error).message));
-    }
-  }
-);
-
-app.listen(port, () => {
-  console.log(`Server is up and running on port ${port}`);
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port🌈 🌈 ⚡️💥🔥${PORT}`);
 });
