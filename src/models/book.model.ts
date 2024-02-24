@@ -1,10 +1,9 @@
-// book.model.ts
-import mongoose, { Schema, Document, Types } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 import { IAuthor } from "./author.model";
 
-interface IBook extends Document {
+export interface IBook extends Document {
   title: string;
-  author: Types.ObjectId | IAuthor; 
+  author: Types.ObjectId | IAuthor;
   ISBN: string;
   genre: string[];
   description: string;

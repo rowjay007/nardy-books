@@ -1,28 +1,14 @@
-// book.controller.ts
 import { Request, Response } from "express";
 import Book from "../models/book.model";
+import AppError from "../utils/appError";
+import catchAsync from "../utils/catchAsync";
 
-export const getAllBooks = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const books = await Book.find();
-    res.status(200).json({ books });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error getting books:", error.message);
-      res.status(500).json({ error: "Internal Server Error" });
-    } else {
-      res.status(500).json({ error: "Unknown error occurred" });
-    }
-  }
-};
+export const getAllBooks = catchAsync(async (req: Request, res: Response) => {
+  const books = await Book.find();
+  res.status(200).json({ books });
+});
 
-export const createBook = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const createBook = catchAsync(async (req: Request, res: Response) => {
   const {
     title,
     author,
@@ -34,8 +20,47 @@ export const createBook = async (
     coverImageURL,
   } = req.body;
 
-  try {
-    const newBook = await Book.create({
+  const newBook = await Book.create({
+    title,
+    author,
+    ISBN,
+    genre,
+    description,
+    publicationDate,
+    language,
+    coverImageURL,
+  });
+
+  res.status(201).json({ book: newBook });
+});
+
+export const getBookById = catchAsync(async (req: Request, res: Response) => {
+  const { bookId } = req.params;
+
+  const book = await Book.findById(bookId);
+  if (!book) {
+    throw new AppError("Book not found", 404);
+  }
+
+  res.status(200).json({ book });
+});
+
+export const updateBook = catchAsync(async (req: Request, res: Response) => {
+  const { bookId } = req.params;
+  const {
+    title,
+    author,
+    ISBN,
+    genre,
+    description,
+    publicationDate,
+    language,
+    coverImageURL,
+  } = req.body;
+
+  const updatedBook = await Book.findByIdAndUpdate(
+    bookId,
+    {
       title,
       author,
       ISBN,
@@ -44,39 +69,25 @@ export const createBook = async (
       publicationDate,
       language,
       coverImageURL,
-    });
+    },
+    { new: true }
+  );
 
-    res.status(201).json({ book: newBook });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error creating book:", error.message);
-      res.status(500).json({ error: "Internal Server Error" });
-    } else {
-      res.status(500).json({ error: "Unknown error occurred" });
-    }
+  if (!updatedBook) {
+    throw new AppError("Book not found", 404);
   }
-};
 
-export const getBookById = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+  res.status(200).json({ book: updatedBook });
+});
+
+export const deleteBook = catchAsync(async (req: Request, res: Response) => {
   const { bookId } = req.params;
 
-  try {
-    const book = await Book.findById(bookId);
-    if (!book) {
-      res.status(404).json({ error: "Book not found" });
-      return;
-    }
+  const deletedBook = await Book.findByIdAndDelete(bookId);
 
-    res.status(200).json({ book });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error getting book by ID:", error.message);
-      res.status(500).json({ error: "Internal Server Error" });
-    } else {
-      res.status(500).json({ error: "Unknown error occurred" });
-    }
+  if (!deletedBook) {
+    throw new AppError("Book not found", 404);
   }
-};
+
+  res.status(204).json();
+});
