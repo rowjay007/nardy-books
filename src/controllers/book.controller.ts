@@ -91,3 +91,13 @@ export const deleteBook = catchAsync(async (req: Request, res: Response) => {
 
   res.status(204).json();
 });
+
+export const searchBooks = catchAsync(async (req: Request, res: Response) => {
+  const { query } = req.query;
+
+  const books = await Book.find({
+    $or: [{ title: { $regex: query, $options: "i" } }],
+  });
+
+  res.status(200).json({ books });
+});
