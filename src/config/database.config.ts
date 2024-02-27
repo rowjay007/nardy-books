@@ -1,13 +1,12 @@
-import mongoose from "mongoose";
+// config.ts
 
-const connectDB = async (): Promise<void> => {
-    try {
-    const conn = await mongoose.connect(process.env.MONGO_URI as string);
-    console.log(`MongoDB Connected:🌈 🌈 ⚡️💥🔥 ${conn.connection.host}`);
-  } catch (error) {
-    console.error(error);
-    process.exit(1);
-  }
-  return;
-};
-export default connectDB;
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const env = process.env.NODE_ENV || "development";
+
+const serverPort =
+  env === "production" ? process.env.PROD_PORT : process.env.DEV_PORT;
+
+export { serverPort };
