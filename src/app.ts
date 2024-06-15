@@ -1,24 +1,34 @@
+import cors from "cors";
 import express from "express";
-import bodyParser from "body-parser";
-import userRoutes from "./routes/userRoutes";
-import dotenv from "dotenv";
-import swaggerUi from "swagger-ui-express";
-import swaggerSpec from "./swagger"; // Import the swagger configuration file
+import helmet from "helmet";
+import morgan from "morgan";
+import connectDB from "./config/db";
+import logger from "./config/logger";
+import AppError from "./middlewares/errorHandling";
+import errorMiddleware from "./middlewares/errorMiddleware";
 
-// Load environment variables
-dotenv.config();
 
-// Create an Express application instance
 const app = express();
 
-// Middleware to parse JSON bodies
-app.use(bodyParser.json());
+(async () => {
 
-// Route for user-related endpoints
-app.use("/api/v1/users", userRoutes);
+  await connectDB();
+  logger.info("Database connected");
 
-// Swagger documentation route
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Export the Express application instance for server setup
+  app.use(morgan("dev"));
+  app.use(helmet());
+  app.use(cors());
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+
+
+
+  app.all("*", (req, res, next) => {
+    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+  });
+
+  app.use(errorMiddleware);
+})();
+
 export default app;

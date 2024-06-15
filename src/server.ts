@@ -1,13 +1,19 @@
-import dotenv from "dotenv";
 import app from "./app";
-import { connectToDatabase } from "./config/db";
+import env from "./config/env";
+import logger from "./config/logger";
 
-dotenv.config();
+const PORT = env.PORT || 5000;
 
-const PORT = process.env.PORT || 300;
+const server = app.listen(PORT, () => {
+  logger.info(`Server running in ${env.NODE_ENV} mode on port ${PORT}`);
+});
 
-connectToDatabase().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+process.on("unhandledRejection", (err: any) => {
+  logger.error(`Unhandled Rejection: ${err.message}`);
+  server.close(() => process.exit(1));
+});
+
+process.on("uncaughtException", (err: any) => {
+  logger.error(`Uncaught Exception: ${err.message}`);
+  server.close(() => process.exit(1));
 });
