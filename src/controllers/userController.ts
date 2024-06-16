@@ -1,65 +1,48 @@
 import { Request, Response, NextFunction } from "express";
 import userService from "../services/userService";
+import catchAsync from "../utils/catchAsync";
 
-const register = async (req: Request, res: Response, next: NextFunction) => {
-  try {
+const register = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { username, email, password } = req.body;
     const user = await userService.register(username, email, password);
-    res.status(201).json(user);
-  } catch (error) {
-    next(error);
+    res.status(201).json({ status: "success", data: user });
   }
-};
+);
 
-const login = async (req: Request, res: Response, next: NextFunction) => {
-  try {
+const login = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     const { user, token } = await userService.login(email, password);
-    res.status(200).json({ user, token });
-  } catch (error) {
-    next(error);
+    res.status(200).json({ status: "success", data: { user, token } });
   }
-};
+);
 
-const logout = async (req: Request, res: Response) => {
-  // Logout logic, usually handled by the client by removing the token
-  res.status(200).send("Logged out");
-};
+const logout = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    await userService.logout();
+    res.status(204).json({ status: "success", data: null });
+  }
+);
 
-const requestPasswordReset = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+const requestPasswordReset = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { email } = req.body;
     const token = await userService.requestPasswordReset(email);
-    res.status(200).json({ token });
-  } catch (error) {
-    next(error);
+    res.status(200).json({ status: "success", data: { token } });
   }
-};
+);
 
-const resetPassword = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+const resetPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { token, newPassword } = req.body;
     const user = await userService.resetPassword(token, newPassword);
-    res.status(200).json(user);
-  } catch (error) {
-    next(error);
+    res.status(200).json({ status: "success", data: user });
   }
-};
+);
 
-const changePassword = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+const changePassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
     const { currentPassword, newPassword } = req.body;
     const user = await userService.changePassword(
@@ -67,47 +50,35 @@ const changePassword = async (
       currentPassword,
       newPassword
     );
-    res.status(200).json(user);
-  } catch (error) {
-    next(error);
+    res.status(200).json({ status: "success", data: user });
   }
-};
+);
 
-const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
-  try {
+const verifyEmail = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
     const user = await userService.verifyEmail(userId);
-    res.status(200).json(user);
-  } catch (error) {
-    next(error);
+    res.status(200).json({ status: "success", data: user });
   }
-};
+);
 
-const resendVerificationEmail = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+const resendVerificationEmail = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
     await userService.resendVerificationEmail(userId);
-    res.status(200).send("Verification email sent");
-  } catch (error) {
-    next(error);
+    res.status(200).json({ status: "success", data: null });
   }
-};
+);
 
-const getUserById = async (req: Request, res: Response, next: NextFunction) => {
-  try {
+const getUserById = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
     const user = await userService.getUserById(userId);
-    res.status(200).json(user);
-  } catch (error) {
-    next(error);
+    res.status(200).json({ status: "success", data: user });
   }
-};
+);
 
-const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const filter = req.query.filter || {};
     const sort = req.query.sort || {};
@@ -118,28 +89,23 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   } catch (error) {
     next(error);
   }
-};
-
-const updateUser = async (req: Request, res: Response, next: NextFunction) => {
-  try {
+});
+const updateUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
     const updateData = req.body;
     const user = await userService.updateUser(userId, updateData);
-    res.status(200).json(user);
-  } catch (error) {
-    next(error);
+    res.status(200).json({ status: "success", data: user });
   }
-};
+);
 
-const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
-  try {
+const deleteUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
     await userService.deleteUser(userId);
-    res.status(204).send("User deleted");
-  } catch (error) {
-    next(error);
+    res.status(204).json({ status: "success", data: null });
   }
-};
+);
 
 export default {
   register,
