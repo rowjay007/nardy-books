@@ -32,6 +32,7 @@ const login = async (email: string, password: string) => {
   return { user, token };
 };
 
+
 const logout = () => {
     // Logout logic, usually handled by the client by removing the token
     //TODO implement logout logic

@@ -1,5 +1,7 @@
+// src/routes/userRoutes.ts
 import { Router } from "express";
 import userController from "../controllers/userController";
+import authMiddleware from "../middlewares/authMiddleware";
 
 /**
  * @swagger
@@ -62,6 +64,9 @@ router.post("/register", userController.register);
  *         description: Bad request, validation error
  */
 router.post("/login", userController.login);
+
+// Apply authMiddleware to all routes below
+router.use(authMiddleware);
 
 /**
  * @swagger

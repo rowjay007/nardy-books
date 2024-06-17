@@ -1,4 +1,3 @@
-// repositories/userRepository.ts
 import User, { IUser } from "../models/userModel";
 import AppError from "../utils/appError";
 
@@ -9,13 +8,11 @@ const createUser = async (userData: Partial<IUser>) => {
 };
 
 const findUserByEmail = async (email: string): Promise<IUser | null> => {
-  const user = await User.findOne({ email });
-  return user;
+  return User.findOne({ email });
 };
 
 const findUserById = async (id: string): Promise<IUser | null> => {
-  const user = await User.findById(id);
-  return user;
+  return User.findById(id);
 };
 
 const findUsers = async (
@@ -55,11 +52,10 @@ const setResetPasswordToken = async (
 const findByResetPasswordToken = async (
   token: string
 ): Promise<IUser | null> => {
-  const user = await User.findOne({
+  return User.findOne({
     resetPasswordToken: token,
     resetPasswordExpires: { $gt: new Date() },
   });
-  return user;
 };
 
 export default {

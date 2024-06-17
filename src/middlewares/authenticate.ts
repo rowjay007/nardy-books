@@ -1,4 +1,3 @@
-// src/middlewares/authMiddleware.ts
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import env from "../config/env";
@@ -27,7 +26,7 @@ const authMiddleware = async (
       if (!user) {
         return next(new AppError("User no longer exists", 401));
       }
-      (req as any).user = user; 
+      req.user = user;
       return next();
     } catch (error) {
       return next(new AppError("Not authorized, token failed", 401));
