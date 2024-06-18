@@ -65,7 +65,6 @@ router.post("/register", userController.register);
  */
 router.post("/login", userController.login);
 
-// Apply authMiddleware to all routes below
 router.use(authMiddleware);
 
 /**
