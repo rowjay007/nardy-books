@@ -5,6 +5,29 @@ import authMiddleware from "../middlewares/authMiddleware";
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - username
+ *         - email
+ *         - password
+ *       properties:
+ *         username:
+ *           type: string
+ *         email:
+ *           type: string
+ *         password:
+ *           type: string
+ * example:
+ * username: test
+ * email: <EMAIL>
+ * password: <PASSWORD>
+ */
+
+/**
+ * @swagger
  * tags:
  *   name: User
  *   description: User management and authentication
