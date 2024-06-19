@@ -34,11 +34,29 @@ export const getAuthorById = catchAsync(
 
 export const getAllAuthors = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const authors = await AuthorService.getAllAuthors();
+    const {
+      name,
+      page = 1,
+      limit = 10,
+      sortBy = "name",
+      sortOrder = "asc",
+    } = req.query;
+
+    const authorsData = await AuthorService.getAllAuthors(
+      name as string,
+      parseInt(page as string, 10),
+      parseInt(limit as string, 10),
+      sortBy as string,
+      sortOrder as string
+    );
+
     res.status(200).json({
       status: "success",
       data: {
-        authors,
+        authors: authorsData.authors,
+        total: authorsData.total,
+        page: authorsData.page,
+        limit: authorsData.limit,
       },
     });
   }

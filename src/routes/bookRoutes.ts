@@ -8,6 +8,11 @@ router.use(authMiddleware);
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     Book:
  *       type: object
@@ -60,6 +65,8 @@ router.use(authMiddleware);
  *   post:
  *     summary: Create a new book
  *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -84,6 +91,8 @@ router.post("/", BookController.createBook);
  *   get:
  *     summary: Get the book by id
  *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -109,6 +118,8 @@ router.get("/:id", BookController.getBookById);
  *   get:
  *     summary: Returns the list of all the books
  *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: sort
@@ -146,6 +157,8 @@ router.get("/", BookController.getAllBooks);
  *   put:
  *     summary: Update the book by the id
  *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -179,6 +192,8 @@ router.put("/:id", BookController.updateBookById);
  *   delete:
  *     summary: Remove the book by id
  *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

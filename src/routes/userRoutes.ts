@@ -1,4 +1,3 @@
-// src/routes/userRoutes.ts
 import { Router } from "express";
 import userController from "../controllers/userController";
 import authMiddleware from "../middlewares/authMiddleware";
@@ -6,6 +5,11 @@ import authMiddleware from "../middlewares/authMiddleware";
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     User:
  *       type: object
@@ -20,10 +24,10 @@ import authMiddleware from "../middlewares/authMiddleware";
  *           type: string
  *         password:
  *           type: string
- * example:
- * username: test
- * email: <EMAIL>
- * password: <PASSWORD>
+ *       example:
+ *         username: test
+ *         email: user@example.com
+ *         password: password123
  */
 
 /**
@@ -88,19 +92,19 @@ router.post("/register", userController.register);
  */
 router.post("/login", userController.login);
 
-router.use(authMiddleware);
-
 /**
  * @swagger
  * /api/v1/users/logout:
  *   post:
  *     summary: Log out a user
  *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: User logged out successfully
  */
-router.post("/logout", userController.logout);
+router.post("/logout", authMiddleware, userController.logout);
 
 /**
  * @swagger
@@ -160,6 +164,8 @@ router.post("/reset-password", userController.resetPassword);
  *   post:
  *     summary: Change password for a user
  *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -187,7 +193,11 @@ router.post("/reset-password", userController.resetPassword);
  *       404:
  *         description: User not found or current password incorrect
  */
-router.post("/change-password/:userId", userController.changePassword);
+router.post(
+  "/change-password/:userId",
+  authMiddleware,
+  userController.changePassword
+);
 
 /**
  * @swagger
@@ -240,6 +250,8 @@ router.post(
  *   get:
  *     summary: Get user details by ID
  *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -253,7 +265,7 @@ router.post(
  *       404:
  *         description: User not found
  */
-router.get("/:userId", userController.getUserById);
+router.get("/:userId", authMiddleware, userController.getUserById);
 
 /**
  * @swagger
@@ -261,6 +273,8 @@ router.get("/:userId", userController.getUserById);
  *   get:
  *     summary: Get all users with filters, sorting, and pagination
  *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: filter
@@ -286,7 +300,7 @@ router.get("/:userId", userController.getUserById);
  *       200:
  *         description: List of users retrieved successfully
  */
-router.get("/", userController.getAllUsers);
+router.get("/", authMiddleware, userController.getAllUsers);
 
 /**
  * @swagger
@@ -294,6 +308,8 @@ router.get("/", userController.getAllUsers);
  *   put:
  *     summary: Update user details
  *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -323,7 +339,7 @@ router.get("/", userController.getAllUsers);
  *       400:
  *         description: Bad request, validation error
  */
-router.put("/:userId", userController.updateUser);
+router.put("/:userId", authMiddleware, userController.updateUser);
 
 /**
  * @swagger
@@ -331,6 +347,8 @@ router.put("/:userId", userController.updateUser);
  *   delete:
  *     summary: Delete a user
  *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -344,6 +362,6 @@ router.put("/:userId", userController.updateUser);
  *       404:
  *         description: User not found
  */
-router.delete("/:userId", userController.deleteUser);
+router.delete("/:userId", authMiddleware, userController.deleteUser);
 
 export default router;

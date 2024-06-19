@@ -5,8 +5,8 @@ import cors from "cors";
 import AppError from "./middlewares/errorHandling";
 import errorMiddleware from "./middlewares/errorMiddleware";
 import router from "./routes";
-import swaggerUi from "swagger-ui-express"; // Import Swagger UI express
-import swaggerSpec from "./config/swaggerConfig"; // Import the Swagger specification
+import swaggerUi from "swagger-ui-express"; 
+import swaggerSpec from "./config/swaggerConfig"; 
 
 const app = express();
 
@@ -16,10 +16,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve Swagger UI documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Routes
 app.use(router);
 
 app.all("*", (req, res, next) => {

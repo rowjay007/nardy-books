@@ -1,6 +1,6 @@
+import * as AuthorRepository from "../repositories/authorRepository";
 import { IAuthor } from "../models/authorModel";
 import { Types } from "mongoose";
-import * as AuthorRepository from "../repositories/authorRepository";
 
 export const createAuthor = async (
   authorData: Partial<IAuthor>
@@ -14,8 +14,40 @@ export const getAuthorById = async (
   return AuthorRepository.getAuthorById(id);
 };
 
-export const getAllAuthors = async (): Promise<IAuthor[]> => {
-  return AuthorRepository.getAllAuthors();
+export const getAllAuthors = async (
+  name?: string,
+  page = 1,
+  limit = 10,
+  sortBy = "name",
+  sortOrder = "asc"
+): Promise<{
+  authors: IAuthor[];
+  total: number;
+  page: number;
+  limit: number;
+}> => {
+  const filter: any = {};
+  if (name) {
+    filter.name = { $regex: name, $options: "i" };
+  }
+
+  const sort: any = {};
+  sort[sortBy] = sortOrder === "desc" ? -1 : 1;
+
+  const authors = await AuthorRepository.getAllAuthors(
+    filter,
+    page,
+    limit,
+    sort
+  );
+  const total = await AuthorRepository.getTotalCount(filter);
+
+  return {
+    authors,
+    total,
+    page,
+    limit,
+  };
 };
 
 export const updateAuthorById = async (
