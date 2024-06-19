@@ -1,5 +1,5 @@
 import { Router } from "express";
-import BookController from "../controllers/bookController";
+import * as BookController from "../controllers/bookController";
 import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();

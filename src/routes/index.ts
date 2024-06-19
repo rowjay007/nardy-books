@@ -3,15 +3,16 @@ import userRoutes from "./userRoutes";
 import authorRoutes from "./authorRoutes";
 import bookRoutes from "./bookRoutes";
 import genreRoutes from "./genreRoutes";
+import publisherRoutes from "./publisherRoutes";
 
 const router = express.Router();
-
 const apiV1Router = express.Router();
 
 apiV1Router.use("/users", userRoutes);
 apiV1Router.use("/authors", authorRoutes);
 apiV1Router.use("/books", bookRoutes);
 apiV1Router.use("/genres", genreRoutes);
+apiV1Router.use("/publishers", publisherRoutes);
 
 router.use("/api/v1", apiV1Router);
 

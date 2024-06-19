@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 
-interface IPublisher extends Document {
+export interface IPublisher extends Document {
   name: string;
   address: string;
   books: Types.ObjectId[];
