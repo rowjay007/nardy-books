@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 
-interface IGenre extends Document {
+export interface IGenre extends Document {
   name: string;
   description: string;
   books: Types.ObjectId[]; 
