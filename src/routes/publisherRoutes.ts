@@ -1,10 +1,37 @@
-// Import required modules and middleware
 import express from "express";
 import * as PublisherController from "../controllers/publisherController";
 import authMiddleware from "../middlewares/authMiddleware";
 
 const router = express.Router();
 router.use(authMiddleware);
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Publisher:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: Unique identifier for the publisher
+ *         name:
+ *           type: string
+ *           description: Name of the publisher
+ *         address:
+ *           type: string
+ *           description: Address of the publisher
+ *         books:
+ *           type: array
+ *           items:
+ *             type: string
+ *             description: List of books associated with the publisher
+ *       example:
+ *         id: "6423e4f4c1e6b4e2f7328a6e"
+ *         name: "Penguin Books"
+ *         address: "New York, NY"
+ *         books: ["6423e4f4c1e6b4e2f7328a6f", "6423e4f4c1e6b4e2f7328a70"]
+ */
 
 /**
  * @swagger
@@ -76,7 +103,7 @@ router.get("/:id", PublisherController.getPublisherById);
  * @swagger
  * /publishers:
  *   get:
- *     summary: Retrieve all publishers
+ *     summary: Retrieve all publishers with optional filtering, pagination, and sorting
  *     tags: [Publishers]
  *     security:
  *       - bearerAuth: []
@@ -85,23 +112,23 @@ router.get("/:id", PublisherController.getPublisherById);
  *         name: filter
  *         schema:
  *           type: object
- *         description: Filter criteria
+ *         description: JSON object containing filter criteria for publishers
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
- *         description: Page number
+ *         description: Page number for pagination
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *         description: Number of items per page
+ *         description: Number of items per page for pagination
  *       - in: query
  *         name: sort
  *         schema:
  *           type: string
  *           enum: ["asc", "desc"]
- *         description: Sort order
+ *         description: Sort order for the retrieved data
  *     responses:
  *       200:
  *         description: List of publishers retrieved successfully
@@ -111,6 +138,8 @@ router.get("/:id", PublisherController.getPublisherById);
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Publisher'
+ *       400:
+ *         description: Invalid query parameters
  *       500:
  *         description: Internal server error
  */
