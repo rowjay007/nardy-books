@@ -32,7 +32,7 @@ export const getReviewById = catchAsync(
 
 export const getAllReviews = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const sortQuery = req.query.sort as string[];
+    const sortQuery = (req.query.sort as string)?.split(",") || [];
     const filter = req.query.filter
       ? JSON.parse(req.query.filter as string)
       : {};
@@ -41,11 +41,10 @@ export const getAllReviews = catchAsync(
 
     const sortObject: Record<string, "asc" | "desc"> = {};
 
-    if (Array.isArray(sortQuery) && sortQuery.length === 2) {
-      const sortField = sortQuery[0];
-      const sortDirection = sortQuery[1].toLowerCase() as "asc" | "desc";
-      sortObject[sortField] = sortDirection;
-    } else {
+    if (sortQuery.length === 2) {
+      const [sortField, sortDirection] = sortQuery;
+      sortObject[sortField] = sortDirection.toLowerCase() as "asc" | "desc";
+    } else if (sortQuery.length > 0) {
       return next(new AppError("Invalid sort query parameters", 400));
     }
 
@@ -64,6 +63,7 @@ export const getAllReviews = catchAsync(
     });
   }
 );
+
 
 export const updateReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

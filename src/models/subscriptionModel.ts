@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 
-interface ISubscription extends Document {
+export interface ISubscription extends Document {
   type: string;
   startDate: Date;
   endDate: Date;
