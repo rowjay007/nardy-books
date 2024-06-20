@@ -1,31 +1,23 @@
-import BookRepository from "../repositories/bookRepository";
+import { Types } from "mongoose";
+import * as BookRepository from "../repositories/bookRepository";
 import { IBook } from "../models/bookModel";
 
-class BookService {
-  async createBook(bookData: Partial<IBook>): Promise<IBook> {
-    return BookRepository.create(bookData);
-  }
+export const createBook = async (bookData: Partial<IBook>): Promise<IBook> =>
+  BookRepository.createBook(bookData);
 
-  async getBookById(id: string): Promise<IBook | null> {
-    return BookRepository.findById(id);
-  }
+export const getBookById = async (id: Types.ObjectId): Promise<IBook | null> =>
+  BookRepository.findBookById(id);
 
-  async getAllBooks(
-    queryParams: any
-  ): Promise<{ books: IBook[]; total: number }> {
-    return BookRepository.findAll(queryParams);
-  }
+export const getAllBooks = async (
+  queryParams: any
+): Promise<{ books: IBook[]; total: number }> =>
+  BookRepository.findAllBooks(queryParams);
 
-  async updateBookById(
-    id: string,
-    bookData: Partial<IBook>
-  ): Promise<IBook | null> {
-    return BookRepository.updateById(id, bookData);
-  }
+export const updateBookById = async (
+  id: Types.ObjectId,
+  bookData: Partial<IBook>
+): Promise<IBook | null> => BookRepository.updateBookById(id, bookData);
 
-  async deleteBookById(id: string): Promise<IBook | null> {
-    return BookRepository.deleteById(id);
-  }
-}
-
-export default new BookService();
+export const deleteBookById = async (
+  id: Types.ObjectId
+): Promise<IBook | null> => BookRepository.deleteBookById(id);
