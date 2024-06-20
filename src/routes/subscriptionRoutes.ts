@@ -3,6 +3,7 @@ import * as subscriptionController from "../controllers/subscriptionController";
 import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
+
 router.use(authMiddleware);
 
 /**
@@ -18,15 +19,12 @@ router.use(authMiddleware);
  *       properties:
  *         type:
  *           type: string
- *           description: Type of subscription (e.g., Premium, Basic)
  *         startDate:
  *           type: string
  *           format: date
- *           description: Start date of the subscription
  *         endDate:
  *           type: string
  *           format: date
- *           description: End date of the subscription
  *         users:
  *           type: array
  *           items:
@@ -37,7 +35,6 @@ router.use(authMiddleware);
  *         startDate: 2024-07-01
  *         endDate: 2025-07-01
  *         users: ["user1", "user2"]
- *
  *   securitySchemes:
  *     bearerAuth:
  *       type: http
