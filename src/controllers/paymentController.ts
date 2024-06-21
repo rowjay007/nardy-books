@@ -38,8 +38,8 @@ export const updatePayment = catchAsync(
 
 export const deletePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    await PaymentService.deletePayment(req.params.id);
-    res.status(204).json({ status: "success", data: null });
+    const response = await PaymentService.deletePayment(req.params.id);
+    res.status(204).json({ status: "success", data: response });
   }
 );
 
