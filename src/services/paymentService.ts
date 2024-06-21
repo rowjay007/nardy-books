@@ -1,50 +1,63 @@
-import PaymentRepository from "../repositories/paymentRepository";
+import * as PaymentRepository from "../repositories/paymentRepository";
 import { IPayment } from "../models/paymentModel";
 import { initializePayment, verifyPayment } from "../utils/paystack";
 import {
-  initializeFlutterwavePayment,
-  verifyFlutterwavePayment,
+  initializeFlutterwavePayment as initFlutterwavePayment,
+  verifyFlutterwavePayment as verifyFlutterwavePaymentUtil,
 } from "../utils/flutterwave";
 
-class PaymentService {
-  async createPayment(paymentData: Partial<IPayment>): Promise<IPayment> {
-    return PaymentRepository.create(paymentData);
-  }
+export const createPayment = async (
+  paymentData: Partial<IPayment>
+): Promise<IPayment> => {
+  return PaymentRepository.create(paymentData);
+};
 
-  async getPaymentById(id: string): Promise<IPayment | null> {
-    return PaymentRepository.findById(id);
-  }
+export const getPaymentById = async (id: string): Promise<IPayment | null> => {
+  return PaymentRepository.findById(id);
+};
 
-  async getAllPayments(): Promise<IPayment[]> {
-    return PaymentRepository.findAll();
-  }
+export const getAllPayments = async (
+  filter: any = {},
+  sort: any = { date: -1 },
+  page: number = 1,
+  limit: number = 10
+): Promise<IPayment[]> => {
+  return PaymentRepository.findAll(filter, sort, page, limit);
+};
 
-  async updatePayment(
-    id: string,
-    updateData: Partial<IPayment>
-  ): Promise<IPayment | null> {
-    return PaymentRepository.update(id, updateData);
-  }
+export const updatePayment = async (
+  id: string,
+  updateData: Partial<IPayment>
+): Promise<IPayment | null> => {
+  return PaymentRepository.update(id, updateData);
+};
 
-  async deletePayment(id: string): Promise<IPayment | null> {
-    return PaymentRepository.delete(id);
-  }
+export const deletePayment = async (id: string): Promise<void> => {
+  await PaymentRepository.remove(id);
+};
 
-  async processPaystackPayment(amount: number, email: string): Promise<any> {
-    return initializePayment(amount, email);
-  }
+export const processPaystackPayment = async (
+  amount: number,
+  email: string
+): Promise<any> => {
+  return initializePayment(amount, email);
+};
 
-  async verifyPaystackPayment(reference: string): Promise<any> {
-    return verifyPayment(reference);
-  }
+export const verifyPaystackPayment = async (
+  reference: string
+): Promise<any> => {
+  return verifyPayment(reference);
+};
 
-  async processFlutterwavePayment(amount: number, email: string): Promise<any> {
-    return initializeFlutterwavePayment(amount, email);
-  }
+export const processFlutterwavePayment = async (
+  amount: number,
+  email: string
+): Promise<any> => {
+  return initFlutterwavePayment(amount, email);
+};
 
-  async verifyFlutterwavePayment(reference: string): Promise<any> {
-    return verifyFlutterwavePayment(reference);
-  }
-}
-
-export default new PaymentService();
+export const verifyFlutterwavePayment = async (
+  reference: string
+): Promise<any> => {
+  return verifyFlutterwavePaymentUtil(reference);
+};
