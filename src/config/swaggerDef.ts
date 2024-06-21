@@ -7,9 +7,20 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "/api/v1",
+      url: "http://localhost:3001/api/v1",
+      description: "Development server",
     },
   ],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+    }
+  },
+   security: [{ bearerAuth: [] }],
 };
 
 export default swaggerDefinition;

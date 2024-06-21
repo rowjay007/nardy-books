@@ -55,6 +55,8 @@ router.use(authMiddleware);
  *   post:
  *     summary: Create a new subscription
  *     tags: [Subscriptions]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       description: Subscription details
  *       required: true
@@ -78,6 +80,8 @@ router.post("/", subscriptionController.createSubscription);
  *   get:
  *     summary: Get all subscriptions with filters, sorting, and pagination options
  *     tags: [Subscriptions]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: filter
@@ -113,6 +117,8 @@ router.get("/", subscriptionController.getSubscriptions);
  *   get:
  *     summary: Get a single subscription by ID
  *     tags: [Subscriptions]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -136,6 +142,8 @@ router.get("/:id", subscriptionController.getSubscriptionById);
  *   put:
  *     summary: Update a subscription by ID
  *     tags: [Subscriptions]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -166,6 +174,8 @@ router.put("/:id", subscriptionController.updateSubscription);
  *   delete:
  *     summary: Delete a subscription by ID
  *     tags: [Subscriptions]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
