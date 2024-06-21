@@ -1,10 +1,10 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
 
-interface IPayment extends Document {
+export interface IPayment extends Document {
   amount: number;
   method: string;
   status: string;
-  user: Types.ObjectId; 
+  user: Types.ObjectId;
   date: Date;
 }
 
