@@ -1,6 +1,6 @@
-import * as GenreRepository from "../repositories/genreRepository";
-import { IGenre } from "../models/genreModel";
 import { Types } from "mongoose";
+import { IGenre } from "../models/genreModel";
+import * as GenreRepository from "../repositories/genreRepository";
 
 export const createGenre = async (genreData: Partial<IGenre>) => {
   return GenreRepository.createGenre(genreData);
@@ -18,7 +18,6 @@ export const getAllGenres = async (
 ) => {
   return GenreRepository.getAllGenres(filter, page, limit, sort);
 };
-
 
 export const updateGenreById = async (
   id: Types.ObjectId,
