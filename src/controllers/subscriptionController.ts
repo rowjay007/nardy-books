@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as subscriptionService from "../services/subscriptionService";
 import catchAsync from "../utils/catchAsync";
-import AppError from "../middlewares/errorHandling";
+import AppError from "../utils/appError";
 
 export const createSubscription = catchAsync(
   async (req: Request, res: Response) => {
