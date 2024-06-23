@@ -2,11 +2,11 @@ import express from "express";
 import morgan from "morgan";
 import helmet from "helmet";
 import cors from "cors";
-import AppError from "./middlewares/errorHandling";
 import errorMiddleware from "./middlewares/errorMiddleware";
 import router from "./routes";
 import swaggerUi from "swagger-ui-express"; 
 import swaggerSpec from "./config/swaggerConfig"; 
+import AppError from "./utils/appError";
 
 const app = express();
 

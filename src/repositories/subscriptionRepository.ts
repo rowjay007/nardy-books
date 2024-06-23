@@ -1,6 +1,6 @@
-import AppError from "../middlewares/errorHandling";
 import Subscription, { ISubscription } from "../models/subscriptionModel";
 import { Types } from "mongoose";
+import AppError from "../utils/appError";
 
 export const createSubscription = async (subscriptionData: ISubscription) => {
   const subscription = new Subscription(subscriptionData);
