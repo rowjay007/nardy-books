@@ -17,10 +17,10 @@ export const getPaymentById = async (id: string): Promise<IPayment | null> => {
 };
 
 export const getAllPayments = async (
-  filter: any = {},
-  sort: any = { date: -1 },
-  page: number = 1,
-  limit: number = 10
+  filter: any, // Pass filters
+  sort: any, // Pass sorting criteria
+  page: number, // Pass pagination page
+  limit: number // Pass pagination limit
 ): Promise<IPayment[]> => {
   return PaymentRepository.findAll(filter, sort, page, limit);
 };
@@ -35,6 +35,7 @@ export const updatePayment = async (
 export const deletePayment = async (id: string): Promise<void> => {
   await PaymentRepository.remove(id);
 };
+
 
 export const processPaystackPayment = async (
   amount: number,

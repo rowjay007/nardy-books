@@ -1,5 +1,5 @@
 import Payment, { IPayment } from "../models/paymentModel";
-import { isValid } from "date-fns";
+import { Query } from "mongoose";
 
 export const create = async (
   paymentData: Partial<IPayment>
@@ -13,18 +13,16 @@ export const findById = async (id: string): Promise<IPayment | null> => {
 };
 
 export const findAll = async (
-  filter: any = {},
-  sort: any = { date: -1 },
-  page: number = 1,
-  limit: number = 10
+  filter: any, // Define your filter type according to your needs
+  sort: any, // Define your sort type according to your needs
+  page: number,
+  limit: number
 ): Promise<IPayment[]> => {
-  const skip = (page - 1) * limit;
-  return Payment.find(filter)
-    .populate("user")
+  const query = buildQuery(filter)
     .sort(sort)
-    .skip(skip)
-    .limit(limit)
-    .exec();
+    .skip((page - 1) * limit)
+    .limit(limit);
+  return query.exec();
 };
 
 export const update = async (
@@ -37,3 +35,16 @@ export const update = async (
 export const remove = async (id: string): Promise<IPayment | null> => {
   return Payment.findByIdAndDelete(id).exec();
 };
+
+function buildQuery(filter: any): Query<IPayment[], IPayment, {}> {
+  let query = Payment.find();
+
+  if (filter.method) {
+    query = query.where("method").equals(filter.method);
+  }
+  if (filter.status) {
+    query = query.where("status").equals(filter.status);
+  }
+
+  return query;
+}

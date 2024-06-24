@@ -40,57 +40,49 @@ router.use(authMiddleware);
  *         amount: 100
  *         method: "Card"
  *         status: "Paid"
- *         user: "user1"
+ *         user: "60c72b2f9b1d4c3f7e1e4567"
  *         date: "2024-06-25"
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  */
 
 /**
  * @swagger
- * /payments:
+ * /api/v1/payments:
  *   get:
- *     summary: Retrieve all payments
+ *     summary: Get all payments with filters, sorting, and pagination options
  *     tags: [Payments]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: filter
  *         schema:
- *           type: object
- *           description: Filtering criteria for payments
+ *           type: string
+ *         description: JSON filter object for payments
  *       - in: query
  *         name: sort
  *         schema:
- *           type: object
- *           description: Sorting criteria for payments
+ *           type: string
+ *         description: JSON sort object for payments
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
- *           description: Page number for pagination
+ *         description: Page number for pagination
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *           description: Maximum number of payments per page
+ *         description: Limit per page for pagination
  *     responses:
- *       '200':
- *         description: Successfully retrieved payments
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Payment'
- *       '500':
- *         description: Internal server error
+ *       200:
+ *         description: List of payments retrieved successfully
+ *       400:
+ *         description: Invalid query parameters
  */
+
 router.get("/", PaymentController.getAllPayments);
 
 /**
@@ -109,7 +101,7 @@ router.get("/", PaymentController.getAllPayments);
  *           type: string
  *         description: Payment ID
  *     responses:
- *       '200':
+ *       200:
  *         description: Successfully retrieved the payment
  *         content:
  *           application/json:
@@ -121,9 +113,9 @@ router.get("/", PaymentController.getAllPayments);
  *                   example: success
  *                 data:
  *                   $ref: '#/components/schemas/Payment'
- *       '404':
+ *       404:
  *         description: Payment not found
- *       '500':
+ *       500:
  *         description: Internal server error
  */
 router.get("/:id", PaymentController.getPaymentById);
@@ -144,7 +136,7 @@ router.get("/:id", PaymentController.getPaymentById);
  *           schema:
  *             $ref: '#/components/schemas/Payment'
  *     responses:
- *       '201':
+ *       201:
  *         description: Payment created successfully
  *         content:
  *           application/json:
@@ -156,9 +148,9 @@ router.get("/:id", PaymentController.getPaymentById);
  *                   example: success
  *                 data:
  *                   $ref: '#/components/schemas/Payment'
- *       '400':
+ *       400:
  *         description: Invalid request body
- *       '500':
+ *       500:
  *         description: Internal server error
  */
 router.post("/", PaymentController.createPayment);
@@ -186,7 +178,7 @@ router.post("/", PaymentController.createPayment);
  *           schema:
  *             $ref: '#/components/schemas/Payment'
  *     responses:
- *       '200':
+ *       200:
  *         description: Payment updated successfully
  *         content:
  *           application/json:
@@ -198,11 +190,11 @@ router.post("/", PaymentController.createPayment);
  *                   example: success
  *                 data:
  *                   $ref: '#/components/schemas/Payment'
- *       '400':
+ *       400:
  *         description: Invalid request body or ID
- *       '404':
+ *       404:
  *         description: Payment not found
- *       '500':
+ *       500:
  *         description: Internal server error
  */
 router.put("/:id", PaymentController.updatePayment);
@@ -223,11 +215,11 @@ router.put("/:id", PaymentController.updatePayment);
  *           type: string
  *         description: Payment ID
  *     responses:
- *       '204':
+ *       204:
  *         description: Payment deleted successfully
- *       '404':
+ *       404:
  *         description: Payment not found
- *       '500':
+ *       500:
  *         description: Internal server error
  */
 router.delete("/:id", PaymentController.deletePayment);
@@ -256,7 +248,7 @@ router.delete("/:id", PaymentController.deletePayment);
  *                 format: email
  *                 example: user@example.com
  *     responses:
- *       '200':
+ *       200:
  *         description: Payment initialized successfully
  *         content:
  *           application/json:
@@ -275,9 +267,9 @@ router.delete("/:id", PaymentController.deletePayment);
  *                     access_code:
  *                       type: string
  *                       example: xyz123
- *       '400':
+ *       400:
  *         description: Invalid request body
- *       '500':
+ *       500:
  *         description: Internal server error
  */
 router.post("/paystack", PaymentController.processPaystackPayment);
@@ -302,7 +294,7 @@ router.post("/paystack", PaymentController.processPaystackPayment);
  *                 type: string
  *                 example: abc123
  *     responses:
- *       '200':
+ *       200:
  *         description: Payment verified successfully
  *         content:
  *           application/json:
@@ -318,11 +310,11 @@ router.post("/paystack", PaymentController.processPaystackPayment);
  *                     message:
  *                       type: string
  *                       example: Payment verified
- *       '400':
+ *       400:
  *         description: Invalid request body
- *       '404':
+ *       404:
  *         description: Payment not found
- *       '500':
+ *       500:
  *         description: Internal server error
  */
 router.post("/paystack/verify", PaymentController.verifyPaystackPayment);
@@ -351,7 +343,7 @@ router.post("/paystack/verify", PaymentController.verifyPaystackPayment);
  *                 format: email
  *                 example: user@example.com
  *     responses:
- *       '200':
+ *       200:
  *         description: Payment initialized successfully
  *         content:
  *           application/json:
@@ -370,9 +362,9 @@ router.post("/paystack/verify", PaymentController.verifyPaystackPayment);
  *                     access_code:
  *                       type: string
  *                       example: xyz123
- *       '400':
+ *       400:
  *         description: Invalid request body
- *       '500':
+ *       500:
  *         description: Internal server error
  */
 router.post("/flutterwave", PaymentController.processFlutterwavePayment);
@@ -397,7 +389,7 @@ router.post("/flutterwave", PaymentController.processFlutterwavePayment);
  *                 type: string
  *                 example: abc123
  *     responses:
- *       '200':
+ *       200:
  *         description: Payment verified successfully
  *         content:
  *           application/json:
@@ -413,11 +405,11 @@ router.post("/flutterwave", PaymentController.processFlutterwavePayment);
  *                     message:
  *                       type: string
  *                       example: Payment verified
- *       '400':
+ *       400:
  *         description: Invalid request body
- *       '404':
+ *       404:
  *         description: Payment not found
- *       '500':
+ *       500:
  *         description: Internal server error
  */
 router.post("/flutterwave/verify", PaymentController.verifyFlutterwavePayment);

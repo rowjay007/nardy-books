@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as PaymentService from "../services/paymentService";
 import catchAsync from "../utils/catchAsync";
+import AppError from "../utils/appError";
 
 export const createPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -20,10 +21,10 @@ export const getAllPayments = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { filter, sort, page, limit } = req.query;
     const payments = await PaymentService.getAllPayments(
-      JSON.parse(filter as string),
-      JSON.parse(sort as string),
-      parseInt(page as string, 10),
-      parseInt(limit as string, 10)
+      JSON.parse((filter as string) || "{}"), // Parse filter as needed
+      JSON.parse((sort as string) || "{}"), // Parse sort as needed
+      parseInt(page as string, 10) || 1, // Parse page as integer, default to 1
+      parseInt(limit as string, 10) || 10 // Parse limit as integer, default to 10
     );
     res.status(200).json({ status: "success", data: { payments } });
   }
@@ -38,8 +39,8 @@ export const updatePayment = catchAsync(
 
 export const deletePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const response = await PaymentService.deletePayment(req.params.id);
-    res.status(204).json({ status: "success", data: response });
+    await PaymentService.deletePayment(req.params.id);
+    res.status(204).json({ status: "success", data: null });
   }
 );
 
