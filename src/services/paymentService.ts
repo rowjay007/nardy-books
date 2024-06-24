@@ -1,15 +1,18 @@
-import * as PaymentRepository from "../repositories/paymentRepository";
 import { IPayment } from "../models/paymentModel";
-import { initializePayment, verifyPayment } from "../utils/paystack";
+import * as PaymentRepository from "../repositories/paymentRepository";
 import {
   initializeFlutterwavePayment as initFlutterwavePayment,
   verifyFlutterwavePayment as verifyFlutterwavePaymentUtil,
 } from "../utils/flutterwave";
+import { initializePayment, verifyPayment } from "../utils/paystack";
+import { generateUniqueReference } from "../utils/referenceTag";
 
 export const createPayment = async (
   paymentData: Partial<IPayment>
 ): Promise<IPayment> => {
-  return PaymentRepository.create(paymentData);
+  paymentData.reference = generateUniqueReference();
+  const payment = await PaymentRepository.create(paymentData);
+  return payment;
 };
 
 export const getPaymentById = async (id: string): Promise<IPayment | null> => {
@@ -17,10 +20,10 @@ export const getPaymentById = async (id: string): Promise<IPayment | null> => {
 };
 
 export const getAllPayments = async (
-  filter: any, // Pass filters
-  sort: any, // Pass sorting criteria
-  page: number, // Pass pagination page
-  limit: number // Pass pagination limit
+  filter: any,
+  sort: any,
+  page: number,
+  limit: number
 ): Promise<IPayment[]> => {
   return PaymentRepository.findAll(filter, sort, page, limit);
 };
@@ -35,7 +38,6 @@ export const updatePayment = async (
 export const deletePayment = async (id: string): Promise<void> => {
   await PaymentRepository.remove(id);
 };
-
 
 export const processPaystackPayment = async (
   amount: number,

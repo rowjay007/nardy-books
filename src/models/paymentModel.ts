@@ -7,6 +7,7 @@ export interface IPayment extends Document {
   status: string;
   user: Types.ObjectId;
   date: Date | string;
+  reference: string; 
 }
 
 const PaymentSchema: Schema<IPayment> = new Schema({
@@ -15,6 +16,7 @@ const PaymentSchema: Schema<IPayment> = new Schema({
   status: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   date: { type: Date, default: Date.now },
+  reference: { type: String, required: true, unique: true }, 
 });
 
 PaymentSchema.pre<IPayment>("save", function (next) {
