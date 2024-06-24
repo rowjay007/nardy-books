@@ -11,6 +11,7 @@ export const createPayment = async (
   paymentData: Partial<IPayment>
 ): Promise<IPayment> => {
   paymentData.reference = generateUniqueReference();
+
   const payment = await PaymentRepository.create(paymentData);
   return payment;
 };

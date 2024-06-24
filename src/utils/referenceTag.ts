@@ -6,3 +6,5 @@ export const generateUniqueReference = (): string => {
   const uuid = uuidv4().replace(/-/g, "").substring(0, 8); 
   return `${PREFIX}${uuid}`;
 };
+
+

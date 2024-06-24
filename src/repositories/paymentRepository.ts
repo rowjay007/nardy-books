@@ -4,15 +4,9 @@ import { Query } from "mongoose";
 export const create = async (
   paymentData: Partial<IPayment>
 ): Promise<IPayment> => {
-  // Ensure amount is provided
-  if (paymentData.amount === undefined) {
-    throw new Error("Amount is required to create a payment");
-  }
-
   const payment = new Payment(paymentData);
   return payment.save();
 };
-
 
 export const findById = async (id: string): Promise<IPayment | null> => {
   return Payment.findById(id).populate("user").exec();
