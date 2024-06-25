@@ -1,19 +1,19 @@
-import { IPayment } from "../models/paymentModel";
 import * as PaymentRepository from "../repositories/paymentRepository";
+import { IPayment } from "../models/paymentModel";
+import { initializePayment, verifyPayment } from "../utils/paystack";
 import {
   initializeFlutterwavePayment as initFlutterwavePayment,
   verifyFlutterwavePayment as verifyFlutterwavePaymentUtil,
 } from "../utils/flutterwave";
-import { initializePayment, verifyPayment } from "../utils/paystack";
 import { generateUniqueReference } from "../utils/referenceTag";
 
 export const createPayment = async (
   paymentData: Partial<IPayment>
 ): Promise<IPayment> => {
-  paymentData.reference = generateUniqueReference();
+  const reference = generateUniqueReference("ADM_");
+  paymentData.reference = reference;
 
-  const payment = await PaymentRepository.create(paymentData);
-  return payment;
+  return PaymentRepository.create(paymentData);
 };
 
 export const getPaymentById = async (id: string): Promise<IPayment | null> => {
@@ -44,7 +44,9 @@ export const processPaystackPayment = async (
   amount: number,
   email: string
 ): Promise<any> => {
-  return initializePayment(amount, email);
+  const reference = generateUniqueReference("PSK_");
+  const response = await initializePayment(amount, email, reference);
+  return { response, reference };
 };
 
 export const verifyPaystackPayment = async (
@@ -57,7 +59,9 @@ export const processFlutterwavePayment = async (
   amount: number,
   email: string
 ): Promise<any> => {
-  return initFlutterwavePayment(amount, email);
+  const reference = generateUniqueReference("FLW_");
+  const response = await initFlutterwavePayment(amount, email, reference);
+  return { response, reference };
 };
 
 export const verifyFlutterwavePayment = async (

@@ -13,8 +13,8 @@ export const findById = async (id: string): Promise<IPayment | null> => {
 };
 
 export const findAll = async (
-  filter: any, 
-  sort: any, 
+  filter: any,
+  sort: any,
   page: number,
   limit: number
 ): Promise<IPayment[]> => {

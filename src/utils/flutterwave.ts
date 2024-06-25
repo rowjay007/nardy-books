@@ -5,12 +5,13 @@ const FLUTTERWAVE_TEST_SECRET_KEY = env.FLUTTERWAVE_TEST_SECRET_KEY;
 
 export const initializeFlutterwavePayment = async (
   amount: number,
-  email: string
+  email: string,
+  reference: string
 ) => {
   const response = await axios.post(
     "https://api.flutterwave.com/v3/payments",
     {
-      tx_ref: `${Date.now()}`,
+      tx_ref: reference,
       amount,
       currency: "NGN",
       redirect_url: "https://your-redirect-url.com",

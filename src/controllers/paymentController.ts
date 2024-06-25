@@ -46,14 +46,17 @@ export const deletePayment = catchAsync(
 export const processPaystackPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { amount, email } = req.body;
-    const response = await PaymentService.processPaystackPayment(amount, email);
-    res.status(200).json({ status: "success", data: { response } });
+    const { response, reference } = await PaymentService.processPaystackPayment(
+      amount,
+      email
+    );
+    res.status(200).json({ status: "success", data: { response, reference } });
   }
 );
 
 export const verifyPaystackPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { reference } = req.body;
+    const { reference } = req.params;
     const response = await PaymentService.verifyPaystackPayment(reference);
     res.status(200).json({ status: "success", data: { response } });
   }
@@ -62,17 +65,15 @@ export const verifyPaystackPayment = catchAsync(
 export const processFlutterwavePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { amount, email } = req.body;
-    const response = await PaymentService.processFlutterwavePayment(
-      amount,
-      email
-    );
-    res.status(200).json({ status: "success", data: { response } });
+    const { response, reference } =
+      await PaymentService.processFlutterwavePayment(amount, email);
+    res.status(200).json({ status: "success", data: { response, reference } });
   }
 );
 
 export const verifyFlutterwavePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { reference } = req.body;
+    const { reference } = req.params;
     const response = await PaymentService.verifyFlutterwavePayment(reference);
     res.status(200).json({ status: "success", data: { response } });
   }

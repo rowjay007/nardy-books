@@ -3,12 +3,17 @@ import env from "../config/env";
 
 const PAYSTACK_TEST_SECRET_KEY = env.PAYSTACK_TEST_SECRET_KEY;
 
-export const initializePayment = async (amount: number, email: string) => {
+export const initializePayment = async (
+  amount: number,
+  email: string,
+  reference: string
+) => {
   const response = await axios.post(
     "https://api.paystack.co/transaction/initialize",
     {
       amount: amount * 100,
       email,
+      reference,
     },
     {
       headers: {

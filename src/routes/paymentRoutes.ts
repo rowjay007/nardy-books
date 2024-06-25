@@ -82,7 +82,6 @@ router.use(authMiddleware);
  *       400:
  *         description: Invalid query parameters
  */
-
 router.get("/", PaymentController.getAllPayments);
 
 /**
@@ -276,23 +275,19 @@ router.post("/paystack", PaymentController.processPaystackPayment);
 
 /**
  * @swagger
- * /payments/paystack/verify:
+ * /payments/paystack/verify/{reference}:
  *   post:
  *     summary: Verify Paystack payment
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       description: Payment verification details
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               reference:
- *                 type: string
- *                 example: abc123
+ *     parameters:
+ *       - in: path
+ *         name: reference
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Payment reference
  *     responses:
  *       200:
  *         description: Payment verified successfully
@@ -317,7 +312,10 @@ router.post("/paystack", PaymentController.processPaystackPayment);
  *       500:
  *         description: Internal server error
  */
-router.post("/paystack/verify", PaymentController.verifyPaystackPayment);
+router.post(
+  "/paystack/verify/:reference",
+  PaymentController.verifyPaystackPayment
+);
 
 /**
  * @swagger
@@ -371,23 +369,19 @@ router.post("/flutterwave", PaymentController.processFlutterwavePayment);
 
 /**
  * @swagger
- * /payments/flutterwave/verify:
+ * /payments/flutterwave/verify/{reference}:
  *   post:
  *     summary: Verify Flutterwave payment
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       description: Payment verification details
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               reference:
- *                 type: string
- *                 example: abc123
+ *     parameters:
+ *       - in: path
+ *         name: reference
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Payment reference
  *     responses:
  *       200:
  *         description: Payment verified successfully
@@ -412,6 +406,9 @@ router.post("/flutterwave", PaymentController.processFlutterwavePayment);
  *       500:
  *         description: Internal server error
  */
-router.post("/flutterwave/verify", PaymentController.verifyFlutterwavePayment);
+router.post(
+  "/flutterwave/verify/:reference",
+  PaymentController.verifyFlutterwavePayment
+);
 
 export default router;
