@@ -11,7 +11,7 @@ const swaggerDefinition = {
       description: "Development server",
     },
   ],
-  components: {
+  components: { 
     securitySchemes: {
       bearerAuth: {
         type: "http",

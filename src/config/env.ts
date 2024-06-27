@@ -10,7 +10,11 @@ const env = {
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
   PAYSTACK_TEST_SECRET_KEY: process.env.PAYSTACK_TEST_SECRET_KEY || "",
   FLUTTERWAVE_TEST_SECRET_KEY: process.env.FLUTTERWAVE_TEST_SECRET_KEY || "",
+  EMAIL_PASSWORD: process.env.EMAIL_PASSWORD || "",
+  EMAIL_USERNAME: process.env.EMAIL_USERNAME || "",
+  EMAIL_HOST: process.env.EMAIL_HOST || "",
+  EMAIL_PORT: process.env.EMAIL_PORT || "",
+  EMAIL_ADDRESS: process.env.EMAIL_ADDRESS || "",
 };
 
 export default env;
-
