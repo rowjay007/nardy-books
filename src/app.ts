@@ -2,7 +2,10 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import mongoSanitize from "express-mongo-sanitize";
 import helmet from "helmet";
+import hpp from "hpp";
+import httpStatus from "http-status";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
 import limiter from "./config/rateLimiter";
@@ -27,6 +30,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(compression());
+app.use(mongoSanitize());
+app.use(hpp());
 
 app.use(
   helmet.contentSecurityPolicy({
@@ -49,7 +54,12 @@ app.use(limiter);
 app.use(router);
 
 app.all("*", (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+  next(
+    new AppError(
+      `Can't find ${req.originalUrl} on this server!`,
+      httpStatus.NOT_FOUND
+    )
+  );
 });
 
 app.use(errorMiddleware);
