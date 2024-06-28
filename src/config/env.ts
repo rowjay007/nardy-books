@@ -15,6 +15,10 @@ const env = {
   EMAIL_HOST: process.env.EMAIL_HOST || "",
   EMAIL_PORT: process.env.EMAIL_PORT || "",
   EMAIL_ADDRESS: process.env.EMAIL_ADDRESS || "",
+  EMAIL_VERIFICATION_URL: process.env.EMAIL_VERIFICATION_URL || "",
+  RESET_PASSWORD_URL: process.env.RESET_PASSWORD_URL || "",
+  REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || "",
+  REFRESH_TOKEN_EXPIRATION: process.env.REFRESH_TOKEN_EXPIRATION || "",
 };
 
 export default env;

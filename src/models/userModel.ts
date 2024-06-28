@@ -7,6 +7,8 @@ export interface IUser extends Document {
   isEmailVerified: boolean;
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
+  verificationToken?: string;
+  refreshToken?: string; 
 }
 
 const UserSchema: Schema<IUser> = new Schema({
@@ -16,6 +18,8 @@ const UserSchema: Schema<IUser> = new Schema({
   isEmailVerified: { type: Boolean, default: false },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  verificationToken: String,
+  refreshToken: String, 
 });
 
 const User = mongoose.model<IUser>("User", UserSchema);

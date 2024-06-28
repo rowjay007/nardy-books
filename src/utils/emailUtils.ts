@@ -15,7 +15,7 @@ export async function sendResetPasswordEmail(
   token: string
 ): Promise<void> {
   const mailOptions = {
-    from: env.EMAIL_ADDRESS,
+    from: "example@gmail.com",
     to: email,
     subject: "Reset Your Password",
     text: `Use this token to reset your password: ${token}`,
@@ -29,13 +29,18 @@ export async function sendVerificationEmail(
   verificationLink: string
 ): Promise<void> {
   const mailOptions = {
-    from: env.EMAIL_ADDRESS,
+    from: env.EMAIL_USERNAME,
     to: email,
     subject: "Verify Your Email Address",
-    html: `Click <a href="${verificationLink}">here</a> to verify your email address.`,
+    text: `Click ${verificationLink} to verify your email address.`,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Verification email sent to:", email);
+  } catch (error) {
+    console.error("Error sending verification email:", error);
+  }
 }
 
 // Other email utility functions as needed

@@ -58,6 +58,22 @@ const findByResetPasswordToken = async (
   });
 };
 
+const setRefreshToken = async (id: string, refreshToken: string) => {
+  const user = await User.findById(id);
+  if (!user) throw new AppError("User not found", 404);
+  user.refreshToken = refreshToken;
+  await user.save();
+  return user;
+};
+
+const removeRefreshToken = async (id: string) => {
+  const user = await User.findById(id);
+  if (!user) throw new AppError("User not found", 404);
+  user.refreshToken = undefined;
+  await user.save();
+  return user;
+};
+
 export default {
   createUser,
   findUserByEmail,
@@ -67,4 +83,6 @@ export default {
   deleteUser,
   setResetPasswordToken,
   findByResetPasswordToken,
+  setRefreshToken,
+  removeRefreshToken,
 };

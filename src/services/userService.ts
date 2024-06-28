@@ -1,21 +1,40 @@
-// services/userService.ts
-import userRepository from "../repositories/userRepository";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 import env from "../config/env";
+import User, { IUser } from "../models/userModel";
+import userRepository from "../repositories/userRepository";
 import AppError from "../utils/appError";
+import {
+  sendVerificationEmail,
+  sendResetPasswordEmail,
+} from "../utils/emailUtils";
 
-const register = async (username: string, email: string, password: string) => {
-  const existingUser = await userRepository.findUserByEmail(email);
-  if (existingUser) throw new AppError("Email already in use", 400);
+const generateAccessToken = (userId: string) => {
+  return jwt.sign({ id: userId }, env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
+};
 
-  const hashedPassword = await bcrypt.hash(password, 12);
-  const user = await userRepository.createUser({
+const generateRefreshToken = (userId: string) => {
+  return jwt.sign({ id: userId }, env.REFRESH_TOKEN_SECRET, {
+    expiresIn: env.REFRESH_TOKEN_EXPIRATION,
+  });
+};
+
+const register = async (
+  username: string,
+  email: string,
+  password: string
+): Promise<IUser> => {
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+  const user = new User({
     username,
     email,
-    password: hashedPassword,
+    password,
+    verificationToken,
   });
+  await user.save();
   return user;
 };
 
@@ -26,16 +45,16 @@ const login = async (email: string, password: string) => {
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
   if (!isPasswordCorrect) throw new AppError("Invalid email or password", 401);
 
-  const token = jwt.sign({ id: user._id as string }, env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
-  return { user, token };
+  const accessToken = generateAccessToken(user._id as string);
+  const refreshToken = generateRefreshToken(user._id as string);
+
+  await userRepository.setRefreshToken(user._id as string, refreshToken);
+
+  return { user, accessToken, refreshToken };
 };
 
-
-const logout = () => {
-    // Logout logic, usually handled by the client by removing the token
-    //TODO implement logout logic
+const logout = async (userId: string) => {
+  await userRepository.removeRefreshToken(userId);
 };
 
 const requestPasswordReset = async (email: string) => {
@@ -43,7 +62,7 @@ const requestPasswordReset = async (email: string) => {
   if (!user) throw new AppError("User not found", 404);
 
   const token = crypto.randomBytes(20).toString("hex");
-  const expires = new Date(Date.now() + 3600000); // 1 hour
+  const expires = new Date(Date.now() + 3600000);
 
   await userRepository.setResetPasswordToken(
     user._id as string,
@@ -51,9 +70,11 @@ const requestPasswordReset = async (email: string) => {
     expires
   );
 
+  const resetLink = `${process.env.RESET_PASSWORD_URL}/reset-password/${token}`;
+  await sendResetPasswordEmail(email, resetLink);
+
   return token;
 };
-
 
 const resetPassword = async (token: string, newPassword: string) => {
   const user = await userRepository.findByResetPasswordToken(token);
@@ -89,6 +110,7 @@ const changePassword = async (
 const verifyEmail = async (userId: string) => {
   const user = await userRepository.updateUser(userId, {
     isEmailVerified: true,
+    verificationToken: undefined,
   });
   return user;
 };
@@ -96,8 +118,13 @@ const verifyEmail = async (userId: string) => {
 const resendVerificationEmail = async (userId: string) => {
   const user = await userRepository.findUserById(userId);
   if (!user) throw new AppError("User not found", 404);
-    // Send verification email logic
-    //TODO: Send email here
+
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+  user.verificationToken = verificationToken;
+  await user.save();
+
+  const verificationLink = `${process.env.EMAIL_VERIFICATION_URL}/verify-email/${verificationToken}`;
+  await sendVerificationEmail(user.email, verificationLink);
 };
 
 const getUserById = async (userId: string) => {

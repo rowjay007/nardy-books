@@ -1,9 +1,9 @@
 import { Router } from "express";
 import * as PaymentController from "../controllers/paymentController";
-import authMiddleware from "../middlewares/authMiddleware";
+import { protect } from "../middlewares/authMiddleware";
 
 const router = Router();
-router.use(authMiddleware);
+router.use(protect);
 
 /**
  * @swagger

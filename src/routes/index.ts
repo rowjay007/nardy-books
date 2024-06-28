@@ -12,7 +12,7 @@ import notificationRoutes from "./notificationRoutes";
 const router = express.Router();
 const apiV1Router = express.Router();
 
-apiV1Router.use("/users", userRoutes);
+apiV1Router.use("/auth", userRoutes);
 apiV1Router.use("/authors", authorRoutes);
 apiV1Router.use("/books", bookRoutes);
 apiV1Router.use("/genres", genreRoutes);

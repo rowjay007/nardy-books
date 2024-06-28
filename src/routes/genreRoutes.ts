@@ -1,10 +1,9 @@
-import express from "express";
+import { Router } from "express";
 import * as GenreController from "../controllers/genreController";
-import authMiddleware from "../middlewares/authMiddleware";
+import { protect } from "../middlewares/authMiddleware";
 
-const router = express.Router();
-
-router.use(authMiddleware);
+const router = Router();
+router.use(protect);
 
 /**
  * @swagger

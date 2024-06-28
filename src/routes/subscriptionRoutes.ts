@@ -1,10 +1,9 @@
 import { Router } from "express";
 import * as subscriptionController from "../controllers/subscriptionController";
-import authMiddleware from "../middlewares/authMiddleware";
+import { protect } from "../middlewares/authMiddleware";
 
 const router = Router();
-
-router.use(authMiddleware);
+router.use(protect);
 
 /**
  * @swagger

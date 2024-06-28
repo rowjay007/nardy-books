@@ -1,42 +1,43 @@
-// src/middlewares/authMiddleware.ts
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import env from "../config/env";
-import User from "../models/userModel";
 import AppError from "../utils/appError";
 
-interface JwtPayload {
-  id: string;
+interface AuthenticatedRequest extends Request {
+  user?: string | jwt.JwtPayload; 
 }
 
-const authMiddleware = async (
-  req: Request,
+export const protect = (
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
-  let token: string | undefined;
-
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-      const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
-      const user = await User.findById(decoded.id).select("-password");
-      if (!user) {
-        return next(new AppError("User no longer exists", 401));
-      }
-      (req as any).user = user; 
-      return next();
-    } catch (error) {
-      return next(new AppError("Not authorized, token failed", 401));
-    }
-  }
+  const token = extractTokenFromHeader(req);
 
   if (!token) {
-    return next(new AppError("Not authorized, no token", 401));
+    return next(new AppError("Unauthorized access", 401));
+  }
+
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload;
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return next(new AppError("Invalid token", 401));
   }
 };
 
-export default authMiddleware;
+/**
+ * Extracts JWT token from Authorization header
+ * @param req Express request object
+ * @returns JWT token string or undefined
+ */
+const extractTokenFromHeader = (req: AuthenticatedRequest): string | undefined => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.split(" ")[1];
+  }
+
+  return undefined;
+};

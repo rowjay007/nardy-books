@@ -1,51 +1,86 @@
 import { Router } from "express";
-import userController from "../controllers/userController";
-import authMiddleware from "../middlewares/authMiddleware";
+import * as authController from "../controllers/authController";
+import * as userController from "../controllers/userController";
+import { protect } from "../middlewares/authMiddleware";
+
+const router = Router();
 
 /**
  * @swagger
  * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  *   schemas:
  *     User:
  *       type: object
- *       required:
- *         - username
- *         - email
- *         - password
  *       properties:
+ *         id:
+ *           type: string
+ *           description: Unique identifier for the user
  *         username:
  *           type: string
+ *           description: User's username
  *         email:
  *           type: string
- *         password:
+ *           format: email
+ *           description: User's email address
+ *         createdAt:
  *           type: string
- *       example:
- *         username: test
- *         email: user@example.com
- *         password: password123
+ *           format: date-time
+ *           description: Date and time when the user was created
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Date and time when the user was last updated
+ *     Token:
+ *       type: object
+ *       properties:
+ *         token:
+ *           type: string
+ *           description: JWT token for authentication
+ *     Error:
+ *       type: object
+ *       properties:
+ *         status:
+ *           type: string
+ *           description: Error status code
+ *         message:
+ *           type: string
+ *           description: Error message
+ *     ValidationError:
+ *       type: object
+ *       properties:
+ *         status:
+ *           type: string
+ *           description: Validation error status code
+ *         message:
+ *           type: string
+ *           description: Validation error message
+ *         errors:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               field:
+ *                 type: string
+ *                 description: Name of the field with the validation error
+ *               message:
+ *                 type: string
+ *                 description: Validation error message for the field
  */
 
 /**
  * @swagger
  * tags:
- *   name: User
- *   description: User management and authentication
+ *   name: Authentication
+ *   description: API endpoints for authentication
  */
-const router = Router();
 
 /**
  * @swagger
- * /api/v1/users/register:
+ * /api/v1/auth/register:
  *   post:
  *     summary: Register a new user
- *     tags: [User]
+ *     tags: [Authentication]
  *     requestBody:
- *       description: User registration details
  *       required: true
  *       content:
  *         application/json:
@@ -58,22 +93,30 @@ const router = Router();
  *                 type: string
  *               password:
  *                 type: string
+ *                 format: password
  *     responses:
- *       201:
- *         description: User created successfully
- *       400:
- *         description: Bad request, validation error
+ *       '200':
+ *         description: Successfully registered user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
  */
-router.post("/register", userController.register);
+router.post("/register", authController.register);
 
 /**
  * @swagger
- * /api/v1/users/login:
+ * /api/v1/auth/login:
  *   post:
- *     summary: Login a user
- *     tags: [User]
+ *     summary: Login to the application
+ *     tags: [Authentication]
  *     requestBody:
- *       description: User login details
  *       required: true
  *       content:
  *         application/json:
@@ -84,36 +127,85 @@ router.post("/register", userController.register);
  *                 type: string
  *               password:
  *                 type: string
+ *                 format: password
  *     responses:
- *       200:
- *         description: User logged in successfully
- *       400:
- *         description: Bad request, validation error
+ *       '200':
+ *         description: Successfully logged in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *                     token:
+ *                       type: string
+ *                       description: JWT token for authentication
  */
-router.post("/login", userController.login);
+
+router.post("/login", authController.login);
 
 /**
  * @swagger
- * /api/v1/users/logout:
+ * /api/v1/auth/logout:
  *   post:
- *     summary: Log out a user
- *     tags: [User]
+ *     summary: Logout from the application
+ *     tags: [Authentication]
  *     security:
  *       - bearerAuth: []
  *     responses:
- *       200:
- *         description: User logged out successfully
+ *       '200':
+ *         description: Successfully logged out
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
  */
-router.post("/logout", authMiddleware, userController.logout);
 
 /**
  * @swagger
- * /api/v1/users/request-password-reset:
+ * /api/v1/auth/refresh-token:
  *   post:
- *     summary: Request password reset for a user
- *     tags: [User]
+ *     summary: Refresh access tokens
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully refreshed tokens
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       description: New JWT token
+ */
+router.post("/logout", protect, authController.logout);
+/**
+ * @swagger
+ * /api/v1/auth/request-reset-password:
+ *   post:
+ *     summary: Request a password reset
+ *     tags: [Authentication]
  *     requestBody:
- *       description: User email for password reset request
  *       required: true
  *       content:
  *         application/json:
@@ -123,58 +215,236 @@ router.post("/logout", authMiddleware, userController.logout);
  *               email:
  *                 type: string
  *     responses:
- *       200:
- *         description: Password reset request sent successfully
- *       400:
- *         description: Bad request, validation error
+ *       '200':
+ *         description: Password reset request successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
  */
-router.post("/request-password-reset", userController.requestPasswordReset);
 
+router.post("/refresh-token", authController.refreshTokens);
 /**
  * @swagger
- * /api/v1/users/reset-password:
+ * /api/v1/auth/request-reset-password:
  *   post:
- *     summary: Reset password for a user
- *     tags: [User]
+ *     summary: Request a password reset
+ *     tags: [Authentication]
  *     requestBody:
- *       description: User password reset details
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               token:
- *                 type: string
- *               newPassword:
+ *               email:
  *                 type: string
  *     responses:
- *       200:
- *         description: Password reset successfully
- *       400:
- *         description: Bad request, validation error
- *       404:
- *         description: Token not found or expired
+ *       '200':
+ *         description: Password reset request successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
  */
-router.post("/reset-password", userController.resetPassword);
+
+router.post("/request-reset-password", authController.requestPasswordReset);
 
 /**
  * @swagger
- * /api/v1/users/change-password/{userId}:
+ * /api/v1/auth/reset-password/{token}:
  *   post:
- *     summary: Change password for a user
- *     tags: [User]
+ *     summary: Reset password using token
+ *     tags: [Authentication]
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Reset token received via email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newPassword:
+ *                 type: string
+ *                 format: password
+ *     responses:
+ *       '200':
+ *         description: Password reset successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ */
+router.post("/reset-password/:token", authController.resetPassword);
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: API endpoints for managing users
+ */
+
+
+/**
+ * @swagger
+ * /api/v1/users:
+ *   get:
+ *     summary: Get all users
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: A list of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ */
+router.get("/", protect, userController.getAllUsers);
+
+/**
+ * @swagger
+ * /api/v1/users/{id}:
+ *   get:
+ *     summary: Get a user by ID
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: userId
+ *         name: id
+ *         required: true
  *         schema:
  *           type: string
+ *         description: User ID
+ *     responses:
+ *       '200':
+ *         description: User found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ */
+
+router.get("/:id", protect, userController.getUserById);
+
+/**
+ * @swagger
+ * /api/v1/users/{id}:
+ *   put:
+ *     summary: Update a user by ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
  *         required: true
+ *         schema:
+ *           type: string
  *         description: User ID
  *     requestBody:
- *       description: User change password details
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *                 format: password
+ *     responses:
+ *       '200':
+ *         description: User updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ */
+
+router.put("/:id", protect, userController.updateUser);
+
+/**
+ * @swagger
+ * /api/v1/users/{id}:
+ *   delete:
+ *     summary: Delete a user by ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       '200':
+ *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ */
+router.delete("/:id", protect, userController.deleteUser);
+
+/**
+ * @swagger
+ * /api/v1/users/change-password:
+ *   put:
+ *     summary: Change user password
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
  *       required: true
  *       content:
  *         application/json:
@@ -183,185 +453,75 @@ router.post("/reset-password", userController.resetPassword);
  *             properties:
  *               currentPassword:
  *                 type: string
+ *                 format: password
  *               newPassword:
  *                 type: string
+ *                 format: password
  *     responses:
- *       200:
+ *       '200':
  *         description: Password changed successfully
- *       400:
- *         description: Bad request, validation error
- *       404:
- *         description: User not found or current password incorrect
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
  */
-router.post(
-  "/change-password/:userId",
-  authMiddleware,
-  userController.changePassword
-);
-
+router.put("/change-password", protect, authController.changePassword);
 /**
  * @swagger
- * /api/v1/users/verify-email/{userId}:
+ * /api/v1/users/verify-email/{token}:
  *   get:
- *     summary: Verify email for a user
- *     tags: [User]
+ *     summary: Verify user email using token
+ *     tags: [Users]
  *     parameters:
  *       - in: path
- *         name: userId
+ *         name: token
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: User ID
+ *         description: Verification token received via email
  *     responses:
- *       200:
+ *       '200':
  *         description: Email verified successfully
- *       404:
- *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
  */
-router.get("/verify-email/:userId", userController.verifyEmail);
+
+router.get("/verify-email/:token", authController.verifyEmail);
 
 /**
  * @swagger
- * /api/v1/users/resend-verification-email/{userId}:
+ * /api/v1/users/resend-verification-email:
  *   post:
- *     summary: Resend verification email to a user
- *     tags: [User]
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *         description: User ID
+ *     summary: Resend verification email
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
- *       200:
- *         description: Verification email sent successfully
- *       404:
- *         description: User not found
+ *       '200':
+ *         description: Verification email resent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
  */
 router.post(
-  "/resend-verification-email/:userId",
-  userController.resendVerificationEmail
+  "/resend-verification-email",
+  protect,
+  authController.resendVerificationEmail
 );
-
-/**
- * @swagger
- * /api/v1/users/{userId}:
- *   get:
- *     summary: Get user details by ID
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *         description: User ID
- *     responses:
- *       200:
- *         description: User details retrieved successfully
- *       404:
- *         description: User not found
- */
-router.get("/:userId", authMiddleware, userController.getUserById);
-
-/**
- * @swagger
- * /api/v1/users:
- *   get:
- *     summary: Get all users with filters, sorting, and pagination
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: filter
- *         schema:
- *           type: string
- *         description: Filter criteria
- *       - in: query
- *         name: sort
- *         schema:
- *           type: string
- *         description: Sorting options
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *         description: Limit for pagination
- *       - in: query
- *         name: skip
- *         schema:
- *           type: integer
- *         description: Skip for pagination
- *     responses:
- *       200:
- *         description: List of users retrieved successfully
- */
-router.get("/", authMiddleware, userController.getAllUsers);
-
-/**
- * @swagger
- * /api/v1/users/{userId}:
- *   put:
- *     summary: Update user details
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *         description: User ID
- *     requestBody:
- *       description: Updated user details
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: User details updated successfully
- *       404:
- *         description: User not found
- *       400:
- *         description: Bad request, validation error
- */
-router.put("/:userId", authMiddleware, userController.updateUser);
-
-/**
- * @swagger
- * /api/v1/users/{userId}:
- *   delete:
- *     summary: Delete a user
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *         description: User ID
- *     responses:
- *       200:
- *         description: User deleted successfully
- *       404:
- *         description: User not found
- */
-router.delete("/:userId", authMiddleware, userController.deleteUser);
 
 export default router;
