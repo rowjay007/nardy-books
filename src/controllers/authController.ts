@@ -4,9 +4,10 @@ import bcrypt from "bcrypt";
 import env from "../config/env";
 import userService from "../services/userService";
 import AppError from "../utils/appError";
+import httpStatus from "http-status";
 
 interface AuthenticatedRequest extends Request {
-  user?: string | jwt.JwtPayload; 
+  user?: string | jwt.JwtPayload;
 }
 
 const generateAccessToken = (userId: string) => {
@@ -48,14 +49,14 @@ export const login = async (
   const { email, password } = req.body;
 
   try {
-    const { user, accessToken, refreshToken } = await userService.login(
+    const { user, accessToken } = await userService.login(
       email,
       password
     );
 
     res.status(200).json({
       status: "success",
-      data: { user, accessToken, refreshToken },
+      data: { user, accessToken },
     });
   } catch (error) {
     next(error);
@@ -190,8 +191,9 @@ export const verifyEmail = async (
   try {
     const user = await userService.verifyEmail(token);
 
-    res.status(200).json({
+    res.status(httpStatus.OK).json({
       status: "success",
+      message: "Email verified successfully.",
       data: { user },
     });
   } catch (error) {
@@ -233,3 +235,5 @@ const getUserIdFromRequest = (
   const user = req.user as jwt.JwtPayload | undefined;
   return user?.id as string | undefined;
 };
+
+export { generateAccessToken, generateRefreshToken };

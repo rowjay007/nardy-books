@@ -35,8 +35,13 @@ const register = async (
     verificationToken,
   });
   await user.save();
+
+  const verificationLink = `${env.EMAIL_VERIFICATION_URL}/${verificationToken}`;
+  await sendVerificationEmail(email, verificationLink);
+
   return user;
 };
+
 
 const login = async (email: string, password: string) => {
   const user = await userRepository.findUserByEmail(email);
@@ -107,11 +112,17 @@ const changePassword = async (
   return user;
 };
 
-const verifyEmail = async (userId: string) => {
-  const user = await userRepository.updateUser(userId, {
-    isEmailVerified: true,
-    verificationToken: undefined,
-  });
+const verifyEmail = async (verificationToken: string): Promise<IUser> => {
+  const user = await User.findOneAndUpdate(
+    { verificationToken },
+    { $set: { isEmailVerified: true, verificationToken: undefined } },
+    { new: true }
+  );
+
+  if (!user) {
+    throw new AppError("Invalid verification token.", 400);
+  }
+
   return user;
 };
 
