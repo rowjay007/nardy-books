@@ -3,6 +3,15 @@ import * as ReviewService from "../services/reviewService";
 import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/appError";
 
+/**
+ * Controller function to create a review
+ * @param req Express request object with body containing review data
+ * @param res Express response object
+ * @param next Express next function
+ * @returns Returns a JSON object with the review data
+ * @returns {status: "success", data: {review}}
+ */
+
 export const createReview = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const review = await ReviewService.createReview(req.body);
@@ -14,6 +23,14 @@ export const createReview = catchAsync(
     });
   }
 );
+
+  /**
+   * Controller function by ID to get a review
+   * @param req Express request object
+   * @param res Express response object
+   * @param next Express next function
+   * @returns Returns a JSON object with the review data
+   */
 
 export const getReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -29,6 +46,14 @@ export const getReviewById = catchAsync(
     });
   }
 );
+
+/**
+ * Controller function to get all reviews
+ * @param req Express request object
+ * @param res Express response object
+ * @param next Express next function
+ * @returns Returns a JSON object with the review data
+ */
 
 export const getAllReviews = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -64,6 +89,13 @@ export const getAllReviews = catchAsync(
   }
 );
 
+/**
+ * Controller function to update a review by ID
+ * @param req Express request object with body containing review data
+ * @param res Express response object
+ * @param next Express next function
+ * @returns Returns a JSON object with the review data
+ */
 
 export const updateReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -82,6 +114,14 @@ export const updateReviewById = catchAsync(
     });
   }
 );
+
+/**
+ * Controller function to delete a review by ID
+ * @param req Express request object
+ * @param res Express response object
+ * @param next Express next function
+ * @returns Returns a JSON object with the review data
+ */
 
 export const deleteReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
