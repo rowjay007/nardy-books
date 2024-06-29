@@ -3,6 +3,13 @@ import * as subscriptionService from "../services/subscriptionService";
 import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/appError";
 
+
+/**
+ * Controller function create a subscription
+ * @param req Express request object with body containing subscription data
+ * @param res Express response object
+ * @param next Express next function
+ */
 export const createSubscription = catchAsync(
   async (req: Request, res: Response) => {
     const subscription = await subscriptionService.createSubscription(req.body);
@@ -10,6 +17,12 @@ export const createSubscription = catchAsync(
   }
 );
 
+/**
+ * Controller function get all subscriptions
+ * @param req Express request object
+ * @param res Express response object
+ * @param next Express next function
+ */
 export const getSubscriptions = catchAsync(
   async (req: Request, res: Response) => {
     const { filter, sort, page, limit } = req.query;
@@ -23,6 +36,13 @@ export const getSubscriptions = catchAsync(
   }
 );
 
+/**
+ * Controller function get a subscription by ID
+ * @param req Express request object
+ * @param res Express response object
+ * @param next Express next function
+ */
+
 export const getSubscriptionById = catchAsync(
   async (req: Request, res: Response) => {
     const subscription = await subscriptionService.getSubscriptionById(
@@ -34,6 +54,13 @@ export const getSubscriptionById = catchAsync(
     res.status(200).json(subscription);
   }
 );
+
+/**
+ * Controller function update a subscription
+ * @param req Express request object
+ * @param res Express response object
+ * @param next Express next function
+ */
 
 export const updateSubscription = catchAsync(
   async (req: Request, res: Response) => {
@@ -48,6 +75,12 @@ export const updateSubscription = catchAsync(
   }
 );
 
+/**
+ * Controller function delete a subscription
+ * @param req Express request object
+ * @param res Express response object
+ * @param next Express next function
+ */
 export const deleteSubscription = catchAsync(
   async (req: Request, res: Response) => {
     await subscriptionService.deleteSubscription(req.params.id);
