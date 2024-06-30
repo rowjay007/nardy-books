@@ -1,17 +1,25 @@
+// src/routes/index.ts
 import express from "express";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "../config/swaggerConfig";
 import authorRoutes from "./authorRoutes";
 import bookRoutes from "./bookRoutes";
 import genreRoutes from "./genreRoutes";
+import healthRoutes from "./healthRoutes";
+import notificationRoutes from "./notificationRoutes";
 import paymentRoutes from "./paymentRoutes";
 import publisherRoutes from "./publisherRoutes";
 import reviewRoutes from "./reviewRoutes";
 import subscriptionRoutes from "./subscriptionRoutes";
 import userRoutes from "./userRoutes";
-import notificationRoutes from "./notificationRoutes";
+import baseUrlRoutes from "./baseUrlRoutes";
 
 const router = express.Router();
 const apiV1Router = express.Router();
 
+apiV1Router.use("/", baseUrlRoutes);
+apiV1Router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+apiV1Router.use("/health", healthRoutes);
 apiV1Router.use("/auth", userRoutes);
 apiV1Router.use("/authors", authorRoutes);
 apiV1Router.use("/books", bookRoutes);

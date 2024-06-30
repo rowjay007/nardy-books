@@ -12,6 +12,14 @@ const server = app.listen(PORT, () => {
   logger.info(`Server running in ${env.NODE_ENV} mode on port ${PORT}`);
 });
 
+process.on("SIGINT", () => {
+  logger.info("SIGINT received: Shutting down gracefully");
+  server.close(() => {
+    logger.info("Server closed");
+    process.exit(0);
+  });
+});
+
 process.on("unhandledRejection", (err: any) => {
   logger.error(`Unhandled Rejection: ${err.message}`);
   server.close(() => process.exit(1));

@@ -7,9 +7,7 @@ import helmet from "helmet";
 import hpp from "hpp";
 import httpStatus from "http-status";
 import morgan from "morgan";
-import swaggerUi from "swagger-ui-express";
 import limiter from "./config/rateLimiter";
-import swaggerSpec from "./config/swaggerConfig";
 import errorMiddleware from "./middlewares/errorMiddleware";
 import router from "./routes";
 import AppError from "./utils/appError";
@@ -48,7 +46,6 @@ app.use(
   })
 );
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(limiter);
 
 app.use(router);
