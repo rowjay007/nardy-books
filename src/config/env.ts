@@ -19,6 +19,7 @@ const env = {
   RESET_PASSWORD_URL: process.env.RESET_PASSWORD_URL || "",
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || "",
   REFRESH_TOKEN_EXPIRATION: process.env.REFRESH_TOKEN_EXPIRATION || "",
+  SEND_WELCOME_EMAIL: process.env.SEND_WELCOME_EMAIL || "",
 };
 
 export default env;

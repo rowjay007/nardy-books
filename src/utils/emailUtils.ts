@@ -20,8 +20,12 @@ export async function sendResetPasswordEmail(
     subject: "Reset Your Password",
     text: `Use this token to reset your password: ${token}`,
   };
-
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Password reset email sent to:", email);
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+  }
 }
 
 export async function sendVerificationEmail(
@@ -43,6 +47,18 @@ export async function sendVerificationEmail(
   }
 }
 
-// Other email utility functions as needed
+export async function sendWelcomeEmail(email: string): Promise<void> {
+  const mailOptions = {
+    from: env.EMAIL_USERNAME,
+    to: email,
+    subject: "Welcome to Nardy Books Management Application",
+    text: `Welcome to our platform. Thank you for registering.`,
+  };
 
-export default transporter;
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Welcome email sent to:", email);
+  } catch (error) {
+    console.error("Error sending welcome email:", error);
+  }
+}

@@ -6,8 +6,9 @@ import User, { IUser } from "../models/userModel";
 import userRepository from "../repositories/userRepository";
 import AppError from "../utils/appError";
 import {
-  sendVerificationEmail,
   sendResetPasswordEmail,
+  sendVerificationEmail,
+  sendWelcomeEmail,
 } from "../utils/emailUtils";
 
 const generateAccessToken = (userId: string) => {
@@ -37,11 +38,13 @@ const register = async (
   await user.save();
 
   const verificationLink = `${env.EMAIL_VERIFICATION_URL}/${verificationToken}`;
-  await sendVerificationEmail(email, verificationLink);
+  await Promise.all([
+    sendWelcomeEmail(email),
+    sendVerificationEmail(email, verificationLink),
+  ]);
 
   return user;
 };
-
 
 const login = async (email: string, password: string) => {
   const user = await userRepository.findUserByEmail(email);
