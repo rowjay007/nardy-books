@@ -23,15 +23,54 @@ router.use(protect);
  *           description: User ID
  *         status:
  *           type: string
- *           description: Notification status (e.g., unread, read)
+ *           enum: [unread, read]
+ *           description: Notification status
  *         date:
  *           type: string
  *           format: date-time
+ *         email:
+ *           type: object
+ *           properties:
+ *             to:
+ *               type: string
+ *               format: email
+ *             subject:
+ *               type: string
+ *             body:
+ *               type: string
+ *         sms:
+ *           type: object
+ *           properties:
+ *             to:
+ *               type: string
+ *               format: phone
+ *             message:
+ *               type: string
+ *         push:
+ *           type: object
+ *           properties:
+ *             deviceId:
+ *               type: string
+ *             title:
+ *               type: string
+ *             body:
+ *               type: string
  *       example:
  *         message: "Your payment of $50 was successful."
  *         user: "60c72b2f9b1d4c3f7e1e4567"
  *         status: "unread"
  *         date: "2024-07-01T14:00:00Z"
+ *         email:
+ *           to: "user@example.com"
+ *           subject: "Payment Confirmation"
+ *           body: "Your payment of $50 was successfully processed."
+ *         sms:
+ *           to: "+1234567890"
+ *           message: "Payment of $50 successful."
+ *         push:
+ *           deviceId: "abcxyz123"
+ *           title: "Payment Successful"
+ *           body: "Your payment of $50 was successful."
  *   securitySchemes:
  *     bearerAuth:
  *       type: http

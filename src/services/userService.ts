@@ -46,6 +46,8 @@ const register = async (
   return user;
 };
 
+
+
 const login = async (email: string, password: string) => {
   const user = await userRepository.findUserByEmail(email);
   if (!user) throw new AppError("Invalid email or password", 401);
