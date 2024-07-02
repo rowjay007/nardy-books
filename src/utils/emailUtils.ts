@@ -10,55 +10,71 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function sendResetPasswordEmail(
-  email: string,
-  token: string
-): Promise<void> {
-  const mailOptions = {
-    from: "example@gmail.com",
-    to: email,
+
+const templates = {
+  welcome: (to: string, username: string, verificationLink: string) => ({
+    from: env.EMAIL_USERNAME,
+    to,
+    subject: "Welcome to Our Application!",
+    html: `
+      <p>Dear ${username},</p>
+      <p>Welcome to our application! Please click the following link to verify your email:</p>
+      <a href="${verificationLink}">${verificationLink}</a>
+      <p>Best regards,<br/>Your Application Team</p>
+    `,
+  }),
+
+  verification: (to: string, verificationLink: string) => ({
+    from: env.EMAIL_USERNAME,
+    to,
+    subject: "Email Verification",
+    html: `
+      <p>Dear User,</p>
+      <p>Please click the following link to verify your email:</p>
+      <a href="${verificationLink}">${verificationLink}</a>
+      <p>Best regards,<br/>Your Application Team</p>
+    `,
+  }),
+
+  resetPassword: (to: string, resetLink: string) => ({
+    from: env.EMAIL_USERNAME,
+    to,
     subject: "Reset Your Password",
-    text: `Use this token to reset your password: ${token}`,
-  };
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log("Password reset email sent to:", email);
-  } catch (error) {
-    console.error("Error sending password reset email:", error);
-  }
-}
+    html: `
+      <p>Dear User,</p>
+      <p>We received a request to reset your password. Please click the following link to reset it:</p>
+      <a href="${resetLink}">${resetLink}</a>
+      <p>If you did not request this, you can safely ignore this email.</p>
+      <p>Best regards,<br/>Your Application Team</p>
+    `,
+  }),
+};
 
-export async function sendVerificationEmail(
-  email: string,
+export const sendWelcomeEmail = async (
+  to: string,
+  username: string,
   verificationLink: string
-): Promise<void> {
-  const mailOptions = {
-    from: env.EMAIL_USERNAME,
-    to: email,
-    subject: "Verify Your Email Address",
-    text: `Click ${verificationLink} to verify your email address.`,
-  };
+): Promise<void> => {
+  const { from, subject, html } = templates.welcome(
+    to,
+    username,
+    verificationLink
+  );
+  await transporter.sendMail({ from, to, subject, html });
+};
 
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log("Verification email sent to:", email);
-  } catch (error) {
-    console.error("Error sending verification email:", error);
-  }
-}
+export const sendVerificationEmail = async (
+  to: string,
+  verificationLink: string
+): Promise<void> => {
+  const { from, subject, html } = templates.verification(to, verificationLink);
+  await transporter.sendMail({ from, to, subject, html });
+};
 
-export async function sendWelcomeEmail(email: string): Promise<void> {
-  const mailOptions = {
-    from: env.EMAIL_USERNAME,
-    to: email,
-    subject: "Welcome to Nardy Books Management Application",
-    text: `Welcome to our platform. Thank you for registering.`,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log("Welcome email sent to:", email);
-  } catch (error) {
-    console.error("Error sending welcome email:", error);
-  }
-}
+export const sendResetPasswordEmail = async (
+  to: string,
+  resetLink: string
+): Promise<void> => {
+  const { from, subject, html } = templates.resetPassword(to, resetLink);
+  await transporter.sendMail({ from, to, subject, html });
+};

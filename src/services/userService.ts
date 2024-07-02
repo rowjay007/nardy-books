@@ -39,7 +39,7 @@ const register = async (
 
   const verificationLink = `${env.EMAIL_VERIFICATION_URL}/${verificationToken}`;
   await Promise.all([
-    sendWelcomeEmail(email),
+    sendWelcomeEmail(email, username, verificationLink),
     sendVerificationEmail(email, verificationLink),
   ]);
 
@@ -80,11 +80,12 @@ const requestPasswordReset = async (email: string) => {
     expires
   );
 
-  const resetLink = `${process.env.RESET_PASSWORD_URL}/reset-password/${token}`;
+  const resetLink = `${env.RESET_PASSWORD_URL}/reset-password/${token}`;
   await sendResetPasswordEmail(email, resetLink);
 
   return token;
 };
+
 
 const resetPassword = async (token: string, newPassword: string) => {
   const user = await userRepository.findByResetPasswordToken(token);

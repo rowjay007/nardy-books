@@ -3,16 +3,15 @@ import express from "express";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "../config/swaggerConfig";
 import authorRoutes from "./authorRoutes";
+import baseUrlRoutes from "./baseUrlRoutes";
 import bookRoutes from "./bookRoutes";
 import genreRoutes from "./genreRoutes";
 import healthRoutes from "./healthRoutes";
-import notificationRoutes from "./notificationRoutes";
 import paymentRoutes from "./paymentRoutes";
 import publisherRoutes from "./publisherRoutes";
 import reviewRoutes from "./reviewRoutes";
 import subscriptionRoutes from "./subscriptionRoutes";
 import userRoutes from "./userRoutes";
-import baseUrlRoutes from "./baseUrlRoutes";
 
 const router = express.Router();
 const apiV1Router = express.Router();
@@ -28,7 +27,6 @@ apiV1Router.use("/publishers", publisherRoutes);
 apiV1Router.use("/reviews", reviewRoutes);
 apiV1Router.use("/subscriptions", subscriptionRoutes);
 apiV1Router.use("/payments", paymentRoutes);
-apiV1Router.use("/notifications", notificationRoutes);
 
 router.use("/api/v1", apiV1Router);
 
