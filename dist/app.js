@@ -1,21 +1,21 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="660efdb0-69d7-5035-afb2-82ff40de79b1")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d42f6f29-8a7b-5355-96b0-a7b1b644369a")}catch(e){}}();
 
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
 const compression_1 = __importDefault(require("compression"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
+const express_1 = __importDefault(require("express"));
 const express_mongo_sanitize_1 = __importDefault(require("express-mongo-sanitize"));
 const helmet_1 = __importDefault(require("helmet"));
 const hpp_1 = __importDefault(require("hpp"));
 const http_status_1 = __importDefault(require("http-status"));
 const morgan_1 = __importDefault(require("morgan"));
-const sentry_1 = __importDefault(require("./config/sentry"));
 const rateLimiter_1 = __importDefault(require("./config/rateLimiter"));
+const sentry_1 = __importDefault(require("./config/sentry"));
 const errorMiddleware_1 = __importDefault(require("./middlewares/errorMiddleware"));
 const routes_1 = __importDefault(require("./routes"));
 const appError_1 = __importDefault(require("./utils/appError"));
@@ -50,13 +50,10 @@ app.use(helmet_1.default.contentSecurityPolicy({
 }));
 app.use(rateLimiter_1.default);
 app.use(routes_1.default);
-app.get("/debug-sentry", function mainHandler(req, res) {
-    throw new Error("Nardy Book Sentry error!");
-});
 app.all("*", (req, res, next) => {
     next(new appError_1.default(`Can't find ${req.originalUrl} on this server!`, http_status_1.default.NOT_FOUND));
 });
 app.use(errorMiddleware_1.default);
 exports.default = app;
 //# sourceMappingURL=app.js.map
-//# debugId=660efdb0-69d7-5035-afb2-82ff40de79b1
+//# debugId=d42f6f29-8a7b-5355-96b0-a7b1b644369a
