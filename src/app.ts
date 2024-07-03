@@ -1,14 +1,14 @@
+import express from "express";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express from "express";
 import mongoSanitize from "express-mongo-sanitize";
 import helmet from "helmet";
 import hpp from "hpp";
 import httpStatus from "http-status";
 import morgan from "morgan";
-import limiter from "./config/rateLimiter";
 import Sentry from "./config/sentry";
+import limiter from "./config/rateLimiter";
 import errorMiddleware from "./middlewares/errorMiddleware";
 import router from "./routes";
 import AppError from "./utils/appError";
@@ -53,7 +53,9 @@ app.use(limiter);
 
 app.use(router);
 
-Sentry.setupExpressErrorHandler(app);
+app.get("/debug-sentry", function mainHandler(req, res) {
+  throw new Error("Nardy Book Sentry error!");
+});
 
 app.all("*", (req, res, next) => {
   next(

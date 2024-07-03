@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="678e4f58-d06b-55c9-af11-3ca08151936d")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="2426fda4-e3c4-54a7-84ef-149b2ffedafd")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -32,12 +32,12 @@ const Sentry = __importStar(require("@sentry/node"));
 const profiling_node_1 = require("@sentry/profiling-node");
 const env_1 = __importDefault(require("./env"));
 Sentry.init({
-    dsn: env_1.default.SENTRY_DSN, // Replace with your Sentry DSN from Sentry Dashboard
+    dsn: env_1.default.SENTRY_DSN,
     integrations: [(0, profiling_node_1.nodeProfilingIntegration)()],
-    tracesSampleRate: 1.0, // Capture 100% of transactions for performance monitoring
-    profilesSampleRate: 1.0, // Capture 100% of profiles
-    environment: env_1.default.NODE_ENV, // Optional: Set environment (development, production, etc.)
+    tracesSampleRate: 1.0,
+    profilesSampleRate: 1.0,
+    environment: env_1.default.NODE_ENV,
 });
 exports.default = Sentry;
 //# sourceMappingURL=sentry.js.map
-//# debugId=678e4f58-d06b-55c9-af11-3ca08151936d
+//# debugId=2426fda4-e3c4-54a7-84ef-149b2ffedafd
