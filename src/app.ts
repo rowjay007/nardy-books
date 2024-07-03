@@ -8,6 +8,7 @@ import hpp from "hpp";
 import httpStatus from "http-status";
 import morgan from "morgan";
 import limiter from "./config/rateLimiter";
+import Sentry from "./config/sentry";
 import errorMiddleware from "./middlewares/errorMiddleware";
 import router from "./routes";
 import AppError from "./utils/appError";
@@ -20,6 +21,8 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
+
+Sentry.setupExpressErrorHandler(app);
 
 app.use(morgan("dev"));
 app.use(helmet());
@@ -49,6 +52,8 @@ app.use(
 app.use(limiter);
 
 app.use(router);
+
+Sentry.setupExpressErrorHandler(app);
 
 app.all("*", (req, res, next) => {
   next(

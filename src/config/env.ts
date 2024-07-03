@@ -20,6 +20,7 @@ const env = {
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || "",
   REFRESH_TOKEN_EXPIRATION: process.env.REFRESH_TOKEN_EXPIRATION || "",
   SEND_WELCOME_EMAIL: process.env.SEND_WELCOME_EMAIL || "",
+  SENTRY_DSN: process.env.SENTRY_DSN || "",
 };
 
 export default env;

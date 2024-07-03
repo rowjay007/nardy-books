@@ -15,7 +15,6 @@ bower_components/
 .vscode/
 
 # transpiled / compiled code
-dist/
 build/
 
 # Logs
@@ -24,3 +23,9 @@ logs/
 
 # Runtime files
 .env
+
+# Sentry Config File
+.sentryclirc
+
+# Sentry Config File
+.sentryclirc
