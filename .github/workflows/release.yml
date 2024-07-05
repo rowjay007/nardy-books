@@ -22,14 +22,16 @@ jobs:
         run: npm install
 
       - name: Build
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN}}
         run: npm run build
 
       - name: Upload Source Maps to Sentry
         env:
-          NARDY_SENTRY_AUTH_TOKEN: ${{ secrets.NARDY_SENTRY_AUTH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: npm run sentry:sourcemaps
 
       - name: Semantic Release
         env:
-          NARDY_TOKEN: ${{ secrets.NARDY_TOKEN }}
+          GH_TOKEN: ${{ secrets.NARDY_TOKEN }}
         run: npx semantic-release
