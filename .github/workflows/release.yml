@@ -15,19 +15,20 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: "22"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm install
 
       - name: Build
         env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN}}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: npm run build
 
       - name: Upload Source Maps to Sentry
         env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.NARDY_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: npm run sentry:sourcemaps
 
