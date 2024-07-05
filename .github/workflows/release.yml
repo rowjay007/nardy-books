@@ -1,4 +1,4 @@
-name: Nardy Semantic Release
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,8 +6,9 @@ on:
       - main
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -15,14 +16,17 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm install
 
       - name: Build
-        run: npm run build 
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
 
       - name: Semantic Release
         env:
@@ -31,6 +35,10 @@ jobs:
 
       - name: Upload Source Maps to Sentry
         env:
-          SENTRY_DSN: ${{ env.SENTRY_DSN }}
+          NARDY_SENTRY_AUTH_TOKEN: ${{ secrets.NARDY_SENTRY_AUTH_TOKEN }}
+        run: npm run sentry:sourcemaps
+
+      - name: Deploy to Production
+        if: github.ref == 'refs/heads/main' 
         run: |
-          npm run sentry:sourcemaps  
+          echo "Deploying to production..."
