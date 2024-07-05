@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '22'
+          node-version: '14'
           cache: 'npm'
 
       - name: Install dependencies
@@ -31,9 +31,6 @@ jobs:
 
       - name: Upload Source Maps to Sentry
         env:
-          NARDY_SENTRY_AUTH_TOKEN: ${{ secrets.NARDY_SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: rowjay
-          SENTRY_PROJECT: nardy-book
+          SENTRY_DSN: ${{ env.SENTRY_DSN }}
         run: |
-          npx @sentry/cli releases files "${{ steps.semantic_release.outputs.version }}" upload-sourcemaps dist --url-prefix '~/dist' --validate
-
+          npm run sentry:sourcemaps  
