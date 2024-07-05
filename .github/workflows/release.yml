@@ -19,10 +19,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install || exit 1
+        run: npm install
 
       - name: Build
-        run: npm run build || exit 1
+        run: npm run build 
 
       - name: Semantic Release
         env:
@@ -31,6 +31,6 @@ jobs:
 
       - name: Upload Source Maps to Sentry
         env:
-          SENTRY_DSN: ${{ env.SENTRY_DSN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
           npm run sentry:sourcemaps  
