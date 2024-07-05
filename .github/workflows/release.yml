@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
       - name: Generate Final Version
         id: taggerFinal
-        uses: anothrNick/github-tag-action
+        uses: anothrNick/github-tag-action@v1.67.0
         env:
           NARDY_TOKEN: ${{ secrets.NARDY_TOKEN }}
           WITH_V: true
@@ -30,7 +30,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Release Action
-        uses: ncipollo/release-action@1.10.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           tag: ${{ needs.build.outputs.output_new_tag }}
           token: ${{ secrets.CHANGELOG_RELEASE }}
