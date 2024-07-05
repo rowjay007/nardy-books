@@ -10,12 +10,6 @@
     "semantic-release": "semantic-release",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org rowjay --project nardy-book dist && sentry-cli sourcemaps upload --org rowjay --project nardy-book dist"
   },
-  "husky": {
-    "hooks": {
-      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true",
-      "pre-commit": "npm run semantic-release"
-    }
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
