@@ -21,6 +21,7 @@ const env = {
   REFRESH_TOKEN_EXPIRATION: process.env.REFRESH_TOKEN_EXPIRATION || "",
   SEND_WELCOME_EMAIL: process.env.SEND_WELCOME_EMAIL || "",
   SENTRY_DSN: process.env.SENTRY_DSN || "",
+  GITHUB_TOKEN: process.env.GITHUB_TOKEN || "",
 };
 
 export default env;
