@@ -17,8 +17,6 @@ bower_components/
 # transpiled / compiled code
 build/
 
-.sentryclirc
-
 # Logs
 logs/
 *.log
