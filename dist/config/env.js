@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="840cb056-6775-5dde-9244-ae694c866f04")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="f6b0e355-9972-554f-ae9e-74f8c8bd673e")}catch(e){}}();
 
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -26,7 +26,9 @@ const env = {
     REFRESH_TOKEN_EXPIRATION: process.env.REFRESH_TOKEN_EXPIRATION || "",
     SEND_WELCOME_EMAIL: process.env.SEND_WELCOME_EMAIL || "",
     SENTRY_DSN: process.env.SENTRY_DSN || "",
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN || "",
+    NARDY_SENTRY_AUTH_TOKEN: process.env.NARDY_SENTRY_AUTH_TOKEN || "",
 };
 exports.default = env;
 //# sourceMappingURL=env.js.map
-//# debugId=840cb056-6775-5dde-9244-ae694c866f04
+//# debugId=f6b0e355-9972-554f-ae9e-74f8c8bd673e

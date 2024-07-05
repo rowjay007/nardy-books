@@ -18,6 +18,9 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Create .sentryclirc file
+        run: echo "${{ secrets.NARDY_SENTRY_AUTH_TOKEN }}" > ~/.sentryclirc
+
       - name: Install dependencies
         run: npm install
 
@@ -30,11 +33,7 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.NARDY_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: |
-          sentry-cli --log-level=debug releases new -p nardy-book $(git rev-parse HEAD)
-          sentry-cli releases set-commits --auto $(git rev-parse HEAD)
-          sentry-cli releases finalize $(git rev-parse HEAD)
-          sentry-cli releases files $(git rev-parse HEAD) upload-sourcemaps ./dist --rewrite
+        run: npm run sentry:sourcemaps
 
       - name: Semantic Release
         env:
