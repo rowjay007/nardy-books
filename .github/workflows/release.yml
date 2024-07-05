@@ -1,36 +1,30 @@
 name: CI/CD Pipeline
-
 on:
   push:
     branches:
       - main
-
 jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
       output_new_tag: ${{ steps.taggerFinal.outputs.new_tag }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Generate Final Version
         id: taggerFinal
         uses: anothrNick/github-tag-action@v1
         env:
           NARDY_TOKEN: ${{ secrets.NARDY_TOKEN }}
           WITH_V: true
-
       - name: Echo New Tag
         run: |
           echo "The next new tag will be: ${{ steps.taggerFinal.outputs.new_tag }}"
-
   generate_git_release:
     needs: build
-    name: "Nardy Release"
+    name: "GitHub Release"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,7 +34,6 @@ jobs:
         with:
           tag: ${{ needs.build.outputs.output_new_tag }}
           token: ${{ secrets.CHANGELOG_RELEASE }}
-
   generate_sentry_release:
     needs: [build, generate_git_release]
     name: "Sentry Release"
@@ -54,9 +47,8 @@ jobs:
         uses: jungwinter/split@v2
         id: split_repo_name
         with:
-          msg: ${{ github.repository }}
           separator: '/'
-          maxsplit: 1
+          msg: ${{ github.repository }}
       - name: Echo Repo name
         run: echo "${{ steps.split_repo_name.outputs._1 }}"
       - name: Sentry Release
