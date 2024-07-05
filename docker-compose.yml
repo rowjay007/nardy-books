@@ -15,7 +15,6 @@ services:
     environment:
       - TZ=GMT
       - SENTRY_DSN=${SENTRY_DSN}
-      - NODE_ENV=development
 
   mongodb:
     image: mongo:latest
