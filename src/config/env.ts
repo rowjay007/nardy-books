@@ -22,6 +22,7 @@ const env = {
   SEND_WELCOME_EMAIL: process.env.SEND_WELCOME_EMAIL || "",
   SENTRY_DSN: process.env.SENTRY_DSN || "",
   GITHUB_TOKEN: process.env.GITHUB_TOKEN || "",
+  NARDY_SENTRY_AUTH_TOKEN: process.env.NARDY_SENTRY_AUTH_TOKEN || "",
 };
 
 export default env;

@@ -1,9 +1,9 @@
-name: Semantic Release
+name: Nardy Semantic Release
 
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   release:
@@ -21,10 +21,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install dependencies
+      - name: Build
         run: npm run build
+
+      - name: Upload Source Maps to Sentry
+        env:
+          NARDY_SENTRY_AUTH_TOKEN: ${{ secrets.NARDY_SENTRY_AUTH_TOKEN }}
+        run: npm run sentry:sourcemaps
 
       - name: Semantic Release
         env:
-          GITHUBTOKEN: ${{ secrets.GITHUBTOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
