@@ -44,7 +44,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Split Repo Name
-        uses: jungwinter/split@v2
+        uses: jungwinter/split@v2.0.0
         id: split_repo_name
         with:
           separator: '/'
