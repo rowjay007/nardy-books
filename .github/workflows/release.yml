@@ -15,8 +15,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "22"
-          cache: "npm"
+          node-version: '22'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
@@ -30,7 +30,11 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.NARDY_SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: npm run sentry:sourcemaps
+        run: |
+          sentry-cli --log-level=debug releases new -p nardy-book $(git rev-parse HEAD)
+          sentry-cli releases set-commits --auto $(git rev-parse HEAD)
+          sentry-cli releases finalize $(git rev-parse HEAD)
+          sentry-cli releases files $(git rev-parse HEAD) upload-sourcemaps ./dist --rewrite
 
       - name: Semantic Release
         env:
