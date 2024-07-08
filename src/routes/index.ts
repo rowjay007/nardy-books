@@ -28,7 +28,9 @@ apiV1Router.use("/publishers", publisherRoutes);
 apiV1Router.use("/reviews", reviewRoutes);
 apiV1Router.use("/subscriptions", subscriptionRoutes);
 apiV1Router.use("/payments", paymentRoutes);
+apiV1Router.use(metricsRoutes);
 apiV1Router.use(sentryRoutes);
+
 router.use("/api/v1", apiV1Router);
 router.use("/metrics", metricsRoutes);
 
