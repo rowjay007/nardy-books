@@ -12,6 +12,8 @@ services:
       - "3001:3001"
     depends_on:
       - mongodb
+      - prometheus
+      - grafana
     environment:
       - TZ=GMT
       - SENTRY_DSN=${SENTRY_DSN}
@@ -26,6 +28,25 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-clock-panel
 
 volumes:
   mongo-data:
