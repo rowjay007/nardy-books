@@ -1,19 +1,7 @@
 import NodeCache from "node-cache";
 
-const cache = new NodeCache({ stdTTL: 100, checkperiod: 120 });
+export const CACHE_TTL_SECONDS = 600;
 
-export const setCache = (key: string, value: any, ttl: number = 100) => {
-  cache.set(key, value, ttl);
-};
+const cache = new NodeCache({ stdTTL: CACHE_TTL_SECONDS, checkperiod: 120 });
 
-export const getCache = (key: string) => {
-  return cache.get(key);
-};
-
-export const delCache = (key: string) => {
-  cache.del(key);
-};
-
-export const flushCache = () => {
-  cache.flushAll();
-};
+export default cache;

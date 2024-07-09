@@ -10,7 +10,8 @@ export const createBook = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getBookById = catchAsync(async (req: Request, res: Response) => {
-  const book = await BookService.getBookById(new Types.ObjectId(req.params.id));
+  const { id } = req.params;
+  const book = await BookService.getBookById(new Types.ObjectId(id));
   if (!book) {
     throw new AppError("Book not found", 404);
   }
@@ -24,8 +25,9 @@ export const getAllBooks = catchAsync(async (req: Request, res: Response) => {
 
 export const updateBookById = catchAsync(
   async (req: Request, res: Response) => {
+    const { id } = req.params;
     const book = await BookService.updateBookById(
-      new Types.ObjectId(req.params.id),
+      new Types.ObjectId(id),
       req.body
     );
     if (!book) {
@@ -37,12 +39,8 @@ export const updateBookById = catchAsync(
 
 export const deleteBookById = catchAsync(
   async (req: Request, res: Response) => {
-    const book = await BookService.deleteBookById(
-      new Types.ObjectId(req.params.id)
-    );
-    if (!book) {
-      throw new AppError("Book not found", 404);
-    }
+    const { id } = req.params;
+    await BookService.deleteBookById(new Types.ObjectId(id));
     res.status(200).json({ message: "Book deleted successfully" });
   }
 );
