@@ -1,13 +1,28 @@
 import { Types } from "mongoose";
 import { IGenre } from "../models/genreModel";
 import * as GenreRepository from "../repositories/genreRepository";
+import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 
 export const createGenre = async (genreData: Partial<IGenre>) => {
-  return GenreRepository.createGenre(genreData);
+  const genre = await GenreRepository.createGenre(genreData);
+  cache.flushAll(); 
+  
+  return genre;
 };
 
 export const getGenreById = async (id: Types.ObjectId) => {
-  return GenreRepository.getGenreById(id);
+  const cacheKey = `genre_${id}`;
+  let genre: IGenre | undefined = cache.get<IGenre>(cacheKey);
+
+  if (!genre) {
+    const genreFromDb = await GenreRepository.getGenreById(id);
+    if (genreFromDb) {
+      genre = genreFromDb;
+      cache.set(cacheKey, genre, CACHE_TTL_SECONDS);
+    }
+  }
+
+  return genre;
 };
 
 export const getAllGenres = async (
@@ -16,23 +31,50 @@ export const getAllGenres = async (
   limit: number,
   sort: string | Record<string, number> | null | undefined
 ) => {
-  return GenreRepository.getAllGenres(filter, page, limit, sort);
+  const cacheKey = `genres_${JSON.stringify(
+    filter
+  )}_${page}_${limit}_${JSON.stringify(sort)}`;
+  let genres: IGenre[] | undefined = cache.get<IGenre[]>(cacheKey);
+
+  if (!genres) {
+    genres = await GenreRepository.getAllGenres(filter, page, limit, sort);
+    if (genres) {
+      cache.set(cacheKey, genres, CACHE_TTL_SECONDS);
+    }
+  }
+
+  return genres;
 };
 
 export const updateGenreById = async (
   id: Types.ObjectId,
   updateData: Partial<IGenre>
 ) => {
-  return GenreRepository.updateGenreById(id, updateData);
+  const genre = await GenreRepository.updateGenreById(id, updateData);
+  if (genre) {
+    cache.flushAll(); 
+    
+  }
+  return genre;
 };
 
 export const deleteGenreById = async (id: Types.ObjectId) => {
-  return GenreRepository.deleteGenreById(id);
+  const genre = await GenreRepository.deleteGenreById(id);
+  if (genre) {
+    cache.flushAll(); 
+    
+  }
+  return genre;
 };
 
 export const addBookToGenre = async (
   genreId: Types.ObjectId,
   bookId: Types.ObjectId
 ) => {
-  return await GenreRepository.addBookToGenre(genreId, bookId);
+  const genre = await GenreRepository.addBookToGenre(genreId, bookId);
+  if (genre) {
+    cache.flushAll(); 
+    
+  }
+  return genre;
 };
