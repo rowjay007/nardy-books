@@ -13,6 +13,7 @@ import reviewRoutes from "./reviewRoutes";
 import sentryRoutes from "./sentryRoutes";
 import subscriptionRoutes from "./subscriptionRoutes";
 import userRoutes from "./userRoutes";
+import cacheRoutes from "./cacheRoutes";
 
 const router = express.Router();
 const apiV1Router = express.Router();
@@ -28,10 +29,10 @@ apiV1Router.use("/publishers", publisherRoutes);
 apiV1Router.use("/reviews", reviewRoutes);
 apiV1Router.use("/subscriptions", subscriptionRoutes);
 apiV1Router.use("/payments", paymentRoutes);
+apiV1Router.use("/cache", cacheRoutes);
 apiV1Router.use(metricsRoutes);
 apiV1Router.use(sentryRoutes);
 
 router.use("/api/v1", apiV1Router);
-router.use("/metrics", metricsRoutes);
 
 export default router;
