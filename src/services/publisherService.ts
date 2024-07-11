@@ -67,8 +67,9 @@ export const updatePublisherById = async (
 };
 
 export const deletePublisherById = async (id: Types.ObjectId) => {
-  await PublisherRepository.deletePublisherById(id);
+  const deletedPublisher = await PublisherRepository.deletePublisherById(id);
   cache.flushAll();
+  return deletedPublisher;
 };
 
 export const addBookToPublisher = async (

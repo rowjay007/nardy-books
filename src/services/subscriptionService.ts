@@ -20,12 +20,9 @@ export const getSubscriptions = async (
   );
 };
 
-export const getSubscriptionById = async (
-  id: string
-): Promise<ISubscription | null> => {
+export const getSubscriptionById = async (id: string): Promise<ISubscription | null> => {
   const cacheKey = `subscription_${id}`;
-  let subscription: ISubscription | null =
-    cache.get<ISubscription | null>(cacheKey) ?? null;
+  let subscription: ISubscription | null = cache.get<ISubscription | null>(cacheKey) ?? null;
 
   if (subscription === null) {
     subscription = await subscriptionRepository.getSubscriptionById(id);
@@ -55,7 +52,9 @@ export const updateSubscription = async (
 };
 
 export const deleteSubscription = async (id: string) => {
-  const deletedSubscription = await subscriptionRepository.deleteSubscription(id);
+  const deletedSubscription = await subscriptionRepository.deleteSubscription(
+    id
+  );
 
   if (deletedSubscription) {
     const cacheKey = `subscription_${id}`;

@@ -87,9 +87,11 @@ export const updatePublisherById = catchAsync(
 
 export const deletePublisherById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const publisherId = convertToObjectId(req.params.id); 
-    const publisher = await PublisherService.deletePublisherById(publisherId);
-    if (!publisher) {
+    const publisherId = convertToObjectId(req.params.id);
+    const publisherDeleted = await PublisherService.deletePublisherById(
+      publisherId
+    );
+    if (!publisherDeleted) {
       return next(new AppError("No publisher found with that ID", 404));
     }
     res.status(204).json({

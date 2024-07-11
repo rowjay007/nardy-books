@@ -125,8 +125,8 @@ export const updateReviewById = catchAsync(
 
 export const deleteReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const review = await ReviewService.deleteReviewById(req.params.id);
-    if (!review) {
+    const isDeleted = await ReviewService.deleteReviewById(req.params.id);
+    if (!isDeleted) {
       return next(new AppError("No review found with that ID", 404));
     }
     res.status(204).json({

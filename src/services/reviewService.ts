@@ -53,9 +53,9 @@ export const updateReviewById = async (reviewId: string, updateData: any) => {
   }
   return review;
 };
-
-export const deleteReviewById = async (reviewId: string) => {
+export const deleteReviewById = async (reviewId: string): Promise<boolean> => {
   const id = new Types.ObjectId(reviewId);
-  await ReviewRepository.deleteReviewById(id);
-  cache.flushAll(); 
+  const result = await ReviewRepository.deleteReviewById(id);
+  cache.flushAll();
+  return result !== null;
 };
