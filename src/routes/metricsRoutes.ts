@@ -36,6 +36,29 @@ const requestCounter = new Counter({
   labelNames: ["method", "route", "status_code"],
 });
 
+/**
+ * @swagger
+ * tags:
+ *   name: Metrics
+ *   description: Metrics collection and reporting
+ */
+
+/**
+ * @swagger
+ * /metrics:
+ *   get:
+ *     summary: Get application metrics
+ *     tags: [Metrics]
+ *     responses:
+ *       200:
+ *         description: Metrics collected by Prometheus
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *       500:
+ *         description: Some server error
+ */
 router.use((req, res, next) => {
   const endHistogram = httpRequestDurationHistogram.startTimer();
   const endSummary = httpRequestDurationSummary.startTimer();
