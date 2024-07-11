@@ -1,12 +1,13 @@
 import { Types } from "mongoose";
 import * as BookRepository from "../repositories/bookRepository";
 import { IBook } from "../models/bookModel";
-import cache from "../utils/cache";
+import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 
-import { CACHE_TTL_SECONDS } from "../utils/cache";
-
-export const createBook = async (bookData: Partial<IBook>): Promise<IBook> =>
-  BookRepository.createBook(bookData);
+export const createBook = async (bookData: Partial<IBook>): Promise<IBook> => {
+  const book = await BookRepository.createBook(bookData);
+  cache.flushAll(); 
+  return book;
+};
 
 export const getBookById = async (
   id: Types.ObjectId
@@ -44,8 +45,20 @@ export const getAllBooks = async (
 export const updateBookById = async (
   id: Types.ObjectId,
   bookData: Partial<IBook>
-): Promise<IBook | null> => BookRepository.updateBookById(id, bookData);
+): Promise<IBook | null> => {
+  const book = await BookRepository.updateBookById(id, bookData);
+  if (book) {
+    cache.flushAll(); 
+  }
+  return book;
+};
 
 export const deleteBookById = async (
   id: Types.ObjectId
-): Promise<IBook | null> => BookRepository.deleteBookById(id);
+): Promise<IBook | null> => {
+  const book = await BookRepository.deleteBookById(id);
+  if (book) {
+    cache.flushAll(); 
+  }
+  return book;
+};

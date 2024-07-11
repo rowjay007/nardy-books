@@ -6,7 +6,10 @@ import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 export const createAuthor = async (
   authorData: Partial<IAuthor>
 ): Promise<IAuthor> => {
-  return AuthorRepository.createAuthor(authorData);
+  const author = await AuthorRepository.createAuthor(authorData);
+  cache.flushAll(); 
+  
+  return author;
 };
 
 export const getAuthorById = async (
@@ -77,7 +80,8 @@ export const updateAuthorById = async (
 ): Promise<IAuthor | null> => {
   const author = await AuthorRepository.updateAuthorById(id, updateData);
   if (author) {
-    cache.set(`author_${id.toString()}`, author, CACHE_TTL_SECONDS);
+    cache.flushAll(); 
+    
   }
   return author;
 };
@@ -87,7 +91,8 @@ export const deleteAuthorById = async (
 ): Promise<IAuthor | null> => {
   const author = await AuthorRepository.deleteAuthorById(id);
   if (author) {
-    cache.del(`author_${id.toString()}`);
+    cache.flushAll(); 
+    
   }
   return author;
 };
@@ -98,7 +103,8 @@ export const addBookToAuthor = async (
 ): Promise<IAuthor | null> => {
   const author = await AuthorRepository.addBookToAuthor(authorId, bookId);
   if (author) {
-    cache.set(`author_${authorId.toString()}`, author, CACHE_TTL_SECONDS);
+    cache.flushAll(); 
+    
   }
   return author;
 };
