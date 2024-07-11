@@ -36,7 +36,6 @@ const requestCounter = new Counter({
   labelNames: ["method", "route", "status_code"],
 });
 
-// Middleware to record metrics
 router.use((req, res, next) => {
   const endHistogram = httpRequestDurationHistogram.startTimer();
   const endSummary = httpRequestDurationSummary.startTimer();

@@ -17,4 +17,12 @@ router.get("/", (req: Request, res: Response) => {
   });
 });
 
+router.delete("/", (req: Request, res: Response) => {
+  cache.flushAll();
+  res.status(200).json({
+    status: "success",
+    message: "Cache cleared",
+  });
+});
+
 export default router;
