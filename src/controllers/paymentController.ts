@@ -43,6 +43,8 @@ export const deletePayment = catchAsync(
   }
 );
 
+//TODO: add successfully deleted messages
+
 export const processPaystackPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { amount, email } = req.body;
