@@ -1,13 +1,26 @@
 import * as ReviewRepository from "../repositories/reviewRepository";
 import { Types } from "mongoose";
+import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 
 export const createReview = async (reviewData: any) => {
-  return ReviewRepository.createReview(reviewData);
+  const review = await ReviewRepository.createReview(reviewData);
+  cache.flushAll(); 
+  return review;
 };
 
 export const getReviewById = async (reviewId: string) => {
+  const cacheKey = `review_${reviewId}`;
   const id = new Types.ObjectId(reviewId);
-  return ReviewRepository.getReviewById(id);
+  let review = cache.get<any>(cacheKey);
+
+  if (!review) {
+    review = await ReviewRepository.getReviewById(id);
+    if (review) {
+      cache.set(cacheKey, review, CACHE_TTL_SECONDS);
+    }
+  }
+
+  return review;
 };
 
 export const getAllReviews = async (
@@ -16,15 +29,33 @@ export const getAllReviews = async (
   limit: number,
   sort: Record<string, "asc" | "desc">
 ) => {
-  return ReviewRepository.getAllReviews(filter, page, limit, sort);
+  const cacheKey = `allReviews_${JSON.stringify({
+    filter,
+    page,
+    limit,
+    sort,
+  })}`;
+  let reviews = cache.get<any[]>(cacheKey);
+
+  if (!reviews) {
+    reviews = await ReviewRepository.getAllReviews(filter, page, limit, sort);
+    cache.set(cacheKey, reviews, CACHE_TTL_SECONDS);
+  }
+
+  return reviews;
 };
 
 export const updateReviewById = async (reviewId: string, updateData: any) => {
   const id = new Types.ObjectId(reviewId);
-  return ReviewRepository.updateReviewById(id, updateData);
+  const review = await ReviewRepository.updateReviewById(id, updateData);
+  if (review) {
+    cache.flushAll(); 
+  }
+  return review;
 };
 
 export const deleteReviewById = async (reviewId: string) => {
   const id = new Types.ObjectId(reviewId);
-  return ReviewRepository.deleteReviewById(id);
+  await ReviewRepository.deleteReviewById(id);
+  cache.flushAll(); 
 };

@@ -10,6 +10,7 @@ import {
   sendVerificationEmail,
   sendWelcomeEmail,
 } from "../utils/emailUtils";
+import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 
 const generateAccessToken = (userId: string) => {
   return jwt.sign({ id: userId }, env.JWT_SECRET, {
@@ -43,10 +44,11 @@ const register = async (
     sendVerificationEmail(email, verificationLink),
   ]);
 
+  cache.flushAll(); 
+  
+
   return user;
 };
-
-
 
 const login = async (email: string, password: string) => {
   const user = await userRepository.findUserByEmail(email);
@@ -65,6 +67,8 @@ const login = async (email: string, password: string) => {
 
 const logout = async (userId: string) => {
   await userRepository.removeRefreshToken(userId);
+  cache.flushAll(); 
+  
 };
 
 const requestPasswordReset = async (email: string) => {
@@ -86,7 +90,6 @@ const requestPasswordReset = async (email: string) => {
   return token;
 };
 
-
 const resetPassword = async (token: string, newPassword: string) => {
   const user = await userRepository.findByResetPasswordToken(token);
   if (!user) throw new AppError("Invalid or expired token", 400);
@@ -95,6 +98,10 @@ const resetPassword = async (token: string, newPassword: string) => {
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;
   await user.save();
+
+  cache.flushAll(); 
+  
+
   return user;
 };
 
@@ -115,6 +122,10 @@ const changePassword = async (
 
   user.password = await bcrypt.hash(newPassword, 12);
   await user.save();
+
+  cache.flushAll(); 
+  
+
   return user;
 };
 
@@ -129,6 +140,9 @@ const verifyEmail = async (verificationToken: string): Promise<IUser> => {
     throw new AppError("Invalid verification token.", 400);
   }
 
+  cache.flushAll(); 
+  
+
   return user;
 };
 
@@ -142,12 +156,25 @@ const resendVerificationEmail = async (userId: string) => {
 
   const verificationLink = `${process.env.EMAIL_VERIFICATION_URL}/verify-email/${verificationToken}`;
   await sendVerificationEmail(user.email, verificationLink);
+
+  cache.flushAll(); 
+  
 };
 
-const getUserById = async (userId: string) => {
-  const user = await userRepository.findUserById(userId);
+const getUserById = async (userId: string): Promise<IUser | null> => {
+  const cacheKey = `user_${userId}`;
+  let user = cache.get<IUser | null>(cacheKey);
+
+  if (user === undefined) {
+    user = await userRepository.findUserById(userId);
+    if (user) {
+      cache.set(cacheKey, user, CACHE_TTL_SECONDS);
+    }
+  }
+
   return user;
 };
+
 
 const getAllUsers = async (
   filter: any,
@@ -155,17 +182,30 @@ const getAllUsers = async (
   limit: number,
   skip: number
 ) => {
-  const users = await userRepository.findUsers(filter, sort, limit, skip);
+  const cacheKey = `allUsers_${JSON.stringify({ filter, sort, limit, skip })}`;
+  let users = cache.get<IUser[]>(cacheKey);
+
+  if (!users) {
+    users = await userRepository.findUsers(filter, sort, limit, skip);
+    cache.set(cacheKey, users, CACHE_TTL_SECONDS);
+  }
+
   return users;
 };
 
 const updateUser = async (userId: string, updateData: any) => {
   const user = await userRepository.updateUser(userId, updateData);
+  if (user) {
+    cache.flushAll(); 
+    
+  }
   return user;
 };
 
 const deleteUser = async (userId: string) => {
   await userRepository.deleteUser(userId);
+  cache.flushAll(); 
+  
 };
 
 export default {
