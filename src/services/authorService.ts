@@ -1,6 +1,7 @@
 import * as AuthorRepository from "../repositories/authorRepository";
 import { IAuthor } from "../models/authorModel";
 import { Types } from "mongoose";
+import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 
 export const createAuthor = async (
   authorData: Partial<IAuthor>
@@ -11,7 +12,20 @@ export const createAuthor = async (
 export const getAuthorById = async (
   id: Types.ObjectId
 ): Promise<IAuthor | null> => {
-  return AuthorRepository.getAuthorById(id);
+  const cacheKey = `author_${id.toString()}`;
+  let author: IAuthor | any = cache.get<IAuthor>(cacheKey);
+
+  if (author === undefined) {
+    const fetchedAuthor = await AuthorRepository.getAuthorById(id);
+    if (fetchedAuthor) {
+      author = fetchedAuthor;
+      cache.set(cacheKey, author, CACHE_TTL_SECONDS);
+    } else {
+      author = null;
+    }
+  }
+
+  return author;
 };
 
 export const getAllAuthors = async (
@@ -34,38 +48,57 @@ export const getAllAuthors = async (
   const sort: any = {};
   sort[sortBy] = sortOrder === "desc" ? -1 : 1;
 
-  const authors = await AuthorRepository.getAllAuthors(
+  const cacheKey = `allAuthors_${JSON.stringify({
     filter,
     page,
     limit,
-    sort
-  );
-  const total = await AuthorRepository.getTotalCount(filter);
+    sort,
+  })}`;
+  let cachedData = cache.get<{ authors: IAuthor[]; total: number }>(cacheKey);
 
-  return {
-    authors,
-    total,
-    page,
-    limit,
-  };
+  if (!cachedData) {
+    const authors = await AuthorRepository.getAllAuthors(
+      filter,
+      page,
+      limit,
+      sort
+    );
+    const total = await AuthorRepository.getTotalCount(filter);
+    cachedData = { authors, total };
+    cache.set(cacheKey, cachedData, CACHE_TTL_SECONDS);
+  }
+
+  return { ...cachedData, page, limit };
 };
 
 export const updateAuthorById = async (
   id: Types.ObjectId,
   updateData: Partial<IAuthor>
 ): Promise<IAuthor | null> => {
-  return AuthorRepository.updateAuthorById(id, updateData);
+  const author = await AuthorRepository.updateAuthorById(id, updateData);
+  if (author) {
+    cache.set(`author_${id.toString()}`, author, CACHE_TTL_SECONDS);
+  }
+  return author;
 };
 
 export const deleteAuthorById = async (
   id: Types.ObjectId
 ): Promise<IAuthor | null> => {
-  return AuthorRepository.deleteAuthorById(id);
+  const author = await AuthorRepository.deleteAuthorById(id);
+  if (author) {
+    cache.del(`author_${id.toString()}`);
+  }
+  return author;
 };
 
 export const addBookToAuthor = async (
   authorId: Types.ObjectId,
   bookId: Types.ObjectId
 ): Promise<IAuthor | null> => {
-  return AuthorRepository.addBookToAuthor(authorId, bookId);
+  const author = await AuthorRepository.addBookToAuthor(authorId, bookId);
+  if (author) {
+    cache.set(`author_${authorId.toString()}`, author, CACHE_TTL_SECONDS);
+  }
+  return author;
 };
