@@ -6,9 +6,9 @@ const generateResetToken = (userId: string): string => {
   return token;
 };
 
-// const generateVerificationToken = (userId: string): string => {
-//   const token = jwt.sign({ userId }, env.JWT_SECRET, { expiresIn: "1d" });
-//   return token;
-// };
+const generateVerificationToken = (userId: string): string => {
+  const token = jwt.sign({ userId }, env.JWT_SECRET, { expiresIn: "1d" });
+  return token;
+};
 
-// export { generateResetToken, generateVerificationToken };
+export { generateResetToken, generateVerificationToken };
