@@ -7,7 +7,7 @@ export interface IPublisher extends Document {
 }
 
 const PublisherSchema: Schema<IPublisher> = new Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, index: true },
   address: { type: String },
   books: [{ type: Schema.Types.ObjectId, ref: "Book" }],
 });

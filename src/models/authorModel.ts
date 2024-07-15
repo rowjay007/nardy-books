@@ -7,7 +7,7 @@ export interface IAuthor extends Document {
 }
 
 const AuthorSchema: Schema<IAuthor> = new Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, index: true }, 
   biography: { type: String },
   books: [{ type: Schema.Types.ObjectId, ref: "Book" }],
 });

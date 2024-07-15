@@ -8,18 +8,18 @@ export interface IUser extends Document {
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
   verificationToken?: string;
-  refreshToken?: string; 
+  refreshToken?: string;
 }
 
 const UserSchema: Schema<IUser> = new Schema({
-  username: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
+  username: { type: String, required: true, index: true }, 
+  email: { type: String, required: true, unique: true, index: true }, 
   password: { type: String, required: true },
   isEmailVerified: { type: Boolean, default: false },
-  resetPasswordToken: String,
-  resetPasswordExpires: Date,
-  verificationToken: String,
-  refreshToken: String, 
+  resetPasswordToken: { type: String, index: true }, 
+  resetPasswordExpires: { type: Date, index: true }, 
+  verificationToken: { type: String, index: true },
+  refreshToken: { type: String, index: true },
 });
 
 const User = mongoose.model<IUser>("User", UserSchema);

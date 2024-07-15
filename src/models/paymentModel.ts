@@ -1,5 +1,5 @@
-import mongoose, { Document, Schema, Types } from "mongoose";
 import { isValid, parse } from "date-fns";
+import mongoose, { Document, Schema, Types } from "mongoose";
 
 export interface IPayment extends Document {
   amount: number;
@@ -7,16 +7,21 @@ export interface IPayment extends Document {
   status: string;
   user: Types.ObjectId;
   date: Date | string;
-  reference: string; 
+  reference: string;
 }
 
 const PaymentSchema: Schema<IPayment> = new Schema({
-  amount: { type: Number, required: true },
-  method: { type: String, required: true },
-  status: { type: String, required: true },
-  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  date: { type: Date, default: Date.now },
-  reference: { type: String, required: true, unique: true }, 
+  amount: { type: Number, required: true, index: true },
+  method: { type: String, required: true, index: true },
+  status: { type: String, required: true, index: true },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    index: true,
+  },
+  date: { type: Date, default: Date.now, index: true },
+  reference: { type: String, required: true, unique: true },
 });
 
 PaymentSchema.pre<IPayment>("save", function (next) {
