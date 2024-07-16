@@ -1,6 +1,8 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import * as PaymentService from "../services/paymentService";
 import catchAsync from "../utils/catchAsync";
+import AppError from "../utils/appError";
+import httpStatus from "http-status";
 
 /**
  * Controller function to create a payment
@@ -12,7 +14,9 @@ import catchAsync from "../utils/catchAsync";
 export const createPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payment = await PaymentService.createPayment(req.body);
-    res.status(201).json({ status: "success", data: { payment } });
+    res
+      .status(httpStatus.CREATED)
+      .json({ status: "success", data: { payment } });
   }
 );
 
@@ -26,7 +30,10 @@ export const createPayment = catchAsync(
 export const getPaymentById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payment = await PaymentService.getPaymentById(req.params.id);
-    res.status(200).json({ status: "success", data: { payment } });
+    if (!payment) {
+      return next(new AppError("Payment not found", httpStatus.NOT_FOUND));
+    }
+    res.status(httpStatus.OK).json({ status: "success", data: { payment } });
   }
 );
 
@@ -46,7 +53,7 @@ export const getAllPayments = catchAsync(
       parseInt(page as string, 10) || 1,
       parseInt(limit as string, 10) || 10
     );
-    res.status(200).json({ status: "success", data: { payments } });
+    res.status(httpStatus.OK).json({ status: "success", data: { payments } });
   }
 );
 
@@ -60,7 +67,10 @@ export const getAllPayments = catchAsync(
 export const updatePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payment = await PaymentService.updatePayment(req.params.id, req.body);
-    res.status(200).json({ status: "success", data: { payment } });
+    if (!payment) {
+      return next(new AppError("Payment not found", httpStatus.NOT_FOUND));
+    }
+    res.status(httpStatus.OK).json({ status: "success", data: { payment } });
   }
 );
 
@@ -74,7 +84,7 @@ export const updatePayment = catchAsync(
 export const deletePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     await PaymentService.deletePayment(req.params.id);
-    res.status(200).json({
+    res.status(httpStatus.OK).json({
       status: "success",
       message: "Payment successfully deleted",
       data: null,
@@ -96,7 +106,9 @@ export const processPaystackPayment = catchAsync(
       amount,
       email
     );
-    res.status(200).json({ status: "success", data: { response, reference } });
+    res
+      .status(httpStatus.OK)
+      .json({ status: "success", data: { response, reference } });
   }
 );
 
@@ -111,7 +123,7 @@ export const verifyPaystackPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { reference } = req.params;
     const response = await PaymentService.verifyPaystackPayment(reference);
-    res.status(200).json({ status: "success", data: { response } });
+    res.status(httpStatus.OK).json({ status: "success", data: { response } });
   }
 );
 
@@ -127,7 +139,9 @@ export const processFlutterwavePayment = catchAsync(
     const { amount, email } = req.body;
     const { response, reference } =
       await PaymentService.processFlutterwavePayment(amount, email);
-    res.status(200).json({ status: "success", data: { response, reference } });
+    res
+      .status(httpStatus.OK)
+      .json({ status: "success", data: { response, reference } });
   }
 );
 
@@ -142,6 +156,6 @@ export const verifyFlutterwavePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { reference } = req.params;
     const response = await PaymentService.verifyFlutterwavePayment(reference);
-    res.status(200).json({ status: "success", data: { response } });
+    res.status(httpStatus.OK).json({ status: "success", data: { response } });
   }
 );
