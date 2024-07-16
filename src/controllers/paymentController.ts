@@ -2,6 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import * as PaymentService from "../services/paymentService";
 import catchAsync from "../utils/catchAsync";
 
+/**
+ * Controller function to create a payment
+ * @param {Request} req - Express request object with body containing payment data
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the payment data
+ */
 export const createPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payment = await PaymentService.createPayment(req.body);
@@ -9,6 +16,13 @@ export const createPayment = catchAsync(
   }
 );
 
+/**
+ * Controller function to get a payment by ID
+ * @param {Request} req - Express request object with params containing payment ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the payment data
+ */
 export const getPaymentById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payment = await PaymentService.getPaymentById(req.params.id);
@@ -16,6 +30,13 @@ export const getPaymentById = catchAsync(
   }
 );
 
+/**
+ * Controller function to get all payments
+ * @param {Request} req - Express request object with query parameters for filtering, sorting, pagination
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the payments data
+ */
 export const getAllPayments = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { filter, sort, page, limit } = req.query;
@@ -29,6 +50,13 @@ export const getAllPayments = catchAsync(
   }
 );
 
+/**
+ * Controller function to update a payment by ID
+ * @param {Request} req - Express request object with params containing payment ID and body containing update data
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the updated payment data
+ */
 export const updatePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payment = await PaymentService.updatePayment(req.params.id, req.body);
@@ -36,15 +64,31 @@ export const updatePayment = catchAsync(
   }
 );
 
+/**
+ * Controller function to delete a payment by ID
+ * @param {Request} req - Express request object with params containing payment ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object indicating successful deletion
+ */
 export const deletePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     await PaymentService.deletePayment(req.params.id);
-    res.status(204).json({ status: "success", data: null });
+    res.status(200).json({
+      status: "success",
+      message: "Payment successfully deleted",
+      data: null,
+    });
   }
 );
 
-//TODO: add successfully deleted messages
-
+/**
+ * Controller function to process a Paystack payment
+ * @param {Request} req - Express request object with body containing amount and email
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the payment response and reference
+ */
 export const processPaystackPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { amount, email } = req.body;
@@ -56,6 +100,13 @@ export const processPaystackPayment = catchAsync(
   }
 );
 
+/**
+ * Controller function to verify a Paystack payment
+ * @param {Request} req - Express request object with params containing payment reference
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the payment verification response
+ */
 export const verifyPaystackPayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { reference } = req.params;
@@ -64,6 +115,13 @@ export const verifyPaystackPayment = catchAsync(
   }
 );
 
+/**
+ * Controller function to process a Flutterwave payment
+ * @param {Request} req - Express request object with body containing amount and email
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the payment response and reference
+ */
 export const processFlutterwavePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { amount, email } = req.body;
@@ -73,6 +131,13 @@ export const processFlutterwavePayment = catchAsync(
   }
 );
 
+/**
+ * Controller function to verify a Flutterwave payment
+ * @param {Request} req - Express request object with params containing payment reference
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the payment verification response
+ */
 export const verifyFlutterwavePayment = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { reference } = req.params;

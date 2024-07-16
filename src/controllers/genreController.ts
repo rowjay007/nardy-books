@@ -4,7 +4,13 @@ import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/appError";
 import { Types } from "mongoose";
 
-const convertToObjectId = (id: string) => {
+/**
+ * Converts a string to a Mongoose ObjectId.
+ * @param {string} id - The ID to convert.
+ * @returns {Types.ObjectId} - The converted ObjectId.
+ * @throws {AppError} - Throws an error if the ID format is invalid.
+ */
+const convertToObjectId = (id: string): Types.ObjectId => {
   try {
     return new Types.ObjectId(id);
   } catch (error) {
@@ -12,6 +18,13 @@ const convertToObjectId = (id: string) => {
   }
 };
 
+/**
+ * Controller function to create a genre
+ * @param {Request} req - Express request object with body containing genre data
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the created genre data
+ */
 export const createGenre = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const genre = await GenreService.createGenre(req.body);
@@ -24,6 +37,13 @@ export const createGenre = catchAsync(
   }
 );
 
+/**
+ * Controller function to get a genre by ID
+ * @param {Request} req - Express request object with params containing genre ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the genre data
+ */
 export const getGenreById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const genreId = convertToObjectId(req.params.id);
@@ -40,6 +60,13 @@ export const getGenreById = catchAsync(
   }
 );
 
+/**
+ * Controller function to get all genres
+ * @param {Request} req - Express request object with query parameters for filtering, sorting, and pagination
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the genres data
+ */
 export const getAllGenres = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const sortQuery = req.query.sort as
@@ -63,6 +90,13 @@ export const getAllGenres = catchAsync(
   }
 );
 
+/**
+ * Controller function to update a genre by ID
+ * @param {Request} req - Express request object with params containing genre ID and body containing update data
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the updated genre data
+ */
 export const updateGenreById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const genreId = convertToObjectId(req.params.id);
@@ -79,6 +113,13 @@ export const updateGenreById = catchAsync(
   }
 );
 
+/**
+ * Controller function to delete a genre by ID
+ * @param {Request} req - Express request object with params containing genre ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object indicating successful deletion
+ */
 export const deleteGenreById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const genreId = convertToObjectId(req.params.id);
@@ -86,14 +127,21 @@ export const deleteGenreById = catchAsync(
     if (!genre) {
       return next(new AppError("No genre found with that ID", 404));
     }
-    res.status(204).json({
+    res.status(200).json({
       status: "success",
+      message: "Genre successfully deleted",
       data: null,
     });
   }
 );
 
-//TODO: add successfully deleted messages
+/**
+ * Controller function to add a book to a genre
+ * @param {Request} req - Express request object with params containing genre ID and book ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the updated genre data
+ */
 export const addBookToGenre = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { genreId, bookId } = req.params;

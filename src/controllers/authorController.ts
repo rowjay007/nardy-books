@@ -4,6 +4,13 @@ import * as AuthorService from "../services/authorService";
 import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/appError";
 
+/**
+ * Controller function to create an author
+ * @param {Request} req - Express request object with body containing author data
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the created author data
+ */
 export const createAuthor = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const author = await AuthorService.createAuthor(req.body);
@@ -16,6 +23,13 @@ export const createAuthor = catchAsync(
   }
 );
 
+/**
+ * Controller function to get an author by ID
+ * @param {Request} req - Express request object with params containing author ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the author data
+ */
 export const getAuthorById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const authorId = new Types.ObjectId(req.params.id);
@@ -32,6 +46,13 @@ export const getAuthorById = catchAsync(
   }
 );
 
+/**
+ * Controller function to get all authors
+ * @param {Request} req - Express request object with query parameters for filtering, sorting, and pagination
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the authors data
+ */
 export const getAllAuthors = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const {
@@ -62,6 +83,13 @@ export const getAllAuthors = catchAsync(
   }
 );
 
+/**
+ * Controller function to update an author by ID
+ * @param {Request} req - Express request object with params containing author ID and body containing update data
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the updated author data
+ */
 export const updateAuthorById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const authorId = new Types.ObjectId(req.params.id);
@@ -78,6 +106,13 @@ export const updateAuthorById = catchAsync(
   }
 );
 
+/**
+ * Controller function to delete an author by ID
+ * @param {Request} req - Express request object with params containing author ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object indicating successful deletion
+ */
 export const deleteAuthorById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const authorId = new Types.ObjectId(req.params.id);
@@ -85,14 +120,21 @@ export const deleteAuthorById = catchAsync(
     if (!author) {
       return next(new AppError("No author found with that ID", 404));
     }
-    res.status(204).json({
+    res.status(200).json({
       status: "success",
+      message: "Author deleted successfully",
       data: null,
     });
   }
 );
-//TODO: add successfully deleted messages
 
+/**
+ * Controller function to add a book to an author
+ * @param {Request} req - Express request object with params containing author ID and book ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the updated author data
+ */
 export const addBookToAuthor = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const authorId = new Types.ObjectId(req.params.authorId);
