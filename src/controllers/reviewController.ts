@@ -11,7 +11,6 @@ import AppError from "../utils/appError";
  * @returns Returns a JSON object with the review data
  * @returns {status: "success", data: {review}}
  */
-
 export const createReview = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const review = await ReviewService.createReview(req.body);
@@ -24,14 +23,13 @@ export const createReview = catchAsync(
   }
 );
 
-  /**
-   * Controller function by ID to get a review
-   * @param req Express request object
-   * @param res Express response object
-   * @param next Express next function
-   * @returns Returns a JSON object with the review data
-   */
-
+/**
+ * Controller function by ID to get a review
+ * @param req Express request object
+ * @param res Express response object
+ * @param next Express next function
+ * @returns Returns a JSON object with the review data
+ */
 export const getReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const review = await ReviewService.getReviewById(req.params.id);
@@ -54,7 +52,6 @@ export const getReviewById = catchAsync(
  * @param next Express next function
  * @returns Returns a JSON object with the review data
  */
-
 export const getAllReviews = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const sortQuery = (req.query.sort as string)?.split(",") || [];
@@ -96,7 +93,6 @@ export const getAllReviews = catchAsync(
  * @param next Express next function
  * @returns Returns a JSON object with the review data
  */
-
 export const updateReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const review = await ReviewService.updateReviewById(
@@ -122,18 +118,16 @@ export const updateReviewById = catchAsync(
  * @param next Express next function
  * @returns Returns a JSON object with the review data
  */
-
 export const deleteReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const isDeleted = await ReviewService.deleteReviewById(req.params.id);
     if (!isDeleted) {
       return next(new AppError("No review found with that ID", 404));
     }
-    res.status(204).json({
+    res.status(200).json({
       status: "success",
+      message: "Review successfully deleted",
       data: null,
     });
   }
 );
-
-//TODO: add successfully deleted messages

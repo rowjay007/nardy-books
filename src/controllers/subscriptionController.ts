@@ -3,7 +3,6 @@ import * as subscriptionService from "../services/subscriptionService";
 import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/appError";
 
-
 /**
  * Controller function create a subscription
  * @param req Express request object with body containing subscription data
@@ -42,7 +41,6 @@ export const getSubscriptions = catchAsync(
  * @param res Express response object
  * @param next Express next function
  */
-
 export const getSubscriptionById = catchAsync(
   async (req: Request, res: Response) => {
     const subscription = await subscriptionService.getSubscriptionById(
@@ -61,7 +59,6 @@ export const getSubscriptionById = catchAsync(
  * @param res Express response object
  * @param next Express next function
  */
-
 export const updateSubscription = catchAsync(
   async (req: Request, res: Response) => {
     const subscription = await subscriptionService.updateSubscription(
@@ -84,7 +81,10 @@ export const updateSubscription = catchAsync(
 export const deleteSubscription = catchAsync(
   async (req: Request, res: Response) => {
     await subscriptionService.deleteSubscription(req.params.id);
-    res.status(204).end();
+    res.status(200).json({
+      status: "success",
+      message: "Subscription successfully deleted",
+      data: null,
+    });
   }
 );
-//TODO: add successfully deleted messages

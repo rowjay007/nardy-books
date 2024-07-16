@@ -14,10 +14,10 @@ export const getAllUsers = async (
   next: NextFunction
 ) => {
   try {
-    const filter = {}; 
-    const sort = {}; 
-    const limit = 10; 
-    const skip = 0; 
+    const filter = {};
+    const sort = {};
+    const limit = 10;
+    const skip = 0;
 
     const users = await userService.getAllUsers(filter, sort, limit, skip);
     res.status(200).json({
@@ -28,7 +28,6 @@ export const getAllUsers = async (
     next(error);
   }
 };
-
 
 /**
  * Controller function to get a user by ID
@@ -97,12 +96,12 @@ export const deleteUser = async (
 
   try {
     await userService.deleteUser(userId);
-    res.status(204).json({
+    res.status(200).json({
       status: "success",
+      message: "User successfully deleted",
       data: null,
     });
   } catch (error) {
     next(error);
   }
 };
-//TODO: add successfully deleted messages
