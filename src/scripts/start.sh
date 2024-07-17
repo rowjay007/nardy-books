@@ -1,11 +1,11 @@
-#!/bin/bash
+# #!/bin/bash
 
-set -e
+# set -e
 
-echo "Starting the application..."
+# echo "Starting the application..."
 
-./scripts/build.sh
+# ./scripts/build.sh
 
-npm run dev
+# npm run dev
 
-echo "Application started successfully."
+# echo "Application started successfully."
