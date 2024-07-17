@@ -6,6 +6,15 @@ on:
       - main
 
 jobs:
+  information:
+    name: GitHub Context
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -79,7 +88,7 @@ jobs:
         uses: ncipollo/release-action@v1.14.0
         with:
           tag: ${{ needs.generate_git_tags.outputs.output_new_tag }}
-          token: ${{ secrets.CHANGELOG_RELEASE }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   generate_sentry_release:
     needs: [generate_git_tags, build_and_push_docker]
