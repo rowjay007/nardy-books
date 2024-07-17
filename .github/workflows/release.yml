@@ -12,29 +12,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20' 
-
+          node-version: '20'
       - name: Install dependencies
         run: npm ci
-
       - name: Run tests
         run: npm test
 
-  information:
-    name: GitHub Context
-    needs: test  
-    runs-on: ubuntu-latest
-    steps:
-      - name: Info
-        run: echo "$GITHUB_CONTEXT"
-
   generate_git_tags:
     name: "Generate Git Tags"
-    needs: test 
+    needs: test
     runs-on: ubuntu-latest
     outputs:
       output_new_tag: ${{ steps.taggerFinal.outputs.new_tag }}
@@ -53,8 +42,34 @@ jobs:
         run: |
           echo "The next new tag will be: ${{ steps.taggerFinal.outputs.new_tag }}"
 
-  generate_git_release:
+  build_and_push_docker:
     needs: [test, generate_git_tags]
+    name: "Build and Push Docker Image"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/nardy-books:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/nardy-books:${{ needs.generate_git_tags.outputs.output_new_tag }}
+
+  generate_git_release:
+    needs: [generate_git_tags, build_and_push_docker]
     name: "GitHub Release"
     runs-on: ubuntu-latest
     steps:
@@ -67,7 +82,7 @@ jobs:
           token: ${{ secrets.CHANGELOG_RELEASE }}
 
   generate_sentry_release:
-    needs: [test, generate_git_tags, generate_git_release]
+    needs: [generate_git_tags, build_and_push_docker]
     name: "Sentry Release"
     runs-on: ubuntu-latest
     steps:
