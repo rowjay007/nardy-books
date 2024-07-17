@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { Types } from "mongoose";
 import * as BookService from "../services/bookService";
-import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/appError";
+import catchAsync from "../utils/catchAsync";
 
 /**
  * Controller function to create a book
@@ -21,14 +21,16 @@ export const createBook = catchAsync(async (req: Request, res: Response) => {
  * @param {Response} res - Express response object
  * @returns {Promise<void>} - Returns a JSON object with the book data
  */
-export const getBookById = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const book = await BookService.getBookById(new Types.ObjectId(id));
+export const getBookById = async (req: Request, res: Response, next: any) => {
+  const bookId = new Types.ObjectId(req.params.id);
+  const book = await BookService.getBookById(bookId);
+
   if (!book) {
-    throw new AppError("Book not found", 404);
+    return next(new AppError("Book not found", 404));
   }
+
   res.status(200).json(book);
-});
+};
 
 /**
  * Controller function to get all books
