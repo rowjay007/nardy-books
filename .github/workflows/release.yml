@@ -1,18 +1,40 @@
 name: CI/CD Pipeline
+
 on:
   push:
     branches:
       - main
-jobs:
 
-  information: 
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20' 
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+  information:
     name: GitHub Context
+    needs: test  
     runs-on: ubuntu-latest
     steps:
       - name: Info
         run: echo "$GITHUB_CONTEXT"
 
   generate_git_tags:
+    name: "Generate Git Tags"
+    needs: test 
     runs-on: ubuntu-latest
     outputs:
       output_new_tag: ${{ steps.taggerFinal.outputs.new_tag }}
@@ -32,20 +54,20 @@ jobs:
           echo "The next new tag will be: ${{ steps.taggerFinal.outputs.new_tag }}"
 
   generate_git_release:
-    needs: generate_git_tags
+    needs: [test, generate_git_tags]
     name: "GitHub Release"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Release Action
-        uses: ncipollo/release-action@v1.14.0 
+        uses: ncipollo/release-action@v1.14.0
         with:
           tag: ${{ needs.generate_git_tags.outputs.output_new_tag }}
           token: ${{ secrets.CHANGELOG_RELEASE }}
 
   generate_sentry_release:
-    needs: [generate_git_tags, generate_git_release]
+    needs: [test, generate_git_tags, generate_git_release]
     name: "Sentry Release"
     runs-on: ubuntu-latest
     steps:
