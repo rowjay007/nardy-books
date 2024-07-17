@@ -1,11 +1,11 @@
-# #!/bin/bash
+#!/bin/bash
 
-# set -e
+set -e
 
-# echo "Starting the build process..."
+echo "Starting the build process..."
 
-# npm install
+npm install
 
-# npm run build
+npm run build
 
-# echo "Build process completed successfully."
+echo "Build process completed successfully."

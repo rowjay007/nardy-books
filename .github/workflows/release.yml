@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
           node-version: '20'
       - name: Install dependencies
@@ -39,7 +39,7 @@ jobs:
       output_new_tag: ${{ steps.taggerFinal.outputs.new_tag }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Generate Final Version
@@ -49,7 +49,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
       - name: Echo New Tag
-        run: echo "The next new tag will be - ${{ steps.taggerFinal.outputs.new_tag }}"
+        run: |
+          echo "The next new tag will be: ${{ steps.taggerFinal.outputs.new_tag }}"  # Use a pipe to preserve formatting
 
   generate_git_release:
     needs: [test, generate_git_tags]
@@ -99,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
