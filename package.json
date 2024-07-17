@@ -8,9 +8,8 @@
     "start": "node src/server.ts",
     "dev": "nodemon src/server.ts",
     "test": "jest",
-    "test:watch": "jest --watchAll",
-    "test:coverage": "jest --coverage",
-    "semantic-release": "semantic-release",
+  "test:watch": "jest --watch",
+  "test:coverage": "jest --coverage",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org rowjay --project nardy-book dist && sentry-cli sourcemaps upload --org rowjay --project nardy-book dist"
   },
   "keywords": [],
