@@ -94,3 +94,20 @@ jobs:
           version: '${{ steps.split_repo_name.outputs._1 }}@${{ needs.generate_git_tags.outputs.output_new_tag }}'
           sourcemaps: './build'
           url_prefix: '~'
+
+  docker_deploy:
+    name: Docker Deploy
+    needs: [test, generate_git_tags]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t rowjay007/nardy-books:${{ needs.generate_git_tags.outputs.output_new_tag }} .
+
+      - name: Push Docker image
+        run: docker push rowjay007/nardy-books:${{ needs.generate_git_tags.outputs.output_new_tag }}
