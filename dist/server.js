@@ -1,17 +1,17 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="8191e049-f9ad-531a-8027-27c4199e6810")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="748e1571-7ee2-5195-9e66-2d6b20d4b7cf")}catch(e){}}();
 
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
-const db_1 = __importDefault(require("./config/db"));
+const db_1 = require("./config/db");
 const env_1 = __importDefault(require("./config/env"));
 const logger_1 = __importDefault(require("./config/logger"));
 const sentry_1 = __importDefault(require("./config/sentry"));
 const PORT = env_1.default.PORT || 3000;
-(0, db_1.default)()
+(0, db_1.connectDB)()
     .then(() => {
     const server = app_1.default.listen(PORT, () => {
         logger_1.default.info(`Server running in ${env_1.default.NODE_ENV} mode on port ${PORT}`);
@@ -39,4 +39,4 @@ const PORT = env_1.default.PORT || 3000;
     logger_1.default.error(`Error connecting to database: ${err.message}`);
 });
 //# sourceMappingURL=server.js.map
-//# debugId=8191e049-f9ad-531a-8027-27c4199e6810
+//# debugId=748e1571-7ee2-5195-9e66-2d6b20d4b7cf

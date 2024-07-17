@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="6736dec2-6240-51ce-aeb4-9c8be0e26217")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="040a1a47-b60e-5fd9-8dfd-fe37d80d0e61")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -36,6 +36,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteSubscription = exports.updateSubscription = exports.getSubscriptionById = exports.getSubscriptions = exports.createSubscription = void 0;
 const subscriptionRepository = __importStar(require("../repositories/subscriptionRepository"));
+const cache_1 = __importStar(require("../utils/cache"));
 const createSubscription = (subscriptionData) => __awaiter(void 0, void 0, void 0, function* () {
     return yield subscriptionRepository.createSubscription(subscriptionData);
 });
@@ -45,16 +46,35 @@ const getSubscriptions = (filter, sort, page, limit) => __awaiter(void 0, void 0
 });
 exports.getSubscriptions = getSubscriptions;
 const getSubscriptionById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield subscriptionRepository.getSubscriptionById(id);
+    var _a;
+    const cacheKey = `subscription_${id}`;
+    let subscription = (_a = cache_1.default.get(cacheKey)) !== null && _a !== void 0 ? _a : null;
+    if (subscription === null) {
+        subscription = yield subscriptionRepository.getSubscriptionById(id);
+        if (subscription) {
+            cache_1.default.set(cacheKey, subscription, cache_1.CACHE_TTL_SECONDS);
+        }
+    }
+    return subscription;
 });
 exports.getSubscriptionById = getSubscriptionById;
 const updateSubscription = (id, subscriptionData) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield subscriptionRepository.updateSubscription(id, subscriptionData);
+    const updatedSubscription = yield subscriptionRepository.updateSubscription(id, subscriptionData);
+    if (updatedSubscription) {
+        const cacheKey = `subscription_${id}`;
+        cache_1.default.set(cacheKey, updatedSubscription, cache_1.CACHE_TTL_SECONDS);
+    }
+    return updatedSubscription;
 });
 exports.updateSubscription = updateSubscription;
 const deleteSubscription = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield subscriptionRepository.deleteSubscription(id);
+    const deletedSubscription = yield subscriptionRepository.deleteSubscription(id);
+    if (deletedSubscription) {
+        const cacheKey = `subscription_${id}`;
+        cache_1.default.del(cacheKey);
+    }
+    return deletedSubscription;
 });
 exports.deleteSubscription = deleteSubscription;
 //# sourceMappingURL=subscriptionService.js.map
-//# debugId=6736dec2-6240-51ce-aeb4-9c8be0e26217
+//# debugId=040a1a47-b60e-5fd9-8dfd-fe37d80d0e61

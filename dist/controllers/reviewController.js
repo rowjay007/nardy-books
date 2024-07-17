@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="62764b22-686d-5c40-ae4c-e694ad33452a")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="eb403188-2461-5a5f-bdac-20b0004c5190")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -135,14 +135,15 @@ exports.updateReviewById = (0, catchAsync_1.default)((req, res, next) => __await
  * @returns Returns a JSON object with the review data
  */
 exports.deleteReviewById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const review = yield ReviewService.deleteReviewById(req.params.id);
-    if (!review) {
+    const isDeleted = yield ReviewService.deleteReviewById(req.params.id);
+    if (!isDeleted) {
         return next(new appError_1.default("No review found with that ID", 404));
     }
-    res.status(204).json({
+    res.status(200).json({
         status: "success",
+        message: "Review successfully deleted",
         data: null,
     });
 }));
 //# sourceMappingURL=reviewController.js.map
-//# debugId=62764b22-686d-5c40-ae4c-e694ad33452a
+//# debugId=eb403188-2461-5a5f-bdac-20b0004c5190

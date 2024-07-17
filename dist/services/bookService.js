@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="8180524d-c706-5457-8bcc-41f504256049")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ae44a5a3-f7bf-5820-9755-a4eb35167e59")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -36,15 +36,54 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBookById = exports.updateBookById = exports.getAllBooks = exports.getBookById = exports.createBook = void 0;
 const BookRepository = __importStar(require("../repositories/bookRepository"));
-const createBook = (bookData) => __awaiter(void 0, void 0, void 0, function* () { return BookRepository.createBook(bookData); });
+const cache_1 = __importStar(require("../utils/cache"));
+const createBook = (bookData) => __awaiter(void 0, void 0, void 0, function* () {
+    const book = yield BookRepository.createBook(bookData);
+    cache_1.default.flushAll();
+    return book;
+});
 exports.createBook = createBook;
-const getBookById = (id) => __awaiter(void 0, void 0, void 0, function* () { return BookRepository.findBookById(id); });
+const getBookById = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const cacheKey = `book_${id.toString()}`;
+    let book = cache_1.default.get(cacheKey);
+    if (book === undefined) {
+        const fetchedBook = yield BookRepository.findBookById(id);
+        if (fetchedBook) {
+            book = fetchedBook;
+            cache_1.default.set(cacheKey, book, cache_1.CACHE_TTL_SECONDS);
+        }
+        else {
+            book = null;
+        }
+    }
+    return book;
+});
 exports.getBookById = getBookById;
-const getAllBooks = (queryParams) => __awaiter(void 0, void 0, void 0, function* () { return BookRepository.findAllBooks(queryParams); });
+const getAllBooks = (queryParams) => __awaiter(void 0, void 0, void 0, function* () {
+    const cacheKey = `allBooks_${JSON.stringify(queryParams)}`;
+    let cachedData = cache_1.default.get(cacheKey);
+    if (!cachedData) {
+        cachedData = yield BookRepository.findAllBooks(queryParams);
+        cache_1.default.set(cacheKey, cachedData, cache_1.CACHE_TTL_SECONDS);
+    }
+    return cachedData;
+});
 exports.getAllBooks = getAllBooks;
-const updateBookById = (id, bookData) => __awaiter(void 0, void 0, void 0, function* () { return BookRepository.updateBookById(id, bookData); });
+const updateBookById = (id, bookData) => __awaiter(void 0, void 0, void 0, function* () {
+    const book = yield BookRepository.updateBookById(id, bookData);
+    if (book) {
+        cache_1.default.flushAll();
+    }
+    return book;
+});
 exports.updateBookById = updateBookById;
-const deleteBookById = (id) => __awaiter(void 0, void 0, void 0, function* () { return BookRepository.deleteBookById(id); });
+const deleteBookById = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const book = yield BookRepository.deleteBookById(id);
+    if (book) {
+        cache_1.default.flushAll();
+    }
+    return book;
+});
 exports.deleteBookById = deleteBookById;
 //# sourceMappingURL=bookService.js.map
-//# debugId=8180524d-c706-5457-8bcc-41f504256049
+//# debugId=ae44a5a3-f7bf-5820-9755-a4eb35167e59

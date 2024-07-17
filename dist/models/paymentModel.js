@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d2aac54f-7fe8-576e-a5e8-da93c9e0b9c6")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c6ad973a-b5d7-52f3-bd32-cbc2ca4a3d39")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -25,14 +25,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importStar(require("mongoose"));
 const date_fns_1 = require("date-fns");
+const mongoose_1 = __importStar(require("mongoose"));
 const PaymentSchema = new mongoose_1.Schema({
-    amount: { type: Number, required: true },
-    method: { type: String, required: true },
-    status: { type: String, required: true },
-    user: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true },
-    date: { type: Date, default: Date.now },
+    amount: { type: Number, required: true, index: true },
+    method: { type: String, required: true, index: true },
+    status: { type: String, required: true, index: true },
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        index: true,
+    },
+    date: { type: Date, default: Date.now, index: true },
     reference: { type: String, required: true, unique: true },
 });
 PaymentSchema.pre("save", function (next) {
@@ -50,4 +55,4 @@ PaymentSchema.pre("save", function (next) {
 const Payment = mongoose_1.default.model("Payment", PaymentSchema);
 exports.default = Payment;
 //# sourceMappingURL=paymentModel.js.map
-//# debugId=d2aac54f-7fe8-576e-a5e8-da93c9e0b9c6
+//# debugId=c6ad973a-b5d7-52f3-bd32-cbc2ca4a3d39

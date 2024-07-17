@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="1e073bf2-57fd-5919-b84f-251b65edfac4")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ce076dd2-818f-54d8-9684-316f59602bc3")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -39,26 +39,53 @@ const PaymentRepository = __importStar(require("../repositories/paymentRepositor
 const paystack_1 = require("../utils/paystack");
 const flutterwave_1 = require("../utils/flutterwave");
 const referenceTag_1 = require("../utils/referenceTag");
+const cache_1 = __importStar(require("../utils/cache"));
 const createPayment = (paymentData) => __awaiter(void 0, void 0, void 0, function* () {
     const reference = (0, referenceTag_1.generateUniqueReference)("ADM_");
     paymentData.reference = reference;
-    return PaymentRepository.create(paymentData);
+    const payment = yield PaymentRepository.create(paymentData);
+    cache_1.default.flushAll();
+    return payment;
 });
 exports.createPayment = createPayment;
 const getPaymentById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return PaymentRepository.findById(id);
+    const cacheKey = `payment_${id}`;
+    let payment = cache_1.default.get(cacheKey);
+    if (payment === undefined) {
+        payment = yield PaymentRepository.findById(id);
+        if (payment) {
+            cache_1.default.set(cacheKey, payment, cache_1.CACHE_TTL_SECONDS);
+        }
+    }
+    return payment;
 });
 exports.getPaymentById = getPaymentById;
 const getAllPayments = (filter, sort, page, limit) => __awaiter(void 0, void 0, void 0, function* () {
-    return PaymentRepository.findAll(filter, sort, page, limit);
+    const cacheKey = `allPayments_${JSON.stringify({
+        filter,
+        sort,
+        page,
+        limit,
+    })}`;
+    let payments = cache_1.default.get(cacheKey);
+    if (!payments) {
+        payments = yield PaymentRepository.findAll(filter, sort, page, limit);
+        cache_1.default.set(cacheKey, payments, cache_1.CACHE_TTL_SECONDS);
+    }
+    return payments;
 });
 exports.getAllPayments = getAllPayments;
 const updatePayment = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    return PaymentRepository.update(id, updateData);
+    const payment = yield PaymentRepository.update(id, updateData);
+    if (payment) {
+        cache_1.default.flushAll();
+    }
+    return payment;
 });
 exports.updatePayment = updatePayment;
 const deletePayment = (id) => __awaiter(void 0, void 0, void 0, function* () {
     yield PaymentRepository.remove(id);
+    cache_1.default.flushAll();
 });
 exports.deletePayment = deletePayment;
 const processPaystackPayment = (amount, email) => __awaiter(void 0, void 0, void 0, function* () {
@@ -82,4 +109,4 @@ const verifyFlutterwavePayment = (reference) => __awaiter(void 0, void 0, void 0
 });
 exports.verifyFlutterwavePayment = verifyFlutterwavePayment;
 //# sourceMappingURL=paymentService.js.map
-//# debugId=1e073bf2-57fd-5919-b84f-251b65edfac4
+//# debugId=ce076dd2-818f-54d8-9684-316f59602bc3

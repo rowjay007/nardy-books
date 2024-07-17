@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="562481f5-e432-58e9-aef2-ac56b026856e")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="6fbdc239-7651-5abf-b890-d209c3c0d55c")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27,12 +27,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const ReviewSchema = new mongoose_1.Schema({
-    reviewer: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true },
-    book: { type: mongoose_1.Schema.Types.ObjectId, ref: "Book", required: true },
-    rating: { type: Number, required: true },
+    reviewer: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        index: true,
+    },
+    book: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Book",
+        required: true,
+        index: true,
+    },
+    rating: { type: Number, required: true, index: true },
     comments: { type: String },
 });
 const Review = mongoose_1.default.model("Review", ReviewSchema);
 exports.default = Review;
 //# sourceMappingURL=reviewModel.js.map
-//# debugId=562481f5-e432-58e9-aef2-ac56b026856e
+//# debugId=6fbdc239-7651-5abf-b890-d209c3c0d55c

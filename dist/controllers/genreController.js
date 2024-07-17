@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="35ff0cc5-53a5-58be-86fb-a9411df585c0")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="6097eb92-ba87-5c1c-b48c-22d35afe36c6")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -42,6 +42,12 @@ const GenreService = __importStar(require("../services/genreService"));
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const appError_1 = __importDefault(require("../utils/appError"));
 const mongoose_1 = require("mongoose");
+/**
+ * Converts a string to a Mongoose ObjectId.
+ * @param {string} id - The ID to convert.
+ * @returns {Types.ObjectId} - The converted ObjectId.
+ * @throws {AppError} - Throws an error if the ID format is invalid.
+ */
 const convertToObjectId = (id) => {
     try {
         return new mongoose_1.Types.ObjectId(id);
@@ -50,6 +56,13 @@ const convertToObjectId = (id) => {
         throw new appError_1.default("Invalid ID format", 400);
     }
 };
+/**
+ * Controller function to create a genre
+ * @param {Request} req - Express request object with body containing genre data
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the created genre data
+ */
 exports.createGenre = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const genre = yield GenreService.createGenre(req.body);
     res.status(201).json({
@@ -59,6 +72,13 @@ exports.createGenre = (0, catchAsync_1.default)((req, res, next) => __awaiter(vo
         },
     });
 }));
+/**
+ * Controller function to get a genre by ID
+ * @param {Request} req - Express request object with params containing genre ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the genre data
+ */
 exports.getGenreById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const genreId = convertToObjectId(req.params.id);
     const genre = yield GenreService.getGenreById(genreId);
@@ -72,6 +92,13 @@ exports.getGenreById = (0, catchAsync_1.default)((req, res, next) => __awaiter(v
         },
     });
 }));
+/**
+ * Controller function to get all genres
+ * @param {Request} req - Express request object with query parameters for filtering, sorting, and pagination
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the genres data
+ */
 exports.getAllGenres = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const sortQuery = req.query.sort;
     const genres = yield GenreService.getAllGenres(req.query.filter, Number(req.query.page), Number(req.query.limit), sortQuery);
@@ -82,6 +109,13 @@ exports.getAllGenres = (0, catchAsync_1.default)((req, res, next) => __awaiter(v
         },
     });
 }));
+/**
+ * Controller function to update a genre by ID
+ * @param {Request} req - Express request object with params containing genre ID and body containing update data
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the updated genre data
+ */
 exports.updateGenreById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const genreId = convertToObjectId(req.params.id);
     const genre = yield GenreService.updateGenreById(genreId, req.body);
@@ -95,17 +129,32 @@ exports.updateGenreById = (0, catchAsync_1.default)((req, res, next) => __awaite
         },
     });
 }));
+/**
+ * Controller function to delete a genre by ID
+ * @param {Request} req - Express request object with params containing genre ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object indicating successful deletion
+ */
 exports.deleteGenreById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const genreId = convertToObjectId(req.params.id);
     const genre = yield GenreService.deleteGenreById(genreId);
     if (!genre) {
         return next(new appError_1.default("No genre found with that ID", 404));
     }
-    res.status(204).json({
+    res.status(200).json({
         status: "success",
+        message: "Genre successfully deleted",
         data: null,
     });
 }));
+/**
+ * Controller function to add a book to a genre
+ * @param {Request} req - Express request object with params containing genre ID and book ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the updated genre data
+ */
 exports.addBookToGenre = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { genreId, bookId } = req.params;
     const genre = yield GenreService.addBookToGenre(convertToObjectId(genreId), convertToObjectId(bookId));
@@ -120,4 +169,4 @@ exports.addBookToGenre = (0, catchAsync_1.default)((req, res, next) => __awaiter
     });
 }));
 //# sourceMappingURL=genreController.js.map
-//# debugId=35ff0cc5-53a5-58be-86fb-a9411df585c0
+//# debugId=6097eb92-ba87-5c1c-b48c-22d35afe36c6

@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ce14fbfb-932c-53a5-b0b9-10dc42f50555")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="6ae5d7b9-4463-599a-867e-1bf423b8b9cb")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27,16 +27,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const UserSchema = new mongoose_1.Schema({
-    username: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    username: { type: String, required: true, index: true },
+    email: { type: String, required: true, unique: true, index: true },
     password: { type: String, required: true },
     isEmailVerified: { type: Boolean, default: false },
-    resetPasswordToken: String,
-    resetPasswordExpires: Date,
-    verificationToken: String,
-    refreshToken: String,
+    resetPasswordToken: { type: String, index: true },
+    resetPasswordExpires: { type: Date, index: true },
+    verificationToken: { type: String, index: true },
+    refreshToken: { type: String, index: true },
 });
 const User = mongoose_1.default.model("User", UserSchema);
 exports.default = User;
 //# sourceMappingURL=userModel.js.map
-//# debugId=ce14fbfb-932c-53a5-b0b9-10dc42f50555
+//# debugId=6ae5d7b9-4463-599a-867e-1bf423b8b9cb

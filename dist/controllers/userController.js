@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="5d33c5c8-2d53-5e36-9063-5a234ed85704")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="9e8e5464-1b54-5dd6-8dc3-bb61727a5269")}catch(e){}}();
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -17,92 +17,70 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUser = exports.updateUser = exports.getUserById = exports.getAllUsers = void 0;
 const userService_1 = __importDefault(require("../services/userService"));
 const appError_1 = __importDefault(require("../utils/appError"));
+const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 /**
  * Controller function to get all users
  * @param req Express request object
  * @param res Express response object
  * @param next Express next function
  */
-const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const filter = {};
-        const sort = {};
-        const limit = 10;
-        const skip = 0;
-        const users = yield userService_1.default.getAllUsers(filter, sort, limit, skip);
-        res.status(200).json({
-            status: "success",
-            data: { users },
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.getAllUsers = getAllUsers;
+exports.getAllUsers = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const filter = {};
+    const sort = {};
+    const limit = 10;
+    const skip = 0;
+    const users = yield userService_1.default.getAllUsers(filter, sort, limit, skip);
+    res.status(200).json({
+        status: "success",
+        data: { users },
+    });
+}));
 /**
  * Controller function to get a user by ID
  * @param req Express request object with params containing user ID
  * @param res Express response object
  * @param next Express next function
  */
-const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getUserById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
-    try {
-        const user = yield userService_1.default.getUserById(userId);
-        if (!user) {
-            throw new appError_1.default("User not found", 404);
-        }
-        res.status(200).json({
-            status: "success",
-            data: { user },
-        });
+    const user = yield userService_1.default.getUserById(userId);
+    if (!user) {
+        return next(new appError_1.default("User not found", 404));
     }
-    catch (error) {
-        next(error);
-    }
-});
-exports.getUserById = getUserById;
+    res.status(200).json({
+        status: "success",
+        data: { user },
+    });
+}));
 /**
  * Controller function to update a user
  * @param req Express request object with params containing user ID and body containing update data
  * @param res Express response object
  * @param next Express next function
  */
-const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.updateUser = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
     const updateData = req.body;
-    try {
-        const updatedUser = yield userService_1.default.updateUser(userId, updateData);
-        res.status(200).json({
-            status: "success",
-            data: { user: updatedUser },
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.updateUser = updateUser;
+    const updatedUser = yield userService_1.default.updateUser(userId, updateData);
+    res.status(200).json({
+        status: "success",
+        data: { user: updatedUser },
+    });
+}));
 /**
  * Controller function to delete a user
  * @param req Express request object with params containing user ID
  * @param res Express response object
  * @param next Express next function
  */
-const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.deleteUser = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
-    try {
-        yield userService_1.default.deleteUser(userId);
-        res.status(204).json({
-            status: "success",
-            data: null,
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.deleteUser = deleteUser;
+    yield userService_1.default.deleteUser(userId);
+    res.status(200).json({
+        status: "success",
+        message: "User successfully deleted",
+        data: null,
+    });
+}));
 //# sourceMappingURL=userController.js.map
-//# debugId=5d33c5c8-2d53-5e36-9063-5a234ed85704
+//# debugId=9e8e5464-1b54-5dd6-8dc3-bb61727a5269

@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ae8f4e2e-2bfd-556d-b257-ddf755be7ce5")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="7896a94d-82f7-583a-9f0a-84d73397b63d")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -96,7 +96,11 @@ exports.updateSubscription = (0, catchAsync_1.default)((req, res) => __awaiter(v
  */
 exports.deleteSubscription = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield subscriptionService.deleteSubscription(req.params.id);
-    res.status(204).end();
+    res.status(200).json({
+        status: "success",
+        message: "Subscription successfully deleted",
+        data: null,
+    });
 }));
 //# sourceMappingURL=subscriptionController.js.map
-//# debugId=ae8f4e2e-2bfd-556d-b257-ddf755be7ce5
+//# debugId=7896a94d-82f7-583a-9f0a-84d73397b63d

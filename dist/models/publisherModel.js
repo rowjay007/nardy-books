@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="3ca5ae7e-3e3f-5578-a5e0-d82b7c332384")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="b5216a84-37e8-585a-9d0a-114637477d18")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27,11 +27,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const PublisherSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
+    name: { type: String, required: true, index: true },
     address: { type: String },
     books: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "Book" }],
 });
 const Publisher = mongoose_1.default.model("Publisher", PublisherSchema);
 exports.default = Publisher;
 //# sourceMappingURL=publisherModel.js.map
-//# debugId=3ca5ae7e-3e3f-5578-a5e0-d82b7c332384
+//# debugId=b5216a84-37e8-585a-9d0a-114637477d18

@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ca93bec1-7418-5805-b427-fac88ec808ba")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="801629a9-94c1-5978-945a-c5f4c1c813fd")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -38,32 +38,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addBookToPublisher = exports.deletePublisherById = exports.updatePublisherById = exports.getAllPublishers = exports.getPublisherById = exports.createPublisher = void 0;
-const PublisherRepository = __importStar(require("../repositories/publisherRepository"));
 const publisherModel_1 = __importDefault(require("../models/publisherModel"));
+const PublisherRepository = __importStar(require("../repositories/publisherRepository"));
+const cache_1 = __importStar(require("../utils/cache"));
 const createPublisher = (publisherData) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield PublisherRepository.createPublisher(publisherData);
+    const publisher = yield PublisherRepository.createPublisher(publisherData);
+    cache_1.default.flushAll();
+    return publisher;
 });
 exports.createPublisher = createPublisher;
 const getPublisherById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield PublisherRepository.getPublisherById(id);
+    const cacheKey = `publisher_${id.toString()}`;
+    let publisher = cache_1.default.get(cacheKey);
+    if (publisher === undefined) {
+        publisher = yield PublisherRepository.getPublisherById(id);
+        if (publisher) {
+            cache_1.default.set(cacheKey, publisher, cache_1.CACHE_TTL_SECONDS);
+        }
+    }
+    return publisher;
 });
 exports.getPublisherById = getPublisherById;
 const getAllPublishers = (filter, page, limit, sort) => __awaiter(void 0, void 0, void 0, function* () {
-    return PublisherRepository.getAllPublishers(filter, page, limit, sort);
+    const cacheKey = `allPublishers_${JSON.stringify({
+        filter,
+        page,
+        limit,
+        sort,
+    })}`;
+    let publishers = cache_1.default.get(cacheKey);
+    if (!publishers) {
+        publishers = yield PublisherRepository.getAllPublishers(filter, page, limit, sort);
+        cache_1.default.set(cacheKey, publishers, cache_1.CACHE_TTL_SECONDS);
+    }
+    return publishers;
 });
 exports.getAllPublishers = getAllPublishers;
 const updatePublisherById = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield PublisherRepository.updatePublisherById(id, updateData);
+    const publisher = yield PublisherRepository.updatePublisherById(id, updateData);
+    if (publisher) {
+        cache_1.default.flushAll();
+    }
+    return publisher;
 });
 exports.updatePublisherById = updatePublisherById;
 const deletePublisherById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield PublisherRepository.deletePublisherById(id);
+    const deletedPublisher = yield PublisherRepository.deletePublisherById(id);
+    cache_1.default.flushAll();
+    return deletedPublisher;
 });
 exports.deletePublisherById = deletePublisherById;
 const addBookToPublisher = (publisherId, bookId) => __awaiter(void 0, void 0, void 0, function* () {
     const publisher = yield publisherModel_1.default.findByIdAndUpdate(publisherId, { $push: { books: bookId } }, { new: true }).populate("books");
+    if (publisher) {
+        cache_1.default.flushAll();
+    }
     return publisher;
 });
 exports.addBookToPublisher = addBookToPublisher;
 //# sourceMappingURL=publisherService.js.map
-//# debugId=ca93bec1-7418-5805-b427-fac88ec808ba
+//# debugId=801629a9-94c1-5978-945a-c5f4c1c813fd

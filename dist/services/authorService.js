@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="6e87c422-bdd5-5d3b-a7c7-0efdf46b95b8")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="2e757131-e075-5641-b266-81f7048bbaff")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -36,12 +36,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addBookToAuthor = exports.deleteAuthorById = exports.updateAuthorById = exports.getAllAuthors = exports.getAuthorById = exports.createAuthor = void 0;
 const AuthorRepository = __importStar(require("../repositories/authorRepository"));
+const cache_1 = __importStar(require("../utils/cache"));
 const createAuthor = (authorData) => __awaiter(void 0, void 0, void 0, function* () {
-    return AuthorRepository.createAuthor(authorData);
+    const author = yield AuthorRepository.createAuthor(authorData);
+    cache_1.default.flushAll();
+    return author;
 });
 exports.createAuthor = createAuthor;
 const getAuthorById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return AuthorRepository.getAuthorById(id);
+    const cacheKey = `author_${id.toString()}`;
+    let author = cache_1.default.get(cacheKey);
+    if (author === undefined) {
+        const fetchedAuthor = yield AuthorRepository.getAuthorById(id);
+        if (fetchedAuthor) {
+            author = fetchedAuthor;
+            cache_1.default.set(cacheKey, author, cache_1.CACHE_TTL_SECONDS);
+        }
+        else {
+            author = null;
+        }
+    }
+    return author;
 });
 exports.getAuthorById = getAuthorById;
 const getAllAuthors = (name_1, ...args_1) => __awaiter(void 0, [name_1, ...args_1], void 0, function* (name, page = 1, limit = 10, sortBy = "name", sortOrder = "asc") {
@@ -51,27 +66,45 @@ const getAllAuthors = (name_1, ...args_1) => __awaiter(void 0, [name_1, ...args_
     }
     const sort = {};
     sort[sortBy] = sortOrder === "desc" ? -1 : 1;
-    const authors = yield AuthorRepository.getAllAuthors(filter, page, limit, sort);
-    const total = yield AuthorRepository.getTotalCount(filter);
-    return {
-        authors,
-        total,
+    const cacheKey = `allAuthors_${JSON.stringify({
+        filter,
         page,
         limit,
-    };
+        sort,
+    })}`;
+    let cachedData = cache_1.default.get(cacheKey);
+    if (!cachedData) {
+        const authors = yield AuthorRepository.getAllAuthors(filter, page, limit, sort);
+        const total = yield AuthorRepository.getTotalCount(filter);
+        cachedData = { authors, total };
+        cache_1.default.set(cacheKey, cachedData, cache_1.CACHE_TTL_SECONDS);
+    }
+    return Object.assign(Object.assign({}, cachedData), { page, limit });
 });
 exports.getAllAuthors = getAllAuthors;
 const updateAuthorById = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
-    return AuthorRepository.updateAuthorById(id, updateData);
+    const author = yield AuthorRepository.updateAuthorById(id, updateData);
+    if (author) {
+        cache_1.default.flushAll();
+    }
+    return author;
 });
 exports.updateAuthorById = updateAuthorById;
 const deleteAuthorById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return AuthorRepository.deleteAuthorById(id);
+    const author = yield AuthorRepository.deleteAuthorById(id);
+    if (author) {
+        cache_1.default.flushAll();
+    }
+    return author;
 });
 exports.deleteAuthorById = deleteAuthorById;
 const addBookToAuthor = (authorId, bookId) => __awaiter(void 0, void 0, void 0, function* () {
-    return AuthorRepository.addBookToAuthor(authorId, bookId);
+    const author = yield AuthorRepository.addBookToAuthor(authorId, bookId);
+    if (author) {
+        cache_1.default.flushAll();
+    }
+    return author;
 });
 exports.addBookToAuthor = addBookToAuthor;
 //# sourceMappingURL=authorService.js.map
-//# debugId=6e87c422-bdd5-5d3b-a7c7-0efdf46b95b8
+//# debugId=2e757131-e075-5641-b266-81f7048bbaff

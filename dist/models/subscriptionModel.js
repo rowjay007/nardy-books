@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c080bd5c-b62e-5f86-88c8-f804950c4925")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="48052572-87e0-551c-a985-8ce0bcfed439")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27,12 +27,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const SubscriptionSchema = new mongoose_1.Schema({
-    type: { type: String, required: true },
-    startDate: { type: Date, required: true },
-    endDate: { type: Date, required: true },
+    type: { type: String, required: true, index: true },
+    startDate: { type: Date, required: true, index: true },
+    endDate: { type: Date, required: true, index: true },
     users: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
 });
 const Subscription = mongoose_1.default.model("Subscription", SubscriptionSchema);
 exports.default = Subscription;
 //# sourceMappingURL=subscriptionModel.js.map
-//# debugId=c080bd5c-b62e-5f86-88c8-f804950c4925
+//# debugId=48052572-87e0-551c-a985-8ce0bcfed439

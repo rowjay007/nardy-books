@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="01fc0d51-3476-5e9d-ab78-0e5b6c465c29")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d7139836-7f78-511c-ab2b-7bae238af79b")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -37,28 +37,56 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteReviewById = exports.updateReviewById = exports.getAllReviews = exports.getReviewById = exports.createReview = void 0;
 const ReviewRepository = __importStar(require("../repositories/reviewRepository"));
 const mongoose_1 = require("mongoose");
+const cache_1 = __importStar(require("../utils/cache"));
 const createReview = (reviewData) => __awaiter(void 0, void 0, void 0, function* () {
-    return ReviewRepository.createReview(reviewData);
+    const review = yield ReviewRepository.createReview(reviewData);
+    cache_1.default.flushAll();
+    return review;
 });
 exports.createReview = createReview;
 const getReviewById = (reviewId) => __awaiter(void 0, void 0, void 0, function* () {
+    const cacheKey = `review_${reviewId}`;
     const id = new mongoose_1.Types.ObjectId(reviewId);
-    return ReviewRepository.getReviewById(id);
+    let review = cache_1.default.get(cacheKey);
+    if (!review) {
+        review = yield ReviewRepository.getReviewById(id);
+        if (review) {
+            cache_1.default.set(cacheKey, review, cache_1.CACHE_TTL_SECONDS);
+        }
+    }
+    return review;
 });
 exports.getReviewById = getReviewById;
 const getAllReviews = (filter, page, limit, sort) => __awaiter(void 0, void 0, void 0, function* () {
-    return ReviewRepository.getAllReviews(filter, page, limit, sort);
+    const cacheKey = `allReviews_${JSON.stringify({
+        filter,
+        page,
+        limit,
+        sort,
+    })}`;
+    let reviews = cache_1.default.get(cacheKey);
+    if (!reviews) {
+        reviews = yield ReviewRepository.getAllReviews(filter, page, limit, sort);
+        cache_1.default.set(cacheKey, reviews, cache_1.CACHE_TTL_SECONDS);
+    }
+    return reviews;
 });
 exports.getAllReviews = getAllReviews;
 const updateReviewById = (reviewId, updateData) => __awaiter(void 0, void 0, void 0, function* () {
     const id = new mongoose_1.Types.ObjectId(reviewId);
-    return ReviewRepository.updateReviewById(id, updateData);
+    const review = yield ReviewRepository.updateReviewById(id, updateData);
+    if (review) {
+        cache_1.default.flushAll();
+    }
+    return review;
 });
 exports.updateReviewById = updateReviewById;
 const deleteReviewById = (reviewId) => __awaiter(void 0, void 0, void 0, function* () {
     const id = new mongoose_1.Types.ObjectId(reviewId);
-    return ReviewRepository.deleteReviewById(id);
+    const result = yield ReviewRepository.deleteReviewById(id);
+    cache_1.default.flushAll();
+    return result !== null;
 });
 exports.deleteReviewById = deleteReviewById;
 //# sourceMappingURL=reviewService.js.map
-//# debugId=01fc0d51-3476-5e9d-ab78-0e5b6c465c29
+//# debugId=d7139836-7f78-511c-ab2b-7bae238af79b

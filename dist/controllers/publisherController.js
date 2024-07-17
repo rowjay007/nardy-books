@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="ad5fdaed-0245-5f6d-b7ea-a975633e1d9d")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="f968fccd-a774-5787-9ed6-9fa585b80a4d")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -42,6 +42,12 @@ const PublisherService = __importStar(require("../services/publisherService"));
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const appError_1 = __importDefault(require("../utils/appError"));
 const mongoose_1 = require("mongoose");
+/**
+ * Convert a string to a MongoDB ObjectId
+ * @param {string} id - The ID to convert
+ * @returns {Types.ObjectId} - The converted ObjectId
+ * @throws {AppError} - Throws an error if the ID format is invalid
+ */
 const convertToObjectId = (id) => {
     try {
         return new mongoose_1.Types.ObjectId(id);
@@ -50,6 +56,13 @@ const convertToObjectId = (id) => {
         throw new appError_1.default("Invalid ID format", 400);
     }
 };
+/**
+ * Controller function to create a publisher
+ * @param {Request} req - Express request object with body containing publisher data
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the publisher data
+ */
 exports.createPublisher = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const publisher = yield PublisherService.createPublisher(req.body);
     res.status(201).json({
@@ -59,6 +72,13 @@ exports.createPublisher = (0, catchAsync_1.default)((req, res, next) => __awaite
         },
     });
 }));
+/**
+ * Controller function to get a publisher by ID
+ * @param {Request} req - Express request object with params containing publisher ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the publisher data
+ */
 exports.getPublisherById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const publisherId = convertToObjectId(req.params.id);
     const publisher = yield PublisherService.getPublisherById(publisherId);
@@ -72,6 +92,13 @@ exports.getPublisherById = (0, catchAsync_1.default)((req, res, next) => __await
         },
     });
 }));
+/**
+ * Controller function to get all publishers
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the publishers data
+ */
 exports.getAllPublishers = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const page = Number(req.query.page) || 1;
@@ -88,6 +115,13 @@ exports.getAllPublishers = (0, catchAsync_1.default)((req, res, next) => __await
         next(new appError_1.default("Unable to fetch publishers", 500));
     }
 }));
+/**
+ * Controller function to update a publisher by ID
+ * @param {Request} req - Express request object with params containing publisher ID and body containing update data
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the updated publisher data
+ */
 exports.updatePublisherById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const publisherId = convertToObjectId(req.params.id);
     const publisher = yield PublisherService.updatePublisherById(publisherId, req.body);
@@ -101,17 +135,32 @@ exports.updatePublisherById = (0, catchAsync_1.default)((req, res, next) => __aw
         },
     });
 }));
+/**
+ * Controller function to delete a publisher by ID
+ * @param {Request} req - Express request object with params containing publisher ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object indicating successful deletion
+ */
 exports.deletePublisherById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const publisherId = convertToObjectId(req.params.id);
-    const publisher = yield PublisherService.deletePublisherById(publisherId);
-    if (!publisher) {
+    const publisherDeleted = yield PublisherService.deletePublisherById(publisherId);
+    if (!publisherDeleted) {
         return next(new appError_1.default("No publisher found with that ID", 404));
     }
-    res.status(204).json({
+    res.status(200).json({
         status: "success",
+        message: "Publisher successfully deleted",
         data: null,
     });
 }));
+/**
+ * Controller function to add a book to a publisher
+ * @param {Request} req - Express request object with params containing publisher ID and book ID
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with the updated publisher data
+ */
 exports.addBookToPublisher = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const publisherId = convertToObjectId(req.params.publisherId);
     const bookId = convertToObjectId(req.params.bookId);
@@ -127,4 +176,4 @@ exports.addBookToPublisher = (0, catchAsync_1.default)((req, res, next) => __awa
     });
 }));
 //# sourceMappingURL=publisherController.js.map
-//# debugId=ad5fdaed-0245-5f6d-b7ea-a975633e1d9d
+//# debugId=f968fccd-a774-5787-9ed6-9fa585b80a4d

@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="200bf718-d938-5abc-9166-cb65045d1c94")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="138ebc4b-b1dd-5a94-be69-07a52b5e85c0")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -27,11 +27,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const GenreSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
+    name: { type: String, required: true, index: true },
     description: { type: String },
     books: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "Book" }],
 });
 const Genre = mongoose_1.default.model("Genre", GenreSchema);
 exports.default = Genre;
 //# sourceMappingURL=genreModel.js.map
-//# debugId=200bf718-d938-5abc-9166-cb65045d1c94
+//# debugId=138ebc4b-b1dd-5a94-be69-07a52b5e85c0

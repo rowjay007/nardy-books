@@ -1,6 +1,29 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="7b46c0ac-ec0b-5669-a82a-833091652f6c")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d296d33a-6f45-589e-a24f-5bd3c0978754")}catch(e){}}();
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -22,6 +45,7 @@ const userModel_1 = __importDefault(require("../models/userModel"));
 const userRepository_1 = __importDefault(require("../repositories/userRepository"));
 const appError_1 = __importDefault(require("../utils/appError"));
 const emailUtils_1 = require("../utils/emailUtils");
+const cache_1 = __importStar(require("../utils/cache"));
 const generateAccessToken = (userId) => {
     return jsonwebtoken_1.default.sign({ id: userId }, env_1.default.JWT_SECRET, {
         expiresIn: "1h",
@@ -46,6 +70,7 @@ const register = (username, email, password) => __awaiter(void 0, void 0, void 0
         (0, emailUtils_1.sendWelcomeEmail)(email, username, verificationLink),
         (0, emailUtils_1.sendVerificationEmail)(email, verificationLink),
     ]);
+    cache_1.default.flushAll();
     return user;
 });
 const login = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
@@ -62,6 +87,7 @@ const login = (email, password) => __awaiter(void 0, void 0, void 0, function* (
 });
 const logout = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     yield userRepository_1.default.removeRefreshToken(userId);
+    cache_1.default.flushAll();
 });
 const requestPasswordReset = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield userRepository_1.default.findUserByEmail(email);
@@ -82,6 +108,7 @@ const resetPassword = (token, newPassword) => __awaiter(void 0, void 0, void 0, 
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     yield user.save();
+    cache_1.default.flushAll();
     return user;
 });
 const changePassword = (userId, currentPassword, newPassword) => __awaiter(void 0, void 0, void 0, function* () {
@@ -93,6 +120,7 @@ const changePassword = (userId, currentPassword, newPassword) => __awaiter(void 
         throw new appError_1.default("Current password is incorrect", 401);
     user.password = yield bcrypt_1.default.hash(newPassword, 12);
     yield user.save();
+    cache_1.default.flushAll();
     return user;
 });
 const verifyEmail = (verificationToken) => __awaiter(void 0, void 0, void 0, function* () {
@@ -100,6 +128,7 @@ const verifyEmail = (verificationToken) => __awaiter(void 0, void 0, void 0, fun
     if (!user) {
         throw new appError_1.default("Invalid verification token.", 400);
     }
+    cache_1.default.flushAll();
     return user;
 });
 const resendVerificationEmail = (userId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -111,21 +140,38 @@ const resendVerificationEmail = (userId) => __awaiter(void 0, void 0, void 0, fu
     yield user.save();
     const verificationLink = `${process.env.EMAIL_VERIFICATION_URL}/verify-email/${verificationToken}`;
     yield (0, emailUtils_1.sendVerificationEmail)(user.email, verificationLink);
+    cache_1.default.flushAll();
 });
 const getUserById = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield userRepository_1.default.findUserById(userId);
+    const cacheKey = `user_${userId}`;
+    let user = cache_1.default.get(cacheKey);
+    if (user === undefined) {
+        user = yield userRepository_1.default.findUserById(userId);
+        if (user) {
+            cache_1.default.set(cacheKey, user, cache_1.CACHE_TTL_SECONDS);
+        }
+    }
     return user;
 });
 const getAllUsers = (filter, sort, limit, skip) => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield userRepository_1.default.findUsers(filter, sort, limit, skip);
+    const cacheKey = `allUsers_${JSON.stringify({ filter, sort, limit, skip })}`;
+    let users = cache_1.default.get(cacheKey);
+    if (!users) {
+        users = yield userRepository_1.default.findUsers(filter, sort, limit, skip);
+        cache_1.default.set(cacheKey, users, cache_1.CACHE_TTL_SECONDS);
+    }
     return users;
 });
 const updateUser = (userId, updateData) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield userRepository_1.default.updateUser(userId, updateData);
+    if (user) {
+        cache_1.default.flushAll();
+    }
     return user;
 });
 const deleteUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     yield userRepository_1.default.deleteUser(userId);
+    cache_1.default.flushAll();
 });
 exports.default = {
     register,
@@ -142,4 +188,4 @@ exports.default = {
     deleteUser,
 };
 //# sourceMappingURL=userService.js.map
-//# debugId=7b46c0ac-ec0b-5669-a82a-833091652f6c
+//# debugId=d296d33a-6f45-589e-a24f-5bd3c0978754

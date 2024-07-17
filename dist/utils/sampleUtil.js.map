@@ -1,0 +1,1 @@
+{"version":3,"file":"sampleUtil.js","sources":["utils/sampleUtil.ts"],"sourceRoot":"/","sourcesContent":["export const sum = (a: number, b: number): number => a + b;\n"],"names":[],"mappings":";;;;;AAAO,MAAM,GAAG,GAAG,CAAC,CAAS,EAAE,CAAS,EAAU,EAAE,CAAC,CAAC,GAAG,CAAC,CAAC;AAA9C,QAAA,GAAG,OAA2C","debug_id":"51798611-7a67-5296-ba79-c90c5cbdb143"}
