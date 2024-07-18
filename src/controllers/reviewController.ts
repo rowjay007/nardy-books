@@ -32,7 +32,11 @@ export const createReview = catchAsync(
  */
 export const getReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const review = await ReviewService.getReviewById(req.params.id);
+    const reviewId = req.params?.id;
+    if (!reviewId) {
+      return next(new AppError("No review ID provided", 400));
+    }
+    const review = await ReviewService.getReviewById(reviewId);
     if (!review) {
       return next(new AppError("No review found with that ID", 404));
     }
@@ -95,10 +99,11 @@ export const getAllReviews = catchAsync(
  */
 export const updateReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const review = await ReviewService.updateReviewById(
-      req.params.id,
-      req.body
-    );
+    const reviewId = req.params?.id;
+    if (!reviewId) {
+      return next(new AppError("No review ID provided", 400));
+    }
+    const review = await ReviewService.updateReviewById(reviewId, req.body);
     if (!review) {
       return next(new AppError("No review found with that ID", 404));
     }
@@ -120,7 +125,11 @@ export const updateReviewById = catchAsync(
  */
 export const deleteReviewById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const isDeleted = await ReviewService.deleteReviewById(req.params.id);
+    const reviewId = req.params?.id;
+    if (!reviewId) {
+      return next(new AppError("No review ID provided", 400));
+    }
+    const isDeleted = await ReviewService.deleteReviewById(reviewId);
     if (!isDeleted) {
       return next(new AppError("No review found with that ID", 404));
     }

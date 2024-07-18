@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 export const mockRequest = (): Partial<Request> => ({
   body: {},
-  params: {},
+  params: {}, 
   query: {},
   headers: {},
 });
