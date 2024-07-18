@@ -27,16 +27,19 @@ const convertToObjectId = (id: string) => {
  */
 export const createPublisher = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const publisher = await PublisherService.createPublisher(req.body);
-    res.status(201).json({
-      status: "success",
-      data: {
-        publisher,
-      },
-    });
+    try {
+      const publisher = await PublisherService.createPublisher(req.body);
+      res.status(201).json({
+        status: "success",
+        data: {
+          publisher,
+        },
+      });
+    } catch (error) {
+      next(new AppError("Failed to create publisher", 500));
+    }
   }
 );
-
 /**
  * Controller function to get a publisher by ID
  * @param {Request} req - Express request object with params containing publisher ID
@@ -87,7 +90,7 @@ export const getAllPublishers = catchAsync(
         },
       });
     } catch (error) {
-      next(new AppError("Unable to fetch publishers", 500));
+      next(new AppError("Failed to fetch publishers", 500));
     }
   }
 );
