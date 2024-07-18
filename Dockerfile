@@ -14,7 +14,7 @@ RUN npm rebuild bcrypt --build-from-source
 
 RUN npm install -g typescript
 
-RUN npm run build --verbose
+RUN npm run build
 
 EXPOSE 3001
 
