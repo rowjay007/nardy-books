@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import env from "../config/env";
-import userService from "../services/userService";
+import * as userService from "../services/userService";
 import AppError from "../utils/appError";
 import httpStatus from "http-status";
 

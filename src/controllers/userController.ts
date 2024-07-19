@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import userService from "../services/userService";
+import * as userService from "../services/userService";
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 
@@ -17,6 +17,7 @@ export const getAllUsers = catchAsync(
     const skip = 0;
 
     const users = await userService.getAllUsers(filter, sort, limit, skip);
+
     res.status(200).json({
       status: "success",
       data: { users },
@@ -33,10 +34,18 @@ export const getAllUsers = catchAsync(
 export const getUserById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
+
+    // Validate userId
+    if (!userId) {
+      return next(new AppError("No user ID provided", 400));
+    }
+
     const user = await userService.getUserById(userId);
+
     if (!user) {
       return next(new AppError("User not found", 404));
     }
+
     res.status(200).json({
       status: "success",
       data: { user },
@@ -54,7 +63,17 @@ export const updateUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
     const updateData = req.body;
+
+    if (!userId) {
+      return next(new AppError("No user ID provided", 400));
+    }
+
     const updatedUser = await userService.updateUser(userId, updateData);
+
+    if (!updatedUser) {
+      return next(new AppError("User not found", 404));
+    }
+
     res.status(200).json({
       status: "success",
       data: { user: updatedUser },
@@ -71,7 +90,18 @@ export const updateUser = catchAsync(
 export const deleteUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
-    await userService.deleteUser(userId);
+
+    // Validate userId
+    if (!userId) {
+      return next(new AppError("No user ID provided", 400));
+    }
+
+    const result = await userService.deleteUser(userId);
+
+    if (!result) {
+      return next(new AppError("User not found", 404));
+    }
+
     res.status(200).json({
       status: "success",
       message: "User successfully deleted",

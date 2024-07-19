@@ -5,12 +5,12 @@ import env from "../config/env";
 import User, { IUser } from "../models/userModel";
 import userRepository from "../repositories/userRepository";
 import AppError from "../utils/appError";
+import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 import {
   sendResetPasswordEmail,
   sendVerificationEmail,
   sendWelcomeEmail,
 } from "../utils/emailUtils";
-import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 
 const generateAccessToken = (userId: string) => {
   return jwt.sign({ id: userId }, env.JWT_SECRET, {
@@ -24,7 +24,7 @@ const generateRefreshToken = (userId: string) => {
   });
 };
 
-const register = async (
+export const register = async (
   username: string,
   email: string,
   password: string
@@ -44,13 +44,12 @@ const register = async (
     sendVerificationEmail(email, verificationLink),
   ]);
 
-  cache.flushAll(); 
-  
+  cache.flushAll();
 
   return user;
 };
 
-const login = async (email: string, password: string) => {
+export const login = async (email: string, password: string) => {
   const user = await userRepository.findUserByEmail(email);
   if (!user) throw new AppError("Invalid email or password", 401);
 
@@ -65,13 +64,12 @@ const login = async (email: string, password: string) => {
   return { user, accessToken, refreshToken };
 };
 
-const logout = async (userId: string) => {
+export const logout = async (userId: string) => {
   await userRepository.removeRefreshToken(userId);
-  cache.flushAll(); 
-  
+  cache.flushAll();
 };
 
-const requestPasswordReset = async (email: string) => {
+export const requestPasswordReset = async (email: string) => {
   const user = await userRepository.findUserByEmail(email);
   if (!user) throw new AppError("User not found", 404);
 
@@ -90,7 +88,7 @@ const requestPasswordReset = async (email: string) => {
   return token;
 };
 
-const resetPassword = async (token: string, newPassword: string) => {
+export const resetPassword = async (token: string, newPassword: string) => {
   const user = await userRepository.findByResetPasswordToken(token);
   if (!user) throw new AppError("Invalid or expired token", 400);
 
@@ -99,13 +97,12 @@ const resetPassword = async (token: string, newPassword: string) => {
   user.resetPasswordExpires = undefined;
   await user.save();
 
-  cache.flushAll(); 
-  
+  cache.flushAll();
 
   return user;
 };
 
-const changePassword = async (
+export const changePassword = async (
   userId: string,
   currentPassword: string,
   newPassword: string
@@ -123,13 +120,14 @@ const changePassword = async (
   user.password = await bcrypt.hash(newPassword, 12);
   await user.save();
 
-  cache.flushAll(); 
-  
+  cache.flushAll();
 
   return user;
 };
 
-const verifyEmail = async (verificationToken: string): Promise<IUser> => {
+export const verifyEmail = async (
+  verificationToken: string
+): Promise<IUser> => {
   const user = await User.findOneAndUpdate(
     { verificationToken },
     { $set: { isEmailVerified: true, verificationToken: undefined } },
@@ -140,13 +138,12 @@ const verifyEmail = async (verificationToken: string): Promise<IUser> => {
     throw new AppError("Invalid verification token.", 400);
   }
 
-  cache.flushAll(); 
-  
+  cache.flushAll();
 
   return user;
 };
 
-const resendVerificationEmail = async (userId: string) => {
+export const resendVerificationEmail = async (userId: string) => {
   const user = await userRepository.findUserById(userId);
   if (!user) throw new AppError("User not found", 404);
 
@@ -157,11 +154,10 @@ const resendVerificationEmail = async (userId: string) => {
   const verificationLink = `${process.env.EMAIL_VERIFICATION_URL}/verify-email/${verificationToken}`;
   await sendVerificationEmail(user.email, verificationLink);
 
-  cache.flushAll(); 
-  
+  cache.flushAll();
 };
 
-const getUserById = async (userId: string): Promise<IUser | null> => {
+export const getUserById = async (userId: string): Promise<IUser | null> => {
   const cacheKey = `user_${userId}`;
   let user = cache.get<IUser | null>(cacheKey);
 
@@ -175,8 +171,7 @@ const getUserById = async (userId: string): Promise<IUser | null> => {
   return user;
 };
 
-
-const getAllUsers = async (
+export const getAllUsers = async (
   filter: any,
   sort: any,
   limit: number,
@@ -193,32 +188,16 @@ const getAllUsers = async (
   return users;
 };
 
-const updateUser = async (userId: string, updateData: any) => {
+export const updateUser = async (userId: string, updateData: any) => {
   const user = await userRepository.updateUser(userId, updateData);
   if (user) {
-    cache.flushAll(); 
-    
+    cache.flushAll();
   }
   return user;
 };
 
-const deleteUser = async (userId: string) => {
-  await userRepository.deleteUser(userId);
-  cache.flushAll(); 
-  
-};
-
-export default {
-  register,
-  login,
-  logout,
-  requestPasswordReset,
-  resetPassword,
-  changePassword,
-  verifyEmail,
-  resendVerificationEmail,
-  getUserById,
-  getAllUsers,
-  updateUser,
-  deleteUser,
+export const deleteUser = async (userId: string): Promise<boolean> => {
+  const result = await userRepository.deleteUser(userId);
+  cache.flushAll();
+  return result !== null;
 };
