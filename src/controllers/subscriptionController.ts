@@ -42,16 +42,17 @@ export const getSubscriptions = catchAsync(
  * @param next Express next function
  */
 export const getSubscriptionById = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: any) => {
     const subscription = await subscriptionService.getSubscriptionById(
       req.params.id
     );
     if (!subscription) {
-      throw new AppError("Subscription not found", 404);
+      return next(new AppError("Subscription not found", 404)); // Ensure `next` is called here
     }
     res.status(200).json(subscription);
   }
 );
+
 
 /**
  * Controller function update a subscription
