@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: Run Tests
+    name: Run Tests and Coverage
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -20,10 +20,50 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm test
+      - name: Run coverage
+        run: npm run coverage
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage/
+
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  dependency_check:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'My Project'
+          path: '.'
+          format: 'HTML'
+      - name: Upload Dependency Check report
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: reports
 
   information:
     name: GitHub Context
-    needs: test
+    needs: [test, codeql, dependency_check]
     runs-on: ubuntu-latest
     steps:
       - name: Info
@@ -33,7 +73,7 @@ jobs:
 
   generate_git_tags:
     name: "Generate Git Tags"
-    needs: test
+    needs: [test, codeql, dependency_check]
     runs-on: ubuntu-latest
     outputs:
       output_new_tag: ${{ steps.taggerFinal.outputs.new_tag }}
@@ -50,23 +90,24 @@ jobs:
           WITH_V: true
       - name: Echo New Tag
         run: |
-          echo "The next new tag will be: ${{ steps.taggerFinal.outputs.new_tag }}"  # Use a pipe to preserve formatting
+          echo "The next new tag will be: ${{ steps.taggerFinal.outputs.new_tag }}"
 
   generate_git_release:
-    needs: [test, generate_git_tags]
+    needs: [test, codeql, dependency_check, generate_git_tags]
     name: "GitHub Release"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Release Action
-        uses: ncipollo/release-action@v1.14.0
+        uses: softprops/action-gh-release@v1
         with:
-          tag: ${{ needs.generate_git_tags.outputs.output_new_tag }}
-          token: ${{ secrets.CHANGELOG_RELEASE }}
+          tag_name: ${{ needs.generate_git_tags.outputs.output_new_tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   generate_sentry_release:
-    needs: [test, generate_git_tags, generate_git_release]
+    needs: [test, codeql, dependency_check, generate_git_tags, generate_git_release]
     name: "Sentry Release"
     runs-on: ubuntu-latest
     steps:
