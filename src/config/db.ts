@@ -7,16 +7,13 @@ let mongoServer: MongoMemoryServer | null = null;
 
 const connectDB = async () => {
   if (process.env.NODE_ENV === "test") {
-    // Running tests: Use MongoDB in-memory server
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
 
     await mongoose.connect(mongoUri);
   } else {
-    // Production or other environments: Use real MongoDB URI
     try {
       await mongoose.connect(env.MONGO_URI, {
-        // Remove unnecessary options for production connection
       });
       logger.info("MongoDB connected successfully");
     } catch (error) {

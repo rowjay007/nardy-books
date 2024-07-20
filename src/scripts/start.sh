@@ -6,6 +6,6 @@ echo "Starting the application..."
 
 ./scripts/build.sh
 
-npm run dev
+pm2 start ecosystem.config.js --env production
 
 echo "Application started successfully."

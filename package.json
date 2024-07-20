@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc && npm run sentry:sourcemaps && npm run sentry:sourcemaps && npm run sentry:sourcemaps && npm run sentry:sourcemaps",
-    "start": "node src/server.ts",
+    "start": "pm2 start ecosystem.config.js --env production",
     "dev": "nodemon src/server.ts",
+    "pm2:dev": "pm2 start ecosystem.config.js --only booking-management-api --env development",
     "test": "jest",
-  "test:watch": "jest --watch",
-  "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org rowjay --project nardy-book dist && sentry-cli sourcemaps upload --org rowjay --project nardy-book dist"
   },
   "keywords": [],
@@ -49,6 +50,7 @@
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
     "nodemailer": "^6.9.14",
+    "pm2": "^5.4.2",
     "prom-client": "^15.1.3",
     "semantic-release": "^24.0.0",
     "swagger-jsdoc": "^6.2.8",
