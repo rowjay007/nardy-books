@@ -10,9 +10,9 @@ interface AuthenticatedRequest extends Request {
 }
 
 /**
- * Generates an access token for the given user ID
- * @param {string} userId - User ID
- * @returns {string} Generated access token
+ * Generates an access token for a user
+ * @param {string} userId - The ID of the user for whom the token is generated
+ * @returns {string} - The generated access token
  */
 const generateAccessToken = (userId: string): string => {
   return jwt.sign({ id: userId }, env.JWT_SECRET, {
@@ -21,9 +21,9 @@ const generateAccessToken = (userId: string): string => {
 };
 
 /**
- * Generates a refresh token for the given user ID
- * @param {string} userId - User ID
- * @returns {string} Generated refresh token
+ * Generates a refresh token for a user
+ * @param {string} userId - The ID of the user for whom the token is generated
+ * @returns {string} - The generated refresh token
  */
 const generateRefreshToken = (userId: string): string => {
   return jwt.sign({ id: userId }, env.REFRESH_TOKEN_SECRET, {
@@ -33,24 +33,23 @@ const generateRefreshToken = (userId: string): string => {
 
 /**
  * Controller function to register a new user
- * @param {Request} req - Express request object with body containing username, email, and password
+ * @param {Request} req - Express request object containing user registration details in the body
  * @param {Response} res - Express response object
  * @param {NextFunction} next - Express next function
- * @returns {Promise<void>} - Returns a JSON object with the created user data
+ * @returns {Promise<void>} - Returns a JSON object with a success message and user data
  */
 export const register = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
-  const { username, email, password } = req.body;
-
+) => {
   try {
+    const { username, email, password } = req.body;
     const user = await userService.register(username, email, password);
-
     res.status(httpStatus.CREATED).json({
-      status: "success",
-      data: { user },
+      message:
+        "Registration successful. Please check your email for verification.",
+      user,
     });
   } catch (error) {
     next(error);
@@ -58,25 +57,28 @@ export const register = async (
 };
 
 /**
- * Controller function to authenticate a user and generate access token
- * @param {Request} req - Express request object with body containing email and password
+ * Controller function to log in a user
+ * @param {Request} req - Express request object containing login credentials in the body
  * @param {Response} res - Express response object
  * @param {NextFunction} next - Express next function
- * @returns {Promise<void>} - Returns a JSON object with the authenticated user data and access token
+ * @returns {Promise<void>} - Returns a JSON object with success message, user data, access token, and refresh token
  */
 export const login = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
-  const { email, password } = req.body;
-
+) => {
   try {
-    const { user, accessToken } = await userService.login(email, password);
-
+    const { email, password } = req.body;
+    const { user, accessToken, refreshToken } = await userService.login(
+      email,
+      password
+    );
     res.status(httpStatus.OK).json({
-      status: "success",
-      data: { user, accessToken },
+      message: "Login successful",
+      user,
+      accessToken,
+      refreshToken,
     });
   } catch (error) {
     next(error);
@@ -84,29 +86,25 @@ export const login = async (
 };
 
 /**
- * Controller function to logout a user
+ * Controller function to log out a user
  * @param {AuthenticatedRequest} req - Express request object extended with user information
  * @param {Response} res - Express response object
  * @param {NextFunction} next - Express next function
- * @returns {Promise<void>} - Returns a JSON object indicating successful logout
+ * @returns {Promise<void>} - Returns a JSON object with a success message
  */
 export const logout = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<void> => {
-  const userId = getUserIdFromRequest(req);
-
+) => {
   try {
-    if (!userId) {
-      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
+    if (!req.user || typeof req.user === "string") {
+      throw new AppError("Unauthorized", 401);
     }
 
-    await userService.logout(userId);
-
-    res.status(httpStatus.NO_CONTENT).json({
-      status: "success",
-      data: null,
+    await userService.logout(req.user.id);
+    res.status(httpStatus.OK).json({
+      message: "Logout successful",
     });
   } catch (error) {
     next(error);

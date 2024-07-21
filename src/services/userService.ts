@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import env from "../config/env";
 import User, { IUser } from "../models/userModel";
 import userRepository from "../repositories/userRepository";
 import AppError from "../utils/appError";
+import env from "../config/env";
 import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 import {
   sendResetPasswordEmail,
@@ -33,7 +33,7 @@ export const register = async (
   const user = new User({
     username,
     email,
-    password,
+    password, // Password will be hashed by the pre-save hook
     verificationToken,
   });
   await user.save();
@@ -50,8 +50,16 @@ export const register = async (
 };
 
 export const login = async (email: string, password: string) => {
+  if (!email.includes("@") || !email.split("@")[1].includes(".")) {
+    throw new AppError("Invalid email format", 400);
+  }
+
   const user = await userRepository.findUserByEmail(email);
   if (!user) throw new AppError("Invalid email or password", 401);
+
+  if (!user.isEmailVerified) {
+    throw new AppError("Email not verified", 401);
+  }
 
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
   if (!isPasswordCorrect) throw new AppError("Invalid email or password", 401);
@@ -92,7 +100,7 @@ export const resetPassword = async (token: string, newPassword: string) => {
   const user = await userRepository.findByResetPasswordToken(token);
   if (!user) throw new AppError("Invalid or expired token", 400);
 
-  user.password = await bcrypt.hash(newPassword, 12);
+  user.password = newPassword; // Password will be hashed by the pre-save hook
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;
   await user.save();
@@ -117,7 +125,7 @@ export const changePassword = async (
   if (!isPasswordCorrect)
     throw new AppError("Current password is incorrect", 401);
 
-  user.password = await bcrypt.hash(newPassword, 12);
+  user.password = newPassword; // Password will be hashed by the pre-save hook
   await user.save();
 
   cache.flushAll();
@@ -151,7 +159,7 @@ export const resendVerificationEmail = async (userId: string) => {
   user.verificationToken = verificationToken;
   await user.save();
 
-  const verificationLink = `${process.env.EMAIL_VERIFICATION_URL}/verify-email/${verificationToken}`;
+  const verificationLink = `${env.EMAIL_VERIFICATION_URL}/verify-email/${verificationToken}`;
   await sendVerificationEmail(user.email, verificationLink);
 
   cache.flushAll();
