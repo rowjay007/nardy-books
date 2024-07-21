@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+import httpStatus from "http-status";
 import jwt from "jsonwebtoken";
 import env from "../config/env";
 import * as userService from "../services/userService";
 import AppError from "../utils/appError";
-import httpStatus from "http-status";
 
 interface AuthenticatedRequest extends Request {
   user?: string | jwt.JwtPayload;
@@ -74,16 +74,27 @@ export const login = async (
       email,
       password
     );
+
+    res.cookie("accessToken",  accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", 
+      maxAge: 60 * 60 * 1000, 
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 30 * 24 * 60 * 60 * 1000, 
+    });
+
     res.status(httpStatus.OK).json({
       message: "Login successful",
       user,
-      accessToken,
-      refreshToken,
     });
   } catch (error) {
     next(error);
   }
 };
+
 
 /**
  * Controller function to log out a user
@@ -103,6 +114,9 @@ export const logout = async (
     }
 
     await userService.logout(req.user.id);
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+
     res.status(httpStatus.OK).json({
       message: "Logout successful",
     });
@@ -110,6 +124,7 @@ export const logout = async (
     next(error);
   }
 };
+//TODO fix logout issues and cookies clearance
 
 /**
  * Controller function to refresh access and refresh tokens
@@ -123,7 +138,7 @@ export const refreshTokens = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const refreshToken = req.body.refreshToken;
+  const refreshToken = req.body.refreshToken || req.cookies["refreshToken"];
 
   if (!refreshToken) {
     return next(
@@ -139,9 +154,20 @@ export const refreshTokens = async (
     const accessToken = generateAccessToken(decoded.id);
     const newRefreshToken = generateRefreshToken(decoded.id);
 
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 1000, 
+    });
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 30 * 24 * 60 * 60 * 1000, 
+    });
+
     res.status(httpStatus.OK).json({
       status: "success",
-      data: { accessToken, refreshToken: newRefreshToken },
+      message: "Tokens refreshed successfully",
     });
   } catch (error) {
     next(
@@ -149,6 +175,7 @@ export const refreshTokens = async (
     );
   }
 };
+
 
 /**
  * Controller function to request a password reset for a user
