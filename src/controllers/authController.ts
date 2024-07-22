@@ -38,17 +38,12 @@ const generateRefreshToken = (userId: string): string => {
  * @param {NextFunction} next - Express next function
  * @returns {Promise<void>} - Returns a JSON object with a success message and user data
  */
-export const register = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username, email, password } = req.body;
     const user = await userService.register(username, email, password);
     res.status(httpStatus.CREATED).json({
-      message:
-        "Registration successful. Please check your email for verification.",
+      message: "Registration successful. Please check your email for verification.",
       user,
     });
   } catch (error) {
@@ -63,38 +58,20 @@ export const register = async (
  * @param {NextFunction} next - Express next function
  * @returns {Promise<void>} - Returns a JSON object with success message, user data, access token, and refresh token
  */
-export const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
-    const { user, accessToken, refreshToken } = await userService.login(
-      email,
-      password
-    );
-
-    res.cookie("accessToken",  accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
-      maxAge: 60 * 60 * 1000, 
-    });
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 30 * 24 * 60 * 60 * 1000, 
-    });
-
+    const { user, accessToken, refreshToken } = await userService.login(email, password);
     res.status(httpStatus.OK).json({
       message: "Login successful",
       user,
+      accessToken,
+      refreshToken,
     });
   } catch (error) {
     next(error);
   }
 };
-
 
 /**
  * Controller function to log out a user
@@ -103,20 +80,13 @@ export const login = async (
  * @param {NextFunction} next - Express next function
  * @returns {Promise<void>} - Returns a JSON object with a success message
  */
-export const logout = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const logout = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.user || typeof req.user === "string") {
       throw new AppError("Unauthorized", 401);
     }
 
     await userService.logout(req.user.id);
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
-
     res.status(httpStatus.OK).json({
       message: "Logout successful",
     });
@@ -124,7 +94,6 @@ export const logout = async (
     next(error);
   }
 };
-//TODO fix logout issues and cookies clearance
 
 /**
  * Controller function to refresh access and refresh tokens
@@ -138,7 +107,7 @@ export const refreshTokens = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const refreshToken = req.body.refreshToken || req.cookies["refreshToken"];
+  const refreshToken = req.body.refreshToken;
 
   if (!refreshToken) {
     return next(
@@ -154,20 +123,9 @@ export const refreshTokens = async (
     const accessToken = generateAccessToken(decoded.id);
     const newRefreshToken = generateRefreshToken(decoded.id);
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 1000, 
-    });
-    res.cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 30 * 24 * 60 * 60 * 1000, 
-    });
-
     res.status(httpStatus.OK).json({
       status: "success",
-      message: "Tokens refreshed successfully",
+      data: { accessToken, refreshToken: newRefreshToken },
     });
   } catch (error) {
     next(
@@ -175,7 +133,6 @@ export const refreshTokens = async (
     );
   }
 };
-
 
 /**
  * Controller function to request a password reset for a user

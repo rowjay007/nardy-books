@@ -1,29 +1,41 @@
-import express from "express";
-import { Request, Response } from "express";
+import express, { Request, Response } from "express";
 
 const router = express.Router();
 
-router.get("/set-cookie", (req: Request, res: Response) => {
-  res.cookie("myCookie", "cookieValue", {
-    httpOnly: true, 
-    secure: process.env.NODE_ENV === "production", 
-    maxAge: 24 * 60 * 60 * 1000, 
-  });
-  res.send("Cookie has been set");
-});
-
-router.get("/get-cookie", (req: Request, res: Response) => {
+router.get("/", (req: Request, res: Response) => {
   const myCookie = req.cookies["myCookie"];
   if (myCookie) {
-    res.send(`Cookie value: ${myCookie}`);
+    res.status(200).json({
+      status: "success",
+      data: { myCookie },
+    });
   } else {
-    res.send("No cookie found");
+    res.status(404).json({
+      status: "error",
+      message: "No cookie found",
+    });
   }
 });
 
-router.get("/delete-cookie", (req: Request, res: Response) => {
+router.post("/", (req: Request, res: Response) => {
+  const { value } = req.body;
+  res.cookie("myCookie", value, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+  res.status(200).json({
+    status: "success",
+    message: "Cookie has been set",
+  });
+});
+
+router.delete("/", (req: Request, res: Response) => {
   res.clearCookie("myCookie");
-  res.send("Cookie has been deleted");
+  res.status(200).json({
+    status: "success",
+    message: "Cookie has been deleted",
+  });
 });
 
 export default router;
