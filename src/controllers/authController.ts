@@ -9,41 +9,29 @@ interface AuthenticatedRequest extends Request {
   user?: string | jwt.JwtPayload;
 }
 
-/**
- * Generates an access token for a user
- * @param {string} userId - The ID of the user for whom the token is generated
- * @returns {string} - The generated access token
- */
 const generateAccessToken = (userId: string): string => {
   return jwt.sign({ id: userId }, env.JWT_SECRET, {
     expiresIn: "1h",
   });
 };
 
-/**
- * Generates a refresh token for a user
- * @param {string} userId - The ID of the user for whom the token is generated
- * @returns {string} - The generated refresh token
- */
 const generateRefreshToken = (userId: string): string => {
   return jwt.sign({ id: userId }, env.REFRESH_TOKEN_SECRET, {
     expiresIn: env.REFRESH_TOKEN_EXPIRATION,
   });
 };
 
-/**
- * Controller function to register a new user
- * @param {Request} req - Express request object containing user registration details in the body
- * @param {Response} res - Express response object
- * @param {NextFunction} next - Express next function
- * @returns {Promise<void>} - Returns a JSON object with a success message and user data
- */
-export const register = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username, email, password } = req.body;
     const user = await userService.register(username, email, password);
     res.status(httpStatus.CREATED).json({
-      message: "Registration successful. Please check your email for verification.",
+      message:
+        "Registration successful. Please check your email for verification.",
       user,
     });
   } catch (error) {
@@ -58,37 +46,35 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
  * @param {NextFunction} next - Express next function
  * @returns {Promise<void>} - Returns a JSON object with success message, user data, access token, and refresh token
  */
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email, password } = req.body;
-    const { user, accessToken, refreshToken } = await userService.login(email, password);
+    const { user } = await userService.login(email, password);
+
+    const accessToken = generateAccessToken(user.id);
+    const refreshToken = generateRefreshToken(user.id);
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      maxAge: 3600000,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      maxAge: parseInt(env.REFRESH_TOKEN_EXPIRATION) * 24 * 60 * 60 * 1000,
+    });
+
     res.status(httpStatus.OK).json({
       message: "Login successful",
       user,
       accessToken,
       refreshToken,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * Controller function to log out a user
- * @param {AuthenticatedRequest} req - Express request object extended with user information
- * @param {Response} res - Express response object
- * @param {NextFunction} next - Express next function
- * @returns {Promise<void>} - Returns a JSON object with a success message
- */
-export const logout = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    if (!req.user || typeof req.user === "string") {
-      throw new AppError("Unauthorized", 401);
-    }
-
-    await userService.logout(req.user.id);
-    res.status(httpStatus.OK).json({
-      message: "Logout successful",
     });
   } catch (error) {
     next(error);
@@ -107,7 +93,7 @@ export const refreshTokens = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const refreshToken = req.body.refreshToken;
+  const { refreshToken } = req.cookies;
 
   if (!refreshToken) {
     return next(
@@ -123,14 +109,52 @@ export const refreshTokens = async (
     const accessToken = generateAccessToken(decoded.id);
     const newRefreshToken = generateRefreshToken(decoded.id);
 
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      maxAge: 3600000,
+    });
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      maxAge: parseInt(env.REFRESH_TOKEN_EXPIRATION) * 24 * 60 * 60 * 1000,
+    });
+
     res.status(httpStatus.OK).json({
       status: "success",
-      data: { accessToken, refreshToken: newRefreshToken },
+      message: "Tokens refreshed successfully",
+      accessToken,
+      refreshToken: newRefreshToken,
     });
   } catch (error) {
     next(
       new AppError("Invalid or expired refresh token", httpStatus.UNAUTHORIZED)
     );
+  }
+};
+
+/**
+ * Controller function to log out a user
+ * @param {AuthenticatedRequest} req - Express request object extended with user information
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with a success message
+ */
+export const logout = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+
+    res.status(httpStatus.OK).json({
+      message: "Logout successful",
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
