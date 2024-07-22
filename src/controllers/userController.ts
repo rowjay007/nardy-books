@@ -35,7 +35,6 @@ export const getUserById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
 
-    // Validate userId
     if (!userId) {
       return next(new AppError("No user ID provided", 400));
     }
@@ -59,7 +58,7 @@ export const getUserById = catchAsync(
  * @param res Express response object
  * @param next Express next function
  */
-export const updateUser = catchAsync(
+export const updateUserById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
     const updateData = req.body;
@@ -87,11 +86,10 @@ export const updateUser = catchAsync(
  * @param res Express response object
  * @param next Express next function
  */
-export const deleteUser = catchAsync(
+export const deleteUserById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
 
-    // Validate userId
     if (!userId) {
       return next(new AppError("No user ID provided", 400));
     }

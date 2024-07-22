@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/userModel";
-import userRepository from "../repositories/userRepository";
+import * as userRepository from "../repositories/userRepository";
 import AppError from "../utils/appError";
 import env from "../config/env";
 import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
@@ -12,7 +12,7 @@ import {
   sendWelcomeEmail,
 } from "../utils/emailUtils";
 
-const generateAccessToken = (userId: string) => {
+export const generateAccessToken = (userId: string) => {
   return jwt.sign({ id: userId }, env.JWT_SECRET, {
     expiresIn: "1h",
   });
@@ -33,7 +33,7 @@ export const register = async (
   const user = new User({
     username,
     email,
-    password, // Password will be hashed by the pre-save hook
+    password,
     verificationToken,
   });
   await user.save();
@@ -100,7 +100,7 @@ export const resetPassword = async (token: string, newPassword: string) => {
   const user = await userRepository.findByResetPasswordToken(token);
   if (!user) throw new AppError("Invalid or expired token", 400);
 
-  user.password = newPassword; // Password will be hashed by the pre-save hook
+  user.password = newPassword; 
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;
   await user.save();
@@ -125,7 +125,7 @@ export const changePassword = async (
   if (!isPasswordCorrect)
     throw new AppError("Current password is incorrect", 401);
 
-  user.password = newPassword; // Password will be hashed by the pre-save hook
+  user.password = newPassword;
   await user.save();
 
   cache.flushAll();
@@ -196,16 +196,35 @@ export const getAllUsers = async (
   return users;
 };
 
-export const updateUser = async (userId: string, updateData: any) => {
+export const updateUser = async (
+  userId: string,
+  updateData: Partial<IUser>
+): Promise<IUser> => {
   const user = await userRepository.updateUser(userId, updateData);
-  if (user) {
-    cache.flushAll();
-  }
+  if (!user) throw new AppError("User not found", 404);
+  cache.flushAll();
   return user;
 };
 
 export const deleteUser = async (userId: string): Promise<boolean> => {
   const result = await userRepository.deleteUser(userId);
   cache.flushAll();
-  return result !== null;
+  return result;
+};
+
+export const getCurrentUser = async (userId: string): Promise<IUser | null> => {
+  return userRepository.findUserById(userId);
+};
+
+export const updateCurrentUser = async (
+  userId: string,
+  updateData: Partial<IUser>
+): Promise<IUser> => {
+  const user = await userRepository.updateUser(userId, updateData);
+  if (!user) throw new AppError("User not found", 404);
+  return user;
+};
+
+export const deleteCurrentUser = async (userId: string): Promise<boolean> => {
+  return userRepository.deleteUser(userId);
 };

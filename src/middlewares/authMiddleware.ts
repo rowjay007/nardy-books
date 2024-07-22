@@ -3,28 +3,39 @@ import jwt from "jsonwebtoken";
 import env from "../config/env";
 import AppError from "../utils/appError";
 
+// Extend the Request interface to include userId
 interface AuthenticatedRequest extends Request {
-  user?: string | jwt.JwtPayload; 
+  userId?: string;
 }
 
+/**
+ * Middleware to protect routes by ensuring the request has a valid token
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {void}
+ */
 export const protect = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-) => {
-  const token = extractTokenFromHeader(req);
+): void => {
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return next(new AppError("Unauthorized access", 401));
   }
 
-  try {
-    const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload;
-    req.user = decoded;
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(token, env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return next(new AppError("Invalid token", 401));
+    }
+
+    req.userId = (decoded as { id: string }).id;
     next();
-  } catch (error) {
-    return next(new AppError("Invalid token", 401));
-  }
+  });
 };
 
 /**
@@ -32,7 +43,9 @@ export const protect = (
  * @param req Express request object
  * @returns JWT token string or undefined
  */
-const extractTokenFromHeader = (req: AuthenticatedRequest): string | undefined => {
+const extractTokenFromHeader = (
+  req: AuthenticatedRequest
+): string | undefined => {
   const authHeader = req.headers.authorization;
 
   if (authHeader && authHeader.startsWith("Bearer ")) {

@@ -7,68 +7,6 @@ const router = Router();
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       properties:
- *         id:
- *           type: string
- *           description: Unique identifier for the user
- *         username:
- *           type: string
- *           description: User's username
- *         email:
- *           type: string
- *           format: email
- *           description: User's email address
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: Date and time when the user was created
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: Date and time when the user was last updated
- *     Token:
- *       type: object
- *       properties:
- *         token:
- *           type: string
- *           description: JWT token for authentication
- *     Error:
- *       type: object
- *       properties:
- *         status:
- *           type: string
- *           description: Error status code
- *         message:
- *           type: string
- *           description: Error message
- *     ValidationError:
- *       type: object
- *       properties:
- *         status:
- *           type: string
- *           description: Validation error status code
- *         message:
- *           type: string
- *           description: Validation error message
- *         errors:
- *           type: array
- *           items:
- *             type: object
- *             properties:
- *               field:
- *                 type: string
- *                 description: Name of the field with the validation error
- *               message:
- *                 type: string
- *                 description: Validation error message for the field
- */
-
-/**
- * @swagger
  * tags:
  *   name: Authentication
  *   description: API endpoints for authentication
@@ -95,7 +33,7 @@ const router = Router();
  *                 type: string
  *                 format: password
  *     responses:
- *       '200':
+ *       '201':
  *         description: Successfully registered user
  *         content:
  *           application/json:
@@ -144,11 +82,13 @@ router.post("/register", authController.register);
  *                   properties:
  *                     user:
  *                       $ref: '#/components/schemas/User'
- *                     token:
+ *                     accessToken:
  *                       type: string
- *                       description: JWT token for authentication
+ *                       description: JWT access token
+ *                     refreshToken:
+ *                       type: string
+ *                       description: JWT refresh token
  */
-
 router.post("/login", authController.login);
 
 /**
@@ -160,7 +100,7 @@ router.post("/login", authController.login);
  *     security:
  *       - bearerAuth: []
  *     responses:
- *       '200':
+ *       '204':
  *         description: Successfully logged out
  *         content:
  *           application/json:
@@ -171,6 +111,7 @@ router.post("/login", authController.login);
  *                   type: string
  *                   example: success
  */
+router.post("/logout", protect, authController.logout);
 
 /**
  * @swagger
@@ -178,8 +119,16 @@ router.post("/login", authController.login);
  *   post:
  *     summary: Refresh access tokens
  *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: Refresh token
  *     responses:
  *       '200':
  *         description: Successfully refreshed tokens
@@ -194,40 +143,15 @@ router.post("/login", authController.login);
  *                 data:
  *                   type: object
  *                   properties:
- *                     token:
+ *                     accessToken:
  *                       type: string
- *                       description: New JWT token
+ *                       description: New access token
+ *                     refreshToken:
+ *                       type: string
+ *                       description: New refresh token
  */
-router.post("/logout", protect, authController.logout);
-/**
- * @swagger
- * /api/v1/auth/request-reset-password:
- *   post:
- *     summary: Request a password reset
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *     responses:
- *       '200':
- *         description: Password reset request successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
- */
-
 router.post("/refresh-token", authController.refreshTokens);
+
 /**
  * @swagger
  * /api/v1/auth/request-reset-password:
@@ -255,7 +179,6 @@ router.post("/refresh-token", authController.refreshTokens);
  *                   type: string
  *                   example: success
  */
-
 router.post("/request-reset-password", authController.requestPasswordReset);
 
 /**
@@ -302,7 +225,6 @@ router.post("/reset-password/:token", authController.resetPassword);
  *   description: API endpoints for managing users
  */
 
-
 /**
  * @swagger
  * /api/v1/users:
@@ -333,7 +255,7 @@ router.get("/", protect, userController.getAllUsers);
  * @swagger
  * /api/v1/users/{id}:
  *   get:
- *     summary: Get a user by ID
+ *     summary: Get user by ID
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -346,7 +268,7 @@ router.get("/", protect, userController.getAllUsers);
  *         description: User ID
  *     responses:
  *       '200':
- *         description: User found
+ *         description: User information
  *         content:
  *           application/json:
  *             schema:
@@ -358,14 +280,13 @@ router.get("/", protect, userController.getAllUsers);
  *                 data:
  *                   $ref: '#/components/schemas/User'
  */
-
 router.get("/:id", protect, userController.getUserById);
 
 /**
  * @swagger
  * /api/v1/users/{id}:
- *   put:
- *     summary: Update a user by ID
+ *   patch:
+ *     summary: Update user by ID
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -387,12 +308,9 @@ router.get("/:id", protect, userController.getUserById);
  *                 type: string
  *               email:
  *                 type: string
- *               password:
- *                 type: string
- *                 format: password
  *     responses:
  *       '200':
- *         description: User updated successfully
+ *         description: Updated user information
  *         content:
  *           application/json:
  *             schema:
@@ -404,14 +322,13 @@ router.get("/:id", protect, userController.getUserById);
  *                 data:
  *                   $ref: '#/components/schemas/User'
  */
-
-router.put("/:id", protect, userController.updateUser);
+router.patch("/:id", protect, userController.updateUserById);
 
 /**
  * @swagger
  * /api/v1/users/{id}:
  *   delete:
- *     summary: Delete a user by ID
+ *     summary: Delete user by ID
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -423,8 +340,8 @@ router.put("/:id", protect, userController.updateUser);
  *           type: string
  *         description: User ID
  *     responses:
- *       '200':
- *         description: User deleted successfully
+ *       '204':
+ *         description: User successfully deleted
  *         content:
  *           application/json:
  *             schema:
@@ -434,13 +351,37 @@ router.put("/:id", protect, userController.updateUser);
  *                   type: string
  *                   example: success
  */
-router.delete("/:id", protect, userController.deleteUser);
+router.delete("/:id", protect, userController.deleteUserById);
 
 /**
  * @swagger
- * /api/v1/users/change-password:
- *   put:
- *     summary: Change user password
+ * /api/v1/me:
+ *   get:
+ *     summary: Get current logged-in user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: User information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ */
+router.get("/me", protect, authController.getCurrentUser);
+
+/**
+ * @swagger
+ * /api/v1/me:
+ *   patch:
+ *     summary: Update current logged-in user
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -451,15 +392,13 @@ router.delete("/:id", protect, userController.deleteUser);
  *           schema:
  *             type: object
  *             properties:
- *               currentPassword:
+ *               username:
  *                 type: string
- *                 format: password
- *               newPassword:
+ *               email:
  *                 type: string
- *                 format: password
  *     responses:
  *       '200':
- *         description: Password changed successfully
+ *         description: Updated user information
  *         content:
  *           application/json:
  *             schema:
@@ -468,60 +407,23 @@ router.delete("/:id", protect, userController.deleteUser);
  *                 status:
  *                   type: string
  *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
  */
-router.put("/change-password", protect, authController.changePassword);
-/**
- * @swagger
- * /api/v1/users/verify-email/{token}:
- *   get:
- *     summary: Verify user email using token
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: Verification token received via email
- *     responses:
- *       '200':
- *         description: Email verified successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
- */
-
-router.get("/verify-email/:token", authController.verifyEmail);
+router.patch("/me", protect, authController.updateCurrentUser);
 
 /**
  * @swagger
- * /api/v1/users/resend-verification-email:
- *   post:
- *     summary: Resend verification email
+ * /api/v1/me:
+ *   delete:
+ *     summary: Delete current logged-in user
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
- *       '200':
- *         description: Verification email resent successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
+ *       '204':
+ *         description: User successfully deleted
  */
-router.post(
-  "/resend-verification-email",
-  protect,
-  authController.resendVerificationEmail
-);
+router.delete("/me", protect, authController.deleteCurrentUser);
 
 export default router;

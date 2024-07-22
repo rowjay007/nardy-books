@@ -1,46 +1,46 @@
 import User, { IUser } from "../models/userModel";
 import AppError from "../utils/appError";
 
-const createUser = async (userData: Partial<IUser>) => {
+export const createUser = async (userData: Partial<IUser>): Promise<IUser> => {
   const user = new User(userData);
   await user.save();
   return user;
 };
 
-const findUserByEmail = async (email: string): Promise<IUser | null> => {
+export const findUserByEmail = async (email: string): Promise<IUser | null> => {
   return User.findOne({ email });
 };
 
-const findUserById = async (id: string): Promise<IUser | null> => {
+export const findUserById = async (id: string): Promise<IUser | null> => {
   return User.findById(id);
 };
 
-const findUsers = async (
+export const findUsers = async (
   filter: any,
   sort: any,
   limit: number,
   skip: number
-) => {
+): Promise<IUser[]> => {
   return User.find(filter).sort(sort).limit(limit).skip(skip);
 };
 
-const updateUser = async (id: string, updateData: Partial<IUser>) => {
-  const user = await User.findByIdAndUpdate(id, updateData, { new: true });
-  if (!user) throw new AppError("User not found", 404);
-  return user;
+export const updateUser = async (
+  id: string,
+  updateData: Partial<IUser>
+): Promise<IUser | null> => {
+  return User.findByIdAndUpdate(id, updateData, { new: true });
 };
 
-const deleteUser = async (id: string) => {
-  const user = await User.findByIdAndDelete(id);
-  if (!user) throw new AppError("User not found", 404);
-  return user;
+export const deleteUser = async (id: string): Promise<boolean> => {
+  const result = await User.findByIdAndDelete(id);
+  return result !== null;
 };
 
-const setResetPasswordToken = async (
+export const setResetPasswordToken = async (
   id: string,
   token: string,
   expires: Date
-) => {
+): Promise<IUser> => {
   const user = await User.findById(id);
   if (!user) throw new AppError("User not found", 404);
   user.resetPasswordToken = token;
@@ -49,7 +49,7 @@ const setResetPasswordToken = async (
   return user;
 };
 
-const findByResetPasswordToken = async (
+export const findByResetPasswordToken = async (
   token: string
 ): Promise<IUser | null> => {
   return User.findOne({
@@ -58,7 +58,10 @@ const findByResetPasswordToken = async (
   });
 };
 
-const setRefreshToken = async (id: string, refreshToken: string) => {
+export const setRefreshToken = async (
+  id: string,
+  refreshToken: string
+): Promise<IUser> => {
   const user = await User.findById(id);
   if (!user) throw new AppError("User not found", 404);
   user.refreshToken = refreshToken;
@@ -66,23 +69,10 @@ const setRefreshToken = async (id: string, refreshToken: string) => {
   return user;
 };
 
-const removeRefreshToken = async (id: string) => {
+export const removeRefreshToken = async (id: string): Promise<IUser> => {
   const user = await User.findById(id);
   if (!user) throw new AppError("User not found", 404);
   user.refreshToken = undefined;
   await user.save();
   return user;
-};
-
-export default {
-  createUser,
-  findUserByEmail,
-  findUserById,
-  findUsers,
-  updateUser,
-  deleteUser,
-  setResetPasswordToken,
-  findByResetPasswordToken,
-  setRefreshToken,
-  removeRefreshToken,
 };
