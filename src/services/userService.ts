@@ -210,3 +210,24 @@ export const deleteUser = async (userId: string): Promise<boolean> => {
   return result !== null;
 };
 
+
+export const getCurrentUser = async (userId: string): Promise<IUser | null> => {
+  return userRepository.findUserById(userId);
+};
+
+export const updateCurrentUser = async (
+  userId: string,
+  updateData: Partial<IUser>
+): Promise<IUser | null> => {
+  const user = await userRepository.updateUser(userId, updateData);
+  if (user) {
+    cache.flushAll();
+  }
+  return user;
+};
+
+export const deleteCurrentUser = async (userId: string): Promise<boolean> => {
+  const result = await userRepository.deleteUser(userId);
+  cache.flushAll();
+  return result !== null;
+};

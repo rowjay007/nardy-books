@@ -9,6 +9,10 @@ interface AuthenticatedRequest extends Request {
   user?: string | jwt.JwtPayload;
 }
 
+interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
+
 export const generateAccessToken = (userId: string): string => {
   return jwt.sign({ id: userId }, env.JWT_SECRET, {
     expiresIn: "1h",
@@ -315,4 +319,68 @@ const getUserIdFromRequest = (
   return user?.id as string | undefined;
 };
 
+//TODO get current user
+export const getCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
+    }
 
+    const user = await userService.getCurrentUser(userId);
+    res.status(httpStatus.OK).json({
+      status: "success",
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { userId } = req;
+    if (!userId) {
+      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
+    }
+
+    const updateData = req.body;
+    const user = await userService.updateCurrentUser(userId, updateData);
+    res.status(httpStatus.OK).json({
+      status: "success",
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//TODO fix delete current user
+export const deleteCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
+    }
+
+    await userService.deleteCurrentUser(userId);
+    res.status(httpStatus.NO_CONTENT).json({
+      status: "success",
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
