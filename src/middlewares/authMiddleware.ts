@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import env from "../config/env";
 import AppError from "../utils/appError";
 
 interface AuthenticatedRequest extends Request {
-  userId?: string;
+  user?: string | jwt.JwtPayload; 
 }
 
 export const protect = (
@@ -12,26 +12,32 @@ export const protect = (
   res: Response,
   next: NextFunction
 ) => {
-  let token: string | undefined;
-
-  if (req.cookies && req.cookies.accessToken) {
-    token = req.cookies.accessToken;
-  }
+  const token = extractTokenFromHeader(req);
 
   if (!token) {
-    return next(
-      new AppError("You are not logged in! Please log in to get access.", 401)
-    );
+    return next(new AppError("Unauthorized access", 401));
   }
 
-  jwt.verify(token, env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return next(new AppError("Invalid token. Please log in again.", 401));
-    }
-
-    const payload = decoded as jwt.JwtPayload;
-    req.userId = payload.id;
-
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload;
+    req.user = decoded;
     next();
-  });
+  } catch (error) {
+    return next(new AppError("Invalid token", 401));
+  }
+};
+
+/**
+ * Extracts JWT token from Authorization header
+ * @param req Express request object
+ * @returns JWT token string or undefined
+ */
+const extractTokenFromHeader = (req: AuthenticatedRequest): string | undefined => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.split(" ")[1];
+  }
+
+  return undefined;
 };
