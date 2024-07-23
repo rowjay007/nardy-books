@@ -323,3 +323,81 @@ export const resendVerificationEmail = async (
   }
 };
 
+
+// Add these new functions to authController.ts
+
+export const getCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { userId } = req;
+    if (!userId) {
+      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
+    }
+
+    const user = await userService.getCurrentUser(userId);
+    if (!user) {
+      throw new AppError("User not found", httpStatus.NOT_FOUND);
+    }
+
+    res.status(httpStatus.OK).json({
+      status: "success",
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { userId } = req;
+    if (!userId) {
+      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
+    }
+
+    const updateData = req.body;
+    const user = await userService.updateCurrentUser(userId, updateData);
+    if (!user) {
+      throw new AppError("User not found", httpStatus.NOT_FOUND);
+    }
+
+    res.status(httpStatus.OK).json({
+      status: "success",
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { userId } = req;
+    if (!userId) {
+      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
+    }
+
+    const result = await userService.deleteCurrentUser(userId);
+    if (!result) {
+      throw new AppError("User not found", httpStatus.NOT_FOUND);
+    }
+
+    res.status(httpStatus.NO_CONTENT).json({
+      status: "success",
+      data: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

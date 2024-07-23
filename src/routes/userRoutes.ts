@@ -353,4 +353,84 @@ router.patch("/:id", protect, userController.updateUserById);
  */
 router.delete("/:id", protect, userController.deleteUserById);
 
+/**
+ * @swagger
+ * /api/v1/users/me:
+ *   get:
+ *     summary: Get current user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Current user information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ */
+router.get("/me", protect, authController.getCurrentUser);
+
+/**
+ * @swagger
+ * /api/v1/users/me:
+ *   patch:
+ *     summary: Update current user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Updated current user information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ */
+router.patch("/me", protect, authController.updateCurrentUser);
+
+/**
+ * @swagger
+ * /api/v1/users/me:
+ *   delete:
+ *     summary: Delete current user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '204':
+ *         description: Current user successfully deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ */
+router.delete("/me", protect, authController.deleteCurrentUser);
 export default router;

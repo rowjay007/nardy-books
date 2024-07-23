@@ -69,7 +69,7 @@ describe("User Controller", () => {
       req.params = {}; // No ID provided
       req.body = { username: "JaneDoe" };
 
-      await userController.updateUser(req as any, res as any, next);
+      await userController.updateUserById(req as any, res as any, next);
 
       expect(next).toHaveBeenCalledWith(
         new AppError("No user ID provided", 400)
@@ -86,7 +86,7 @@ describe("User Controller", () => {
       req.body = { username: "JaneDoe" };
       (userService.updateUser as jest.Mock).mockResolvedValue(updatedUser);
 
-      await userController.updateUser(req as any, res as any, next);
+      await userController.updateUserById(req as any, res as any, next);
 
       expect(userService.updateUser).toHaveBeenCalledWith(
         userId.toHexString(),
@@ -108,7 +108,7 @@ describe("User Controller", () => {
       req.body = { username: "JaneDoe" };
       (userService.updateUser as jest.Mock).mockResolvedValue(null);
 
-      await userController.updateUser(req as any, res as any, next);
+      await userController.updateUserById(req as any, res as any, next);
 
       expect(userService.updateUser).toHaveBeenCalledWith(
         userId.toHexString(),
@@ -123,9 +123,9 @@ describe("User Controller", () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      req.params = {}; // No ID provided
+      req.params = {}; 
 
-      await userController.deleteUser(req as any, res as any, next);
+      await userController.deleteUserById(req as any, res as any, next);
 
       expect(next).toHaveBeenCalledWith(
         new AppError("No user ID provided", 400)
@@ -140,7 +140,7 @@ describe("User Controller", () => {
       req.params = { id: userId.toHexString() };
       (userService.deleteUser as jest.Mock).mockResolvedValue(true);
 
-      await userController.deleteUser(req as any, res as any, next);
+      await userController.deleteUserById(req as any, res as any, next);
 
       expect(userService.deleteUser).toHaveBeenCalledWith(userId.toHexString());
       expect(res.status).toHaveBeenCalledWith(200);
@@ -159,7 +159,7 @@ describe("User Controller", () => {
       req.params = { id: userId.toHexString() };
       (userService.deleteUser as jest.Mock).mockResolvedValue(false);
 
-      await userController.deleteUser(req as any, res as any, next);
+      await userController.deleteUserById(req as any, res as any, next);
 
       expect(userService.deleteUser).toHaveBeenCalledWith(userId.toHexString());
       expect(next).toHaveBeenCalledWith(new AppError("User not found", 404));
