@@ -5,47 +5,27 @@ import env from "../config/env";
 import * as userService from "../services/userService";
 import AppError from "../utils/appError";
 
-/**
- * Custom Request interface to include user information
- */
 interface AuthenticatedRequest extends Request {
-  userId?: string;
+  user?: string | jwt.JwtPayload;
 }
 
-/**
- * Generates an access token for a user
- * @param {string} userId - ID of the user
- * @returns {string} - JWT access token
- */
 export const generateAccessToken = (userId: string): string => {
   return jwt.sign({ id: userId }, env.JWT_SECRET, {
     expiresIn: "1h",
   });
 };
 
-/**
- * Generates a refresh token for a user
- * @param {string} userId - ID of the user
- * @returns {string} - JWT refresh token
- */
 export const generateRefreshToken = (userId: string): string => {
   return jwt.sign({ id: userId }, env.REFRESH_TOKEN_SECRET, {
     expiresIn: env.REFRESH_TOKEN_EXPIRATION,
   });
 };
 
-/**
- * Controller function to register a new user
- * @param {Request} req - Express request object containing registration details in the body
- * @param {Response} res - Express response object
- * @param {NextFunction} next - Express next function
- * @returns {Promise<void>} - Returns a JSON object with success message and user data
- */
 export const register = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+) => {
   try {
     const { username, email, password } = req.body;
     const user = await userService.register(username, email, password);
@@ -70,7 +50,7 @@ export const login = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+) => {
   try {
     const { email, password } = req.body;
     const { user } = await userService.login(email, password);
@@ -165,7 +145,7 @@ export const logout = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+) => {
   try {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
@@ -244,7 +224,7 @@ export const changePassword = async (
   next: NextFunction
 ): Promise<void> => {
   const { currentPassword, newPassword } = req.body;
-  const { userId } = req;
+  const userId = getUserIdFromRequest(req);
 
   try {
     if (!userId) {
@@ -305,7 +285,7 @@ export const resendVerificationEmail = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { userId } = req;
+  const userId = getUserIdFromRequest(req);
 
   try {
     if (!userId) {
@@ -323,81 +303,16 @@ export const resendVerificationEmail = async (
   }
 };
 
-
-// Add these new functions to authController.ts
-
-export const getCurrentUser = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const { userId } = req;
-    if (!userId) {
-      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
-    }
-
-    const user = await userService.getCurrentUser(userId);
-    if (!user) {
-      throw new AppError("User not found", httpStatus.NOT_FOUND);
-    }
-
-    res.status(httpStatus.OK).json({
-      status: "success",
-      data: { user },
-    });
-  } catch (error) {
-    next(error);
-  }
+/**
+ * Helper function to extract user ID from the request
+ * @param {AuthenticatedRequest} req - Express request object extended with user information
+ * @returns {string | undefined} - User ID if found, otherwise undefined
+ */
+const getUserIdFromRequest = (
+  req: AuthenticatedRequest
+): string | undefined => {
+  const user = req.user as jwt.JwtPayload | undefined;
+  return user?.id as string | undefined;
 };
 
-export const updateCurrentUser = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const { userId } = req;
-    if (!userId) {
-      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
-    }
 
-    const updateData = req.body;
-    const user = await userService.updateCurrentUser(userId, updateData);
-    if (!user) {
-      throw new AppError("User not found", httpStatus.NOT_FOUND);
-    }
-
-    res.status(httpStatus.OK).json({
-      status: "success",
-      data: { user },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const deleteCurrentUser = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const { userId } = req;
-    if (!userId) {
-      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
-    }
-
-    const result = await userService.deleteCurrentUser(userId);
-    if (!result) {
-      throw new AppError("User not found", httpStatus.NOT_FOUND);
-    }
-
-    res.status(httpStatus.NO_CONTENT).json({
-      status: "success",
-      data: null,
-    });
-  } catch (error) {
-    next(error);
-  }
-};

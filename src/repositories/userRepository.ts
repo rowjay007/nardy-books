@@ -24,7 +24,10 @@ export const findUsers = async (
   return User.find(filter).sort(sort).limit(limit).skip(skip);
 };
 
-export const updateUser = async (id: string, updateData: Partial<IUser>): Promise<IUser | null> => {
+export const updateUser = async (
+  id: string,
+  updateData: Partial<IUser>
+): Promise<IUser | null> => {
   return User.findByIdAndUpdate(id, updateData, { new: true });
 };
 
@@ -46,14 +49,19 @@ export const setResetPasswordToken = async (
   return user;
 };
 
-export const findByResetPasswordToken = async (token: string): Promise<IUser | null> => {
+export const findByResetPasswordToken = async (
+  token: string
+): Promise<IUser | null> => {
   return User.findOne({
     resetPasswordToken: token,
     resetPasswordExpires: { $gt: new Date() },
   });
 };
 
-export const setRefreshToken = async (id: string, refreshToken: string): Promise<IUser> => {
+export const setRefreshToken = async (
+  id: string,
+  refreshToken: string
+): Promise<IUser> => {
   const user = await User.findById(id);
   if (!user) throw new AppError("User not found", 404);
   user.refreshToken = refreshToken;

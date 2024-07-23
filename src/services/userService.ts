@@ -210,22 +210,3 @@ export const deleteUser = async (userId: string): Promise<boolean> => {
   return result !== null;
 };
 
-// Add these new functions to userService.ts
-
-export const getCurrentUser = async (userId: string): Promise<IUser | null> => {
-  return getUserById(userId);
-};
-
-export const updateCurrentUser = async (userId: string, updateData: Partial<IUser>): Promise<IUser | null> => {
-  const user = await userRepository.updateUser(userId, updateData);
-  if (user) {
-    cache.flushAll();
-  }
-  return user;
-};
-
-export const deleteCurrentUser = async (userId: string): Promise<boolean> => {
-  const result = await userRepository.deleteUser(userId);
-  cache.flushAll();
-  return result;
-};
