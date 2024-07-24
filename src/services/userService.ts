@@ -100,7 +100,7 @@ export const resetPassword = async (token: string, newPassword: string) => {
   const user = await userRepository.findByResetPasswordToken(token);
   if (!user) throw new AppError("Invalid or expired token", 400);
 
-  user.password = newPassword; // Password will be hashed by the pre-save hook
+  user.password = newPassword;
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;
   await user.save();
@@ -210,24 +210,3 @@ export const deleteUser = async (userId: string): Promise<boolean> => {
   return result !== null;
 };
 
-
-export const getCurrentUser = async (userId: string): Promise<IUser | null> => {
-  return userRepository.findUserById(userId);
-};
-
-export const updateCurrentUser = async (
-  userId: string,
-  updateData: Partial<IUser>
-): Promise<IUser | null> => {
-  const user = await userRepository.updateUser(userId, updateData);
-  if (user) {
-    cache.flushAll();
-  }
-  return user;
-};
-
-export const deleteCurrentUser = async (userId: string): Promise<boolean> => {
-  const result = await userRepository.deleteUser(userId);
-  cache.flushAll();
-  return result !== null;
-};

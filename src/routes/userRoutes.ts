@@ -1,4 +1,3 @@
-import { updateUserById } from './../controllers/userController';
 import { Router } from "express";
 import * as authController from "../controllers/authController";
 import * as userController from "../controllers/userController";
@@ -524,7 +523,5 @@ router.post(
   authController.resendVerificationEmail
 );
 
-router.get("/me", protect, authController.getCurrentUser);
-router.patch("/me", protect, authController.updateCurrentUser);
-router.delete("/me", protect, authController.deleteCurrentUser);
+
 export default router;
