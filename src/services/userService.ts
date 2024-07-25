@@ -33,7 +33,7 @@ export const register = async (
   const user = new User({
     username,
     email,
-    password, // Password will be hashed by the pre-save hook
+    password, 
     verificationToken,
   });
   await user.save();
