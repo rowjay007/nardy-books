@@ -317,3 +317,86 @@ const getUserIdFromRequest = (
 
 
 
+// Add these new controller functions to userController.ts
+
+export const getCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const userId = getUserIdFromRequest(req);
+
+  try {
+    if (!userId) {
+      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
+    }
+
+    const user = await userService.getCurrentUser(userId);
+
+    if (!user) {
+      throw new AppError("User not found", httpStatus.NOT_FOUND);
+    }
+
+    res.status(httpStatus.OK).json({
+      status: "success",
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const userId = getUserIdFromRequest(req);
+  const updateData = req.body;
+
+  try {
+    if (!userId) {
+      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
+    }
+
+    const user = await userService.updateCurrentUser(userId, updateData);
+
+    if (!user) {
+      throw new AppError("User not found", httpStatus.NOT_FOUND);
+    }
+
+    res.status(httpStatus.OK).json({
+      status: "success",
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteCurrentUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const userId = getUserIdFromRequest(req);
+
+  try {
+    if (!userId) {
+      throw new AppError("User not authenticated", httpStatus.UNAUTHORIZED);
+    }
+
+    const result = await userService.deleteCurrentUser(userId);
+
+    if (!result) {
+      throw new AppError("User not found", httpStatus.NOT_FOUND);
+    }
+
+    res.status(httpStatus.OK).json({
+      status: "success",
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
