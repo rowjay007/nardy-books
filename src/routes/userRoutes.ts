@@ -33,9 +33,12 @@ const router = Router();
  *     Token:
  *       type: object
  *       properties:
- *         token:
+ *         accessToken:
  *           type: string
- *           description: JWT token for authentication
+ *           description: JWT access token
+ *         refreshToken:
+ *           type: string
+ *           description: JWT refresh token
  *     Error:
  *       type: object
  *       properties:
@@ -72,12 +75,8 @@ const router = Router();
  * tags:
  *   name: Authentication
  *   description: API endpoints for authentication
- *   name: Users
- *   description: API endpoints for managing users
  */
 
-// Authentication routes
-router.post("/register", authController.register);
 /**
  * @swagger
  * /api/v1/auth/register:
@@ -95,25 +94,26 @@ router.post("/register", authController.register);
  *                 type: string
  *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
  *                 format: password
  *     responses:
- *       '200':
- *         description: Successfully registered user
+ *       '201':
+ *         description: Registration successful. User created, email verification required.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 status:
+ *                 message:
  *                   type: string
- *                   example: success
- *                 data:
+ *                   example: Registration successful. Please check your email for verification.
+ *                 user:
  *                   $ref: '#/components/schemas/User'
  */
+router.post("/register", authController.register);
 
-router.post("/login", authController.login);
 /**
  * @swagger
  * /api/v1/auth/login:
@@ -129,12 +129,51 @@ router.post("/login", authController.login);
  *             properties:
  *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
  *                 format: password
  *     responses:
  *       '200':
- *         description: Successfully logged in
+ *         description: Login successful, returns access and refresh tokens.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 accessToken:
+ *                   type: string
+ *                   description: JWT access token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: JWT refresh token
+ */
+router.post("/login", authController.login);
+
+/**
+ * @swagger
+ * /api/v1/auth/refresh-token:
+ *   post:
+ *     summary: Refresh access tokens using a refresh token
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: Refresh token to be used for generating new tokens
+ *     responses:
+ *       '200':
+ *         description: Tokens refreshed successfully
  *         content:
  *           application/json:
  *             schema:
@@ -143,17 +182,18 @@ router.post("/login", authController.login);
  *                 status:
  *                   type: string
  *                   example: success
- *                 data:
- *                   type: object
- *                   properties:
- *                     user:
- *                       $ref: '#/components/schemas/User'
- *                     token:
- *                       type: string
- *                       description: JWT token for authentication
+ *                 message:
+ *                   type: string
+ *                   example: Tokens refreshed successfully
+ *                 accessToken:
+ *                   type: string
+ *                   description: New JWT access token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: New JWT refresh token
  */
+router.post("/refresh-token", authController.refreshTokens);
 
-router.post("/logout", protect, authController.logout);
 /**
  * @swagger
  * /api/v1/auth/logout:
@@ -170,40 +210,12 @@ router.post("/logout", protect, authController.logout);
  *             schema:
  *               type: object
  *               properties:
- *                 status:
+ *                 message:
  *                   type: string
- *                   example: success
+ *                   example: Logout successful
  */
+router.post("/logout", protect, authController.logout);
 
-router.post("/refresh-token", authController.refreshTokens);
-/**
- * @swagger
- * /api/v1/auth/refresh-token:
- *   post:
- *     summary: Refresh access tokens
- *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Successfully refreshed tokens
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
- *                 data:
- *                   type: object
- *                   properties:
- *                     token:
- *                       type: string
- *                       description: New JWT token
- */
-
-router.post("/request-reset-password", authController.requestPasswordReset);
 /**
  * @swagger
  * /api/v1/auth/request-reset-password:
@@ -219,9 +231,10 @@ router.post("/request-reset-password", authController.requestPasswordReset);
  *             properties:
  *               email:
  *                 type: string
+ *                 format: email
  *     responses:
  *       '200':
- *         description: Password reset request successful
+ *         description: Password reset request successful. A reset token will be sent to the email.
  *         content:
  *           application/json:
  *             schema:
@@ -230,14 +243,20 @@ router.post("/request-reset-password", authController.requestPasswordReset);
  *                 status:
  *                   type: string
  *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       description: Password reset token
  */
+router.post("/request-reset-password", authController.requestPasswordReset);
 
-router.post("/reset-password/:token", authController.resetPassword);
 /**
  * @swagger
  * /api/v1/auth/reset-password/{token}:
  *   post:
- *     summary: Reset password using token
+ *     summary: Reset password using a reset token
  *     tags: [Authentication]
  *     parameters:
  *       - in: path
@@ -267,15 +286,20 @@ router.post("/reset-password/:token", authController.resetPassword);
  *                 status:
  *                   type: string
  *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
  */
+router.post("/reset-password/:token", authController.resetPassword);
 
-router.put("/change-password", protect, authController.changePassword);
 /**
  * @swagger
- * /api/v1/users/change-password:
- *   put:
- *     summary: Change user password
- *     tags: [Users]
+ * /api/v1/auth/change-password:
+ *   post:
+ *     summary: Change password for the authenticated user
+ *     tags: [Authentication]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -302,21 +326,86 @@ router.put("/change-password", protect, authController.changePassword);
  *                 status:
  *                   type: string
  *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
  */
+router.post("/change-password", protect, authController.changePassword);
 
-// User management routes
-router.get("/me", protect, authController.getCurrentUser);
+/**
+ * @swagger
+ * /api/v1/auth/verify-email/{token}:
+ *   get:
+ *     summary: Verify user email using token
+ *     tags: [Authentication]
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Verification token received via email
+ *     responses:
+ *       '200':
+ *         description: Email verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Email verified successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ */
+router.get("/verify-email/:token", authController.verifyEmail);
+
+/**
+ * @swagger
+ * /api/v1/auth/resend-verification-email:
+ *   post:
+ *     summary: Resend verification email to the authenticated user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Verification email resent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Verification email resent successfully
+ */
+router.post(
+  "/resend-verification-email",
+  protect,
+  authController.resendVerificationEmail
+);
+
 /**
  * @swagger
  * /api/v1/users/me:
  *   get:
- *     summary: Get current logged in user
+ *     summary: Get the currently authenticated user
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       '200':
- *         description: User retrieved successfully
+ *         description: Successfully retrieved the current user
  *         content:
  *           application/json:
  *             schema:
@@ -328,13 +417,13 @@ router.get("/me", protect, authController.getCurrentUser);
  *                 data:
  *                   $ref: '#/components/schemas/User'
  */
+router.get("/me", protect, authController.getCurrentUser);
 
-router.put("/me", protect, authController.updateCurrentUser);
 /**
  * @swagger
  * /api/v1/users/me:
  *   put:
- *     summary: Update current logged in user
+ *     summary: Update the currently authenticated user's information
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -349,9 +438,13 @@ router.put("/me", protect, authController.updateCurrentUser);
  *                 type: string
  *               email:
  *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
  *     responses:
  *       '200':
- *         description: User updated successfully
+ *         description: Successfully updated the current user
  *         content:
  *           application/json:
  *             schema:
@@ -363,19 +456,19 @@ router.put("/me", protect, authController.updateCurrentUser);
  *                 data:
  *                   $ref: '#/components/schemas/User'
  */
+router.put("/me", protect, authController.updateCurrentUser);
 
-router.delete("/me", protect, authController.deleteCurrentUser);
 /**
  * @swagger
  * /api/v1/users/me:
  *   delete:
- *     summary: Delete current logged in user
+ *     summary: Delete the currently authenticated user
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       '200':
- *         description: User deleted successfully
+ *         description: Successfully deleted the current user
  *         content:
  *           application/json:
  *             schema:
@@ -384,9 +477,38 @@ router.delete("/me", protect, authController.deleteCurrentUser);
  *                 status:
  *                   type: string
  *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: User deleted successfully
  */
+router.delete("/me", protect,authController.deleteCurrentUser);
 
-router.get("/:id", protect, userController.getUserById);
+/**
+ * @swagger
+ * /api/v1/users:
+ *   get:
+ *     summary: Get all users
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: List of all users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ */
+router.get("/", protect, userController.getAllUsers);
+
 /**
  * @swagger
  * /api/v1/users/{id}:
@@ -404,7 +526,7 @@ router.get("/:id", protect, userController.getUserById);
  *         description: User ID
  *     responses:
  *       '200':
- *         description: User retrieved successfully
+ *         description: User found
  *         content:
  *           application/json:
  *             schema:
@@ -416,8 +538,8 @@ router.get("/:id", protect, userController.getUserById);
  *                 data:
  *                   $ref: '#/components/schemas/User'
  */
+router.get("/:id", protect, userController.getUserById);
 
-router.put("/:id", protect, userController.updateUserById);
 /**
  * @swagger
  * /api/v1/users/{id}:
@@ -444,6 +566,7 @@ router.put("/:id", protect, userController.updateUserById);
  *                 type: string
  *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
  *                 format: password
@@ -461,8 +584,8 @@ router.put("/:id", protect, userController.updateUserById);
  *                 data:
  *                   $ref: '#/components/schemas/User'
  */
+router.put("/:id", protect, userController.updateUserById);
 
-router.delete("/:id", protect, userController.deleteUserById);
 /**
  * @swagger
  * /api/v1/users/{id}:
@@ -489,59 +612,10 @@ router.delete("/:id", protect, userController.deleteUserById);
  *                 status:
  *                   type: string
  *                   example: success
- */
-
-router.get("/verify-email/:token", authController.verifyEmail);
-/**
- * @swagger
- * /api/v1/users/verify-email/{token}:
- *   get:
- *     summary: Verify user email using token
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: Verification token received via email
- *     responses:
- *       '200':
- *         description: Email verified successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
+ *                 message:
  *                   type: string
- *                   example: success
+ *                   example: User deleted successfully
  */
-
-router.post(
-  "/resend-verification-email",
-  protect,
-  authController.resendVerificationEmail
-);
-/**
- * @swagger
- * /api/v1/users/resend-verification-email:
- *   post:
- *     summary: Resend verification email
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Verification email resent successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
- */
+router.delete("/:id", protect, userController.deleteUserById);
 
 export default router;
