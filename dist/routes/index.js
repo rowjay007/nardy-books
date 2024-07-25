@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="209aed2d-5774-5ff7-be1d-08af65e03e80")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="de20440a-3cf9-5437-9543-795b50e3d3fd")}catch(e){}}();
 
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -21,6 +21,7 @@ const sentryRoutes_1 = __importDefault(require("./sentryRoutes"));
 const subscriptionRoutes_1 = __importDefault(require("./subscriptionRoutes"));
 const userRoutes_1 = __importDefault(require("./userRoutes"));
 const cacheRoutes_1 = __importDefault(require("./cacheRoutes"));
+const cookieRoutes_1 = __importDefault(require("./cookieRoutes"));
 const router = express_1.default.Router();
 const apiV1Router = express_1.default.Router();
 apiV1Router.use("/", baseUrlRoutes_1.default);
@@ -35,9 +36,10 @@ apiV1Router.use("/reviews", reviewRoutes_1.default);
 apiV1Router.use("/subscriptions", subscriptionRoutes_1.default);
 apiV1Router.use("/payments", paymentRoutes_1.default);
 apiV1Router.use("/cache", cacheRoutes_1.default);
+apiV1Router.use("/cookies", cookieRoutes_1.default);
 apiV1Router.use(metricsRoutes_1.default);
 apiV1Router.use(sentryRoutes_1.default);
 router.use("/api/v1", apiV1Router);
 exports.default = router;
 //# sourceMappingURL=index.js.map
-//# debugId=209aed2d-5774-5ff7-be1d-08af65e03e80
+//# debugId=de20440a-3cf9-5437-9543-795b50e3d3fd

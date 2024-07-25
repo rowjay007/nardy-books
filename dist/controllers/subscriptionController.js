@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="7896a94d-82f7-583a-9f0a-84d73397b63d")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="9d669f3b-30cc-5ee6-a1c9-7e09bd6aaaea")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -68,10 +68,10 @@ exports.getSubscriptions = (0, catchAsync_1.default)((req, res) => __awaiter(voi
  * @param res Express response object
  * @param next Express next function
  */
-exports.getSubscriptionById = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getSubscriptionById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const subscription = yield subscriptionService.getSubscriptionById(req.params.id);
     if (!subscription) {
-        throw new appError_1.default("Subscription not found", 404);
+        return next(new appError_1.default("Subscription not found", 404)); // Ensure `next` is called here
     }
     res.status(200).json(subscription);
 }));
@@ -103,4 +103,4 @@ exports.deleteSubscription = (0, catchAsync_1.default)((req, res) => __awaiter(v
     });
 }));
 //# sourceMappingURL=subscriptionController.js.map
-//# debugId=7896a94d-82f7-583a-9f0a-84d73397b63d
+//# debugId=9d669f3b-30cc-5ee6-a1c9-7e09bd6aaaea

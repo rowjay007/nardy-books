@@ -1,6 +1,29 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="d607db3c-933a-57cb-b4be-9db211a022b5")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c9082cad-5d25-52f0-b76d-5c377e05fced")}catch(e){}}();
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -14,48 +37,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateRefreshToken = exports.generateAccessToken = exports.resendVerificationEmail = exports.verifyEmail = exports.changePassword = exports.resetPassword = exports.requestPasswordReset = exports.refreshTokens = exports.logout = exports.login = exports.register = void 0;
+exports.resendVerificationEmail = exports.verifyEmail = exports.changePassword = exports.resetPassword = exports.requestPasswordReset = exports.logout = exports.refreshTokens = exports.login = exports.register = void 0;
+const http_status_1 = __importDefault(require("http-status"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const env_1 = __importDefault(require("../config/env"));
-const userService_1 = __importDefault(require("../services/userService"));
+const userService = __importStar(require("../services/userService"));
 const appError_1 = __importDefault(require("../utils/appError"));
-const http_status_1 = __importDefault(require("http-status"));
-/**
- * Generates an access token for the given user ID
- * @param {string} userId - User ID
- * @returns {string} Generated access token
- */
 const generateAccessToken = (userId) => {
     return jsonwebtoken_1.default.sign({ id: userId }, env_1.default.JWT_SECRET, {
         expiresIn: "1h",
     });
 };
-exports.generateAccessToken = generateAccessToken;
-/**
- * Generates a refresh token for the given user ID
- * @param {string} userId - User ID
- * @returns {string} Generated refresh token
- */
 const generateRefreshToken = (userId) => {
     return jsonwebtoken_1.default.sign({ id: userId }, env_1.default.REFRESH_TOKEN_SECRET, {
         expiresIn: env_1.default.REFRESH_TOKEN_EXPIRATION,
     });
 };
-exports.generateRefreshToken = generateRefreshToken;
-/**
- * Controller function to register a new user
- * @param {Request} req - Express request object with body containing username, email, and password
- * @param {Response} res - Express response object
- * @param {NextFunction} next - Express next function
- * @returns {Promise<void>} - Returns a JSON object with the created user data
- */
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { username, email, password } = req.body;
     try {
-        const user = yield userService_1.default.register(username, email, password);
+        const { username, email, password } = req.body;
+        const user = yield userService.register(username, email, password);
         res.status(http_status_1.default.CREATED).json({
-            status: "success",
-            data: { user },
+            message: "Registration successful. Please check your email for verification.",
+            user,
         });
     }
     catch (error) {
@@ -64,19 +68,33 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.register = register;
 /**
- * Controller function to authenticate a user and generate access token
- * @param {Request} req - Express request object with body containing email and password
+ * Controller function to log in a user
+ * @param {Request} req - Express request object containing login credentials in the body
  * @param {Response} res - Express response object
  * @param {NextFunction} next - Express next function
- * @returns {Promise<void>} - Returns a JSON object with the authenticated user data and access token
+ * @returns {Promise<void>} - Returns a JSON object with success message, user data, access token, and refresh token
  */
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
     try {
-        const { user, accessToken } = yield userService_1.default.login(email, password);
+        const { email, password } = req.body;
+        const { user } = yield userService.login(email, password);
+        const accessToken = generateAccessToken(user.id);
+        const refreshToken = generateRefreshToken(user.id);
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: env_1.default.NODE_ENV === "production",
+            maxAge: 3600000,
+        });
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: env_1.default.NODE_ENV === "production",
+            maxAge: parseInt(env_1.default.REFRESH_TOKEN_EXPIRATION) * 24 * 60 * 60 * 1000,
+        });
         res.status(http_status_1.default.OK).json({
-            status: "success",
-            data: { user, accessToken },
+            message: "Login successful",
+            user,
+            accessToken,
+            refreshToken,
         });
     }
     catch (error) {
@@ -85,30 +103,6 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.login = login;
 /**
- * Controller function to logout a user
- * @param {AuthenticatedRequest} req - Express request object extended with user information
- * @param {Response} res - Express response object
- * @param {NextFunction} next - Express next function
- * @returns {Promise<void>} - Returns a JSON object indicating successful logout
- */
-const logout = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = getUserIdFromRequest(req);
-    try {
-        if (!userId) {
-            throw new appError_1.default("User not authenticated", http_status_1.default.UNAUTHORIZED);
-        }
-        yield userService_1.default.logout(userId);
-        res.status(http_status_1.default.NO_CONTENT).json({
-            status: "success",
-            data: null,
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-});
-exports.logout = logout;
-/**
  * Controller function to refresh access and refresh tokens
  * @param {Request} req - Express request object with body containing refreshToken
  * @param {Response} res - Express response object
@@ -116,7 +110,7 @@ exports.logout = logout;
  * @returns {Promise<void>} - Returns a JSON object with new access and refresh tokens
  */
 const refreshTokens = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const refreshToken = req.body.refreshToken;
+    const { refreshToken } = req.cookies;
     if (!refreshToken) {
         return next(new appError_1.default("Refresh token is required", http_status_1.default.BAD_REQUEST));
     }
@@ -124,9 +118,21 @@ const refreshTokens = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         const decoded = jsonwebtoken_1.default.verify(refreshToken, env_1.default.REFRESH_TOKEN_SECRET);
         const accessToken = generateAccessToken(decoded.id);
         const newRefreshToken = generateRefreshToken(decoded.id);
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: env_1.default.NODE_ENV === "production",
+            maxAge: 3600000,
+        });
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true,
+            secure: env_1.default.NODE_ENV === "production",
+            maxAge: parseInt(env_1.default.REFRESH_TOKEN_EXPIRATION) * 24 * 60 * 60 * 1000,
+        });
         res.status(http_status_1.default.OK).json({
             status: "success",
-            data: { accessToken, refreshToken: newRefreshToken },
+            message: "Tokens refreshed successfully",
+            accessToken,
+            refreshToken: newRefreshToken,
         });
     }
     catch (error) {
@@ -134,6 +140,26 @@ const refreshTokens = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.refreshTokens = refreshTokens;
+/**
+ * Controller function to log out a user
+ * @param {AuthenticatedRequest} req - Express request object extended with user information
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ * @returns {Promise<void>} - Returns a JSON object with a success message
+ */
+const logout = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.clearCookie("accessToken");
+        res.clearCookie("refreshToken");
+        res.status(http_status_1.default.OK).json({
+            message: "Logout successful",
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.logout = logout;
 /**
  * Controller function to request a password reset for a user
  * @param {Request} req - Express request object with body containing email
@@ -144,7 +170,7 @@ exports.refreshTokens = refreshTokens;
 const requestPasswordReset = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     try {
-        const token = yield userService_1.default.requestPasswordReset(email);
+        const token = yield userService.requestPasswordReset(email);
         res.status(http_status_1.default.OK).json({
             status: "success",
             data: { token },
@@ -166,7 +192,7 @@ const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     const { token } = req.params;
     const { newPassword } = req.body;
     try {
-        const user = yield userService_1.default.resetPassword(token, newPassword);
+        const user = yield userService.resetPassword(token, newPassword);
         res.status(http_status_1.default.OK).json({
             status: "success",
             data: { user },
@@ -191,7 +217,7 @@ const changePassword = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         if (!userId) {
             throw new appError_1.default("User not authenticated", http_status_1.default.UNAUTHORIZED);
         }
-        const user = yield userService_1.default.changePassword(userId, currentPassword, newPassword);
+        const user = yield userService.changePassword(userId, currentPassword, newPassword);
         res.status(http_status_1.default.OK).json({
             status: "success",
             data: { user },
@@ -212,7 +238,7 @@ exports.changePassword = changePassword;
 const verifyEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { token } = req.params;
     try {
-        const user = yield userService_1.default.verifyEmail(token);
+        const user = yield userService.verifyEmail(token);
         res.status(http_status_1.default.OK).json({
             status: "success",
             message: "Email verified successfully.",
@@ -237,7 +263,7 @@ const resendVerificationEmail = (req, res, next) => __awaiter(void 0, void 0, vo
         if (!userId) {
             throw new appError_1.default("User not authenticated", http_status_1.default.UNAUTHORIZED);
         }
-        yield userService_1.default.resendVerificationEmail(userId);
+        yield userService.resendVerificationEmail(userId);
         res.status(http_status_1.default.OK).json({
             status: "success",
             message: "Verification email resent successfully",
@@ -258,4 +284,4 @@ const getUserIdFromRequest = (req) => {
     return user === null || user === void 0 ? void 0 : user.id;
 };
 //# sourceMappingURL=authController.js.map
-//# debugId=d607db3c-933a-57cb-b4be-9db211a022b5
+//# debugId=c9082cad-5d25-52f0-b76d-5c377e05fced

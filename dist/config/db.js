@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="b17a217e-daa1-5d9b-89f1-b7f5e39271a2")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="2cf47ed7-a3ef-5354-811b-ca18563925e9")}catch(e){}}();
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22,17 +22,13 @@ const logger_1 = __importDefault(require("./logger"));
 let mongoServer = null;
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     if (process.env.NODE_ENV === "test") {
-        // Running tests: Use MongoDB in-memory server
         mongoServer = yield mongodb_memory_server_1.MongoMemoryServer.create();
         const mongoUri = mongoServer.getUri();
         yield mongoose_1.default.connect(mongoUri);
     }
     else {
-        // Production or other environments: Use real MongoDB URI
         try {
-            yield mongoose_1.default.connect(env_1.default.MONGO_URI, {
-            // Remove unnecessary options for production connection
-            });
+            yield mongoose_1.default.connect(env_1.default.MONGO_URI, {});
             logger_1.default.info("MongoDB connected successfully");
         }
         catch (error) {
@@ -58,4 +54,4 @@ const closeDB = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.closeDB = closeDB;
 //# sourceMappingURL=db.js.map
-//# debugId=b17a217e-daa1-5d9b-89f1-b7f5e39271a2
+//# debugId=2cf47ed7-a3ef-5354-811b-ca18563925e9

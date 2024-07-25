@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="f968fccd-a774-5787-9ed6-9fa585b80a4d")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="49ba3079-f3f2-5a1a-8af0-a7b8dc81bc97")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -64,13 +64,18 @@ const convertToObjectId = (id) => {
  * @returns {Promise<void>} - Returns a JSON object with the publisher data
  */
 exports.createPublisher = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const publisher = yield PublisherService.createPublisher(req.body);
-    res.status(201).json({
-        status: "success",
-        data: {
-            publisher,
-        },
-    });
+    try {
+        const publisher = yield PublisherService.createPublisher(req.body);
+        res.status(201).json({
+            status: "success",
+            data: {
+                publisher,
+            },
+        });
+    }
+    catch (error) {
+        next(new appError_1.default("Failed to create publisher", 500));
+    }
 }));
 /**
  * Controller function to get a publisher by ID
@@ -112,7 +117,7 @@ exports.getAllPublishers = (0, catchAsync_1.default)((req, res, next) => __await
         });
     }
     catch (error) {
-        next(new appError_1.default("Unable to fetch publishers", 500));
+        next(new appError_1.default("Failed to fetch publishers", 500));
     }
 }));
 /**
@@ -176,4 +181,4 @@ exports.addBookToPublisher = (0, catchAsync_1.default)((req, res, next) => __awa
     });
 }));
 //# sourceMappingURL=publisherController.js.map
-//# debugId=f968fccd-a774-5787-9ed6-9fa585b80a4d
+//# debugId=49ba3079-f3f2-5a1a-8af0-a7b8dc81bc97

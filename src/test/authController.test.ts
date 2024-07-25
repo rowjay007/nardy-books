@@ -166,5 +166,4 @@ describe("Auth Controller", () => {
     });
   });
 
-  // Add more tests for other controller functions like logout, requestPasswordReset, resetPassword, etc.
 });

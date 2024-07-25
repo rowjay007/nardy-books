@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="eb403188-2461-5a5f-bdac-20b0004c5190")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c57675c4-2d8b-59d8-a3d3-2a3c8175c2af")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -66,7 +66,12 @@ exports.createReview = (0, catchAsync_1.default)((req, res, next) => __awaiter(v
  * @returns Returns a JSON object with the review data
  */
 exports.getReviewById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const review = yield ReviewService.getReviewById(req.params.id);
+    var _a;
+    const reviewId = (_a = req.params) === null || _a === void 0 ? void 0 : _a.id;
+    if (!reviewId) {
+        return next(new appError_1.default("No review ID provided", 400));
+    }
+    const review = yield ReviewService.getReviewById(reviewId);
     if (!review) {
         return next(new appError_1.default("No review found with that ID", 404));
     }
@@ -116,7 +121,12 @@ exports.getAllReviews = (0, catchAsync_1.default)((req, res, next) => __awaiter(
  * @returns Returns a JSON object with the review data
  */
 exports.updateReviewById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const review = yield ReviewService.updateReviewById(req.params.id, req.body);
+    var _a;
+    const reviewId = (_a = req.params) === null || _a === void 0 ? void 0 : _a.id;
+    if (!reviewId) {
+        return next(new appError_1.default("No review ID provided", 400));
+    }
+    const review = yield ReviewService.updateReviewById(reviewId, req.body);
     if (!review) {
         return next(new appError_1.default("No review found with that ID", 404));
     }
@@ -135,7 +145,12 @@ exports.updateReviewById = (0, catchAsync_1.default)((req, res, next) => __await
  * @returns Returns a JSON object with the review data
  */
 exports.deleteReviewById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const isDeleted = yield ReviewService.deleteReviewById(req.params.id);
+    var _a;
+    const reviewId = (_a = req.params) === null || _a === void 0 ? void 0 : _a.id;
+    if (!reviewId) {
+        return next(new appError_1.default("No review ID provided", 400));
+    }
+    const isDeleted = yield ReviewService.deleteReviewById(reviewId);
     if (!isDeleted) {
         return next(new appError_1.default("No review found with that ID", 404));
     }
@@ -146,4 +161,4 @@ exports.deleteReviewById = (0, catchAsync_1.default)((req, res, next) => __await
     });
 }));
 //# sourceMappingURL=reviewController.js.map
-//# debugId=eb403188-2461-5a5f-bdac-20b0004c5190
+//# debugId=c57675c4-2d8b-59d8-a3d3-2a3c8175c2af

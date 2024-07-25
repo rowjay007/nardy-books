@@ -1,5 +1,5 @@
 "use strict";
-!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="c6bbb1d9-fa57-592f-8b58-5bf46fb19ffd")}catch(e){}}();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="87d22424-e422-55b4-b4ff-bce4e443c479")}catch(e){}}();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -414,7 +414,7 @@ router.get("/:id", authMiddleware_1.protect, userController.getUserById);
  *                 data:
  *                   $ref: '#/components/schemas/User'
  */
-router.put("/:id", authMiddleware_1.protect, userController.updateUser);
+router.put("/:id", authMiddleware_1.protect, userController.updateUserById);
 /**
  * @swagger
  * /api/v1/users/{id}:
@@ -442,7 +442,7 @@ router.put("/:id", authMiddleware_1.protect, userController.updateUser);
  *                   type: string
  *                   example: success
  */
-router.delete("/:id", authMiddleware_1.protect, userController.deleteUser);
+router.delete("/:id", authMiddleware_1.protect, userController.deleteUserById);
 /**
  * @swagger
  * /api/v1/users/change-password:
@@ -526,4 +526,4 @@ router.get("/verify-email/:token", authController.verifyEmail);
 router.post("/resend-verification-email", authMiddleware_1.protect, authController.resendVerificationEmail);
 exports.default = router;
 //# sourceMappingURL=userRoutes.js.map
-//# debugId=c6bbb1d9-fa57-592f-8b58-5bf46fb19ffd
+//# debugId=87d22424-e422-55b4-b4ff-bce4e443c479
