@@ -48,7 +48,6 @@ jobs:
             -Dsonar.typescript.tsconfigPath=tsconfig.json
             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/public/**
             -Dsonar.test.inclusions=**/*.test.ts
-            -Dsonar.automaticAnalysis.enabled=false
 
   information:
     name: GitHub Context
