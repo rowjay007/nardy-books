@@ -16,8 +16,12 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm ci
-      - name: Run tests
-        run: npm test
+      - name: Run tests with coverage
+        run: npm run test:coverage
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   sonarcloud:
     name: SonarCloud Analysis
@@ -36,11 +40,14 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.organization=your-organization
-            -Dsonar.projectKey=your-project-key
+            -Dsonar.organization=rowjay007
+            -Dsonar.projectKey=nardy-books
             -Dsonar.sources=src
-            -Dsonar.tests=tests
+            -Dsonar.tests=src/tests
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.typescript.tsconfigPath=tsconfig.json
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/public/**
+            -Dsonar.test.inclusions=**/*.test.ts
 
   information:
     name: GitHub Context
