@@ -1,10 +1,8 @@
 name: CI/CD Pipeline
-
 on:
   push:
     branches:
       - main
-
 jobs:
   test:
     name: Run Tests
@@ -21,9 +19,32 @@ jobs:
       - name: Run tests
         run: npm test
 
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: .
+          args: >
+            -Dsonar.organization=your-organization
+            -Dsonar.projectKey=your-project-key
+            -Dsonar.sources=src
+            -Dsonar.tests=tests
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+
   information:
     name: GitHub Context
-    needs: test
+    needs: [test, sonarcloud]
     runs-on: ubuntu-latest
     steps:
       - name: Info
@@ -33,7 +54,7 @@ jobs:
 
   generate_git_tags:
     name: "Generate Git Tags"
-    needs: test
+    needs: [test, sonarcloud]
     runs-on: ubuntu-latest
     outputs:
       output_new_tag: ${{ steps.taggerFinal.outputs.new_tag }}
@@ -50,10 +71,10 @@ jobs:
           WITH_V: true
       - name: Echo New Tag
         run: |
-          echo "The next new tag will be: ${{ steps.taggerFinal.outputs.new_tag }}"  # Use a pipe to preserve formatting
+          echo "The next new tag will be: ${{ steps.taggerFinal.outputs.new_tag }}"
 
   generate_git_release:
-    needs: [test, generate_git_tags]
+    needs: [test, sonarcloud, generate_git_tags]
     name: "GitHub Release"
     runs-on: ubuntu-latest
     steps:
@@ -66,7 +87,7 @@ jobs:
           token: ${{ secrets.CHANGELOG_RELEASE }}
 
   generate_sentry_release:
-    needs: [test, generate_git_tags, generate_git_release]
+    needs: [test, sonarcloud, generate_git_tags, generate_git_release]
     name: "Sentry Release"
     runs-on: ubuntu-latest
     steps:
