@@ -316,9 +316,6 @@ const getUserIdFromRequest = (
 };
 
 
-
-// Add these new controller functions to userController.ts
-
 export const getCurrentUser = async (
   req: AuthenticatedRequest,
   res: Response,

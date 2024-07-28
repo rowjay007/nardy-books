@@ -5,91 +5,38 @@ import AppError from "../utils/appError";
 import { mockRequest, mockResponse } from "../utils/testHelpers";
 
 jest.mock("../services/userService");
-jest.mock("jsonwebtoken");
 
 describe("User Controller", () => {
-  let next: jest.Mock;
+  const next = jest.fn();
 
-  beforeEach(() => {
-    next = jest.fn();
-    jest.resetAllMocks();
-  });
-
-  describe("register", () => {
-    it("should register a new user", async () => {
+  describe("getUserById", () => {
+    it("should handle invalid user ID", async () => {
       const req = mockRequest();
       const res = mockResponse();
-      const newUser = {
-        _id: new Types.ObjectId().toString(),
-        username: "newuser",
-        email: "newuser@example.com",
-      };
 
-      req.body = {
-        username: "newuser",
-        email: "newuser@example.com",
-        password: "password123",
-      };
-      (userService.register as jest.Mock).mockResolvedValue(newUser);
+      req.params = {}; // No ID provided
 
-      await userController.register(req as any, res as any, next);
+      await userController.getUserById(req as any, res as any, next);
 
-      expect(userService.register).toHaveBeenCalledWith(
-        "newuser",
-        "newuser@example.com",
-        "password123"
+      expect(next).toHaveBeenCalledWith(
+        new AppError("No user ID provided", 400)
       );
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith({
-        message:
-          "Registration successful. Please check your email for verification.",
-        user: newUser,
-      });
     });
 
-    it("should handle registration errors", async () => {
+    it("should return a user by id", async () => {
       const req = mockRequest();
       const res = mockResponse();
-      const error = new AppError("Registration failed", 400);
+      const userId = new Types.ObjectId();
+      const user = { _id: userId, username: "JohnDoe" };
 
-      req.body = {
-        username: "newuser",
-        email: "newuser@example.com",
-        password: "password123",
-      };
-      (userService.register as jest.Mock).mockRejectedValue(error);
+      req.params = { id: userId.toHexString() };
+      (userService.getUserById as jest.Mock).mockResolvedValue(user);
 
-      await userController.register(req as any, res as any, next);
+      await userController.getUserById(req as any, res as any, next);
 
-      expect(next).toHaveBeenCalledWith(error);
-    });
-  });
-
-  describe("login", () => {
-    // Add tests for login functionality
-  });
-
-  describe("refreshTokens", () => {
-    // Add tests for refreshTokens functionality
-  });
-
-  describe("getCurrentUser", () => {
-    it("should return the current user's data", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
-      const user = {
-        _id: userId,
-        username: "testuser",
-        email: "test@example.com",
-      };
-
-      req.user = { id: userId };
-      (userService.getCurrentUser as jest.Mock).mockResolvedValue(user);
-
-      await userController.getCurrentUser(req as any, res as any, next);
-
-      expect(userService.getCurrentUser).toHaveBeenCalledWith(userId);
+      expect(userService.getUserById).toHaveBeenCalledWith(
+        userId.toHexString()
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         status: "success",
@@ -97,52 +44,53 @@ describe("User Controller", () => {
       });
     });
 
-    it("should handle missing authentication", async () => {
+    it("should return 404 if user not found", async () => {
       const req = mockRequest();
       const res = mockResponse();
+      const userId = new Types.ObjectId();
 
-      await userController.getCurrentUser(req as any, res as any, next);
+      req.params = { id: userId.toHexString() };
+      (userService.getUserById as jest.Mock).mockResolvedValue(null);
 
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not authenticated");
-      expect(next.mock.calls[0][0].statusCode).toBe(401);
-    });
+      await userController.getUserById(req as any, res as any, next);
 
-    it("should handle user not found", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
-
-      req.user = { id: userId };
-      (userService.getCurrentUser as jest.Mock).mockResolvedValue(null);
-
-      await userController.getCurrentUser(req as any, res as any, next);
-
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not found");
-      expect(next.mock.calls[0][0].statusCode).toBe(404);
+      expect(userService.getUserById).toHaveBeenCalledWith(
+        userId.toHexString()
+      );
+      expect(next).toHaveBeenCalledWith(new AppError("User not found", 404));
     });
   });
 
-  describe("updateCurrentUser", () => {
-    it("should update the current user's data", async () => {
+  describe("updateUser", () => {
+    it("should handle invalid user ID", async () => {
       const req = mockRequest();
       const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
-      const updateData = { username: "updateduser" };
-      const updatedUser = { _id: userId, ...updateData };
 
-      req.user = { id: userId };
-      req.body = updateData;
-      (userService.updateCurrentUser as jest.Mock).mockResolvedValue(
-        updatedUser
+      req.params = {}; 
+      req.body = { username: "JaneDoe" };
+
+      await userController.updateUserById(req as any, res as any, next);
+
+      expect(next).toHaveBeenCalledWith(
+        new AppError("No user ID provided", 400)
       );
+    });
 
-      await userController.updateCurrentUser(req as any, res as any, next);
+    it("should update a user and return it", async () => {
+      const req = mockRequest();
+      const res = mockResponse();
+      const userId = new Types.ObjectId();
+      const updatedUser = { _id: userId, username: "JaneDoe" };
 
-      expect(userService.updateCurrentUser).toHaveBeenCalledWith(
-        userId,
-        updateData
+      req.params = { id: userId.toHexString() };
+      req.body = { username: "JaneDoe" };
+      (userService.updateUser as jest.Mock).mockResolvedValue(updatedUser);
+
+      await userController.updateUserById(req as any, res as any, next);
+
+      expect(userService.updateUser).toHaveBeenCalledWith(
+        userId.toHexString(),
+        req.body
       );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
@@ -151,77 +99,70 @@ describe("User Controller", () => {
       });
     });
 
-    it("should handle missing authentication", async () => {
+    it("should return 404 if user not found", async () => {
       const req = mockRequest();
       const res = mockResponse();
+      const userId = new Types.ObjectId();
 
-      await userController.updateCurrentUser(req as any, res as any, next);
+      req.params = { id: userId.toHexString() };
+      req.body = { username: "JaneDoe" };
+      (userService.updateUser as jest.Mock).mockResolvedValue(null);
 
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not authenticated");
-      expect(next.mock.calls[0][0].statusCode).toBe(401);
-    });
+      await userController.updateUserById(req as any, res as any, next);
 
-    it("should handle user not found", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
-
-      req.user = { id: userId };
-      req.body = { username: "updateduser" };
-      (userService.updateCurrentUser as jest.Mock).mockResolvedValue(null);
-
-      await userController.updateCurrentUser(req as any, res as any, next);
-
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not found");
-      expect(next.mock.calls[0][0].statusCode).toBe(404);
+      expect(userService.updateUser).toHaveBeenCalledWith(
+        userId.toHexString(),
+        req.body
+      );
+      expect(next).toHaveBeenCalledWith(new AppError("User not found", 404));
     });
   });
 
-  describe("deleteCurrentUser", () => {
-    it("should delete the current user", async () => {
+  describe("deleteUser", () => {
+    it("should handle invalid user ID", async () => {
       const req = mockRequest();
       const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
 
-      req.user = { id: userId };
-      (userService.deleteCurrentUser as jest.Mock).mockResolvedValue(true);
+      req.params = {}; 
 
-      await userController.deleteCurrentUser(req as any, res as any, next);
+      await userController.deleteUserById(req as any, res as any, next);
 
-      expect(userService.deleteCurrentUser).toHaveBeenCalledWith(userId);
+      expect(next).toHaveBeenCalledWith(
+        new AppError("No user ID provided", 400)
+      );
+    });
+
+    it("should delete a user and return success message", async () => {
+      const req = mockRequest();
+      const res = mockResponse();
+      const userId = new Types.ObjectId();
+
+      req.params = { id: userId.toHexString() };
+      (userService.deleteUser as jest.Mock).mockResolvedValue(true);
+
+      await userController.deleteUserById(req as any, res as any, next);
+
+      expect(userService.deleteUser).toHaveBeenCalledWith(userId.toHexString());
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         status: "success",
-        message: "User deleted successfully",
+        message: "User successfully deleted",
+        data: null,
       });
     });
 
-    it("should handle missing authentication", async () => {
+    it("should return 404 if user not found", async () => {
       const req = mockRequest();
       const res = mockResponse();
+      const userId = new Types.ObjectId();
 
-      await userController.deleteCurrentUser(req as any, res as any, next);
+      req.params = { id: userId.toHexString() };
+      (userService.deleteUser as jest.Mock).mockResolvedValue(false);
 
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not authenticated");
-      expect(next.mock.calls[0][0].statusCode).toBe(401);
-    });
+      await userController.deleteUserById(req as any, res as any, next);
 
-    it("should handle user not found", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
-
-      req.user = { id: userId };
-      (userService.deleteCurrentUser as jest.Mock).mockResolvedValue(false);
-
-      await userController.deleteCurrentUser(req as any, res as any, next);
-
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not found");
-      expect(next.mock.calls[0][0].statusCode).toBe(404);
+      expect(userService.deleteUser).toHaveBeenCalledWith(userId.toHexString());
+      expect(next).toHaveBeenCalledWith(new AppError("User not found", 404));
     });
   });
 });
