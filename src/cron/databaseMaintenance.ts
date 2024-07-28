@@ -3,10 +3,13 @@ import logger from "../config/logger";
 
 export async function performDatabaseMaintenance() {
   try {
-    await mongoose.connection.db.command({ compact: "books" });
-      await mongoose.connection.db.command({ compact: "users" });
-      await mongoose.connection.db.command({ repairDatabase: 1 });
+    const maintenanceTasks = [
+      mongoose.connection.db.command({ compact: "books" }),
+      mongoose.connection.db.command({ compact: "users" }),
+      mongoose.connection.db.command({ repairDatabase: 1 }),
+    ];
 
+    await Promise.all(maintenanceTasks);
 
     logger.info("Database maintenance completed successfully");
   } catch (error) {

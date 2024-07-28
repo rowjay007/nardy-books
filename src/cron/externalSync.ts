@@ -2,13 +2,20 @@ import axios from "axios";
 import Book from "../models/bookModel";
 import logger from "../config/logger";
 
+interface ExternalBook {
+  isbn: string;
+  title: string;
+  author: string;
+  description: string;
+}
+
 export async function syncExternalData() {
   try {
     const response = await axios.get("https://api.example.com/books");
-    const externalBooks = response.data;
+    const externalBooks: ExternalBook[] = response.data;
 
-    for (const externalBook of externalBooks) {
-      await Book.findOneAndUpdate(
+    const syncPromises = externalBooks.map((externalBook: ExternalBook) =>
+      Book.findOneAndUpdate(
         { isbn: externalBook.isbn },
         {
           $set: {
@@ -18,8 +25,11 @@ export async function syncExternalData() {
           },
         },
         { upsert: true, new: true }
-      );
-    }
+      )
+    );
+
+    await Promise.all(syncPromises);
+
     logger.info(`Synced ${externalBooks.length} books from external source`);
   } catch (error) {
     logger.error("Error syncing external data:", error);

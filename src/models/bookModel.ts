@@ -7,31 +7,34 @@ export interface IBook extends Document {
   genre: Types.ObjectId;
   reviews: Types.ObjectId[];
   price: number;
+  ranking?: number;
 }
 
 const BookSchema: Schema<IBook> = new Schema({
-  title: { type: String, required: true, index: true }, 
+  title: { type: String, required: true, index: true },
   author: {
     type: Schema.Types.ObjectId,
     ref: "Author",
     required: true,
     index: true,
-  }, 
+  },
   publisher: {
     type: Schema.Types.ObjectId,
     ref: "Publisher",
     required: true,
     index: true,
-  }, 
+  },
   genre: {
     type: Schema.Types.ObjectId,
     ref: "Genre",
     required: true,
     index: true,
-  }, 
+  },
   reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
-  price: { type: Number, required: true, index: true }, 
+  price: { type: Number, required: true, index: true },
+  ranking: { type: Number }, 
 });
+
 
 const Book = mongoose.model<IBook>("Book", BookSchema);
 
