@@ -1,10 +1,8 @@
 import { Types } from "mongoose";
-import * as userController from "../controllers/userController"; 
+import * as userController from "../controllers/userController";
 import * as userService from "../services/userService";
 import AppError from "../utils/appError";
 import { mockRequest, mockResponse } from "../utils/testHelpers";
-import jwt from "jsonwebtoken";
-import env from "../config/env";
 
 jest.mock("../services/userService");
 jest.mock("jsonwebtoken");

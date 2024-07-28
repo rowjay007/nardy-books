@@ -23,6 +23,7 @@ const env = {
   SENTRY_DSN: process.env.SENTRY_DSN || "",
   GITHUB_TOKEN: process.env.GITHUB_TOKEN || "",
   NARDY_SENTRY_AUTH_TOKEN: process.env.NARDY_SENTRY_AUTH_TOKEN || "",
+  CRON_ENABLED: process.env.CRON_ENABLED === "true" || false,
 };
 
 export default env;

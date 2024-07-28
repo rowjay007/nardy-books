@@ -78,3 +78,17 @@ export const sendResetPasswordEmail = async (
   const { from, subject, html } = templates.resetPassword(to, resetLink);
   await transporter.sendMail({ from, to, subject, html });
 };
+
+export const sendEmail = async (options: {
+  to: string;
+  subject: string;
+  text: string;
+}): Promise<void> => {
+  const { from } = templates.welcome(options.to, "", "");
+  await transporter.sendMail({
+    from,
+    to: options.to,
+    subject: options.subject,
+    text: options.text,
+  });
+};

@@ -75,6 +75,7 @@
     "@types/mocha": "^10.0.7",
     "@types/morgan": "^1.9.9",
     "@types/ms": "^0.7.34",
+    "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.15",
     "@types/supertest": "^6.0.2",
     "@types/swagger-jsdoc": "^6.0.4",
