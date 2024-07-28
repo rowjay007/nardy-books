@@ -14,7 +14,7 @@ describe("User Controller", () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      req.params = {}; // No ID provided
+      req.params = {}; 
 
       await userController.getUserById(req as any, res as any, next);
 

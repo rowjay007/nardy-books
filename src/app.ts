@@ -12,6 +12,7 @@ import Sentry from "./config/sentry";
 import errorMiddleware from "./middlewares/errorMiddleware";
 import router from "./routes";
 import AppError from "./utils/appError";
+import { setupCronJobs } from "./cron";
 
 const app = express();
 
@@ -63,5 +64,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.use(errorMiddleware);
+
+setupCronJobs();
 
 export default app;
