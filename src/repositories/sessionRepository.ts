@@ -1,5 +1,4 @@
 import { ISession, SessionModel } from "../models/sessionModel";
-import AppError from "../utils/appError";
 
 export const createSession = async (
   sessionData: Partial<ISession>

@@ -8,6 +8,7 @@ export interface IBook extends Document {
   reviews: Types.ObjectId[];
   price: number;
   ranking?: number;
+  subscriptions: Types.ObjectId[];
 }
 
 const BookSchema: Schema<IBook> = new Schema({
@@ -32,9 +33,9 @@ const BookSchema: Schema<IBook> = new Schema({
   },
   reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
   price: { type: Number, required: true, index: true },
-  ranking: { type: Number }, 
+  ranking: { type: Number },
+  subscriptions: [{ type: Schema.Types.ObjectId, ref: "Subscription" }],
 });
-
 
 const Book = mongoose.model<IBook>("Book", BookSchema);
 
