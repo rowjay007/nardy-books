@@ -15,6 +15,7 @@ export const createSubscription = catchAsync(
     res.status(201).json(subscription);
   }
 );
+//TODO let the date be 08-12-2024 format
 
 /**
  * Controller function get all subscriptions
