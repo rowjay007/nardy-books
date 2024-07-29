@@ -192,4 +192,84 @@ router.put("/:id", subscriptionController.updateSubscription);
  */
 router.delete("/:id", subscriptionController.deleteSubscription);
 
+/**
+ * @swagger
+ * /books/{id}/add-subscription:
+ *   post:
+ *     summary: Add a subscription to a book
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The book id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               subscriptionId:
+ *                 type: string
+ *                 description: The subscription ID to be added
+ *             required:
+ *               - subscriptionId
+ *     responses:
+ *       200:
+ *         description: The subscription was added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       400:
+ *         description: Invalid ID or error adding subscription
+ *       404:
+ *         description: Book not found
+ */
+
+/**
+ * @swagger
+ * /books/{id}/remove-subscription:
+ *   post:
+ *     summary: Remove a subscription from a book
+ *     tags: [Books]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The book id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               subscriptionId:
+ *                 type: string
+ *                 description: The subscription ID to be removed
+ *             required:
+ *               - subscriptionId
+ *     responses:
+ *       200:
+ *         description: The subscription was removed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       400:
+ *         description: Invalid ID or error removing subscription
+ *       404:
+ *         description: Book not found
+ */
+
 export default router;
