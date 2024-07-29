@@ -129,4 +129,138 @@ describe("Book Controller", () => {
       });
     });
   });
+
+  describe("addSubscriptionToBook", () => {
+    it("should add a subscription to a book and return the updated book", async () => {
+      const req = mockRequest();
+      const res = mockResponse();
+      const bookId = new Types.ObjectId().toHexString();
+      const subscriptionId = new Types.ObjectId().toHexString();
+      const updatedBook = {
+        _id: bookId,
+        title: "Test Book",
+        subscriptions: [subscriptionId],
+      };
+
+      req.params = { bookId };
+      req.body = { subscriptionId };
+      (BookService.addSubscriptionToBook as jest.Mock).mockResolvedValue(
+        updatedBook
+      );
+
+      await bookController.addSubscriptionToBook(req as any, res as any, next);
+
+      expect(BookService.addSubscriptionToBook).toHaveBeenCalledWith(
+        bookId,
+        subscriptionId
+      );
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(updatedBook);
+    });
+
+    it("should return 400 if bookId or subscriptionId is missing", async () => {
+      const req = mockRequest();
+      const res = mockResponse();
+
+      req.params = {};
+      req.body = {};
+
+      await bookController.addSubscriptionToBook(req as any, res as any, next);
+
+      expect(next).toHaveBeenCalledWith(new AppError("Invalid ID", 400));
+    });
+
+    it("should return 404 if book not found", async () => {
+      const req = mockRequest();
+      const res = mockResponse();
+      const bookId = new Types.ObjectId().toHexString();
+      const subscriptionId = new Types.ObjectId().toHexString();
+
+      req.params = { bookId };
+      req.body = { subscriptionId };
+      (BookService.addSubscriptionToBook as jest.Mock).mockResolvedValue(null);
+
+      await bookController.addSubscriptionToBook(req as any, res as any, next);
+
+      expect(BookService.addSubscriptionToBook).toHaveBeenCalledWith(
+        bookId,
+        subscriptionId
+      );
+      expect(next).toHaveBeenCalledWith(new AppError("Book not found", 404));
+    });
+  });
+
+  describe("removeSubscriptionFromBook", () => {
+    it("should remove a subscription from a book and return the updated book", async () => {
+      const req = mockRequest();
+      const res = mockResponse();
+      const bookId = new Types.ObjectId().toHexString();
+      const subscriptionId = new Types.ObjectId().toHexString();
+      const updatedBook = {
+        _id: bookId,
+        title: "Test Book",
+        subscriptions: [],
+      };
+
+      req.params = { bookId };
+      req.body = { subscriptionId };
+      (BookService.removeSubscriptionFromBook as jest.Mock).mockResolvedValue(
+        updatedBook
+      );
+
+      await bookController.removeSubscriptionFromBook(
+        req as any,
+        res as any,
+        next
+      );
+
+      expect(BookService.removeSubscriptionFromBook).toHaveBeenCalledWith(
+        bookId,
+        subscriptionId
+      );
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(updatedBook);
+    });
+
+    it("should return 400 if bookId or subscriptionId is missing", async () => {
+      const req = mockRequest();
+      const res = mockResponse();
+
+      req.params = {};
+      req.body = {};
+
+      await bookController.removeSubscriptionFromBook(
+        req as any,
+        res as any,
+        next
+      );
+
+      expect(next).toHaveBeenCalledWith(new AppError("Invalid ID", 400));
+    });
+
+    it("should return 404 if book not found", async () => {
+      const req = mockRequest();
+      const res = mockResponse();
+      const bookId = new Types.ObjectId().toHexString();
+      const subscriptionId = new Types.ObjectId().toHexString();
+
+      req.params = { bookId };
+      req.body = { subscriptionId };
+      (BookService.removeSubscriptionFromBook as jest.Mock).mockResolvedValue(
+        null
+      );
+
+      await bookController.removeSubscriptionFromBook(
+        req as any,
+        res as any,
+        next
+      );
+
+      expect(BookService.removeSubscriptionFromBook).toHaveBeenCalledWith(
+        bookId,
+        subscriptionId
+      );
+      expect(next).toHaveBeenCalledWith(new AppError("Book not found", 404));
+    });
+  });
 });
