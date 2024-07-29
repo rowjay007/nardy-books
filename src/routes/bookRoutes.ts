@@ -211,7 +211,7 @@ router.delete("/:id", BookController.deleteBookById);
 
 /**
  * @swagger
- * /books/{id}/add-subscription:
+ * /books/{bookId}/add-subscription:
  *   post:
  *     summary: Add a subscription to a book
  *     tags: [Books]
@@ -219,11 +219,11 @@ router.delete("/:id", BookController.deleteBookById);
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: bookId
  *         schema:
  *           type: string
  *         required: true
- *         description: The book id
+ *         description: The ID of the book
  *     requestBody:
  *       required: true
  *       content:
@@ -233,7 +233,7 @@ router.delete("/:id", BookController.deleteBookById);
  *             properties:
  *               subscriptionId:
  *                 type: string
- *                 description: The subscription ID to be added
+ *                 description: The ID of the subscription to be added
  *             required:
  *               - subscriptionId
  *     responses:
@@ -248,10 +248,11 @@ router.delete("/:id", BookController.deleteBookById);
  *       404:
  *         description: Book not found
  */
-router.post("/:id/add-subscription", BookController.addSubscriptionToBook);
+router.post("/:bookId/add-subscription", BookController.addSubscriptionToBook);
+
 /**
  * @swagger
- * /books/{id}/remove-subscription:
+ * /books/{bookId}/remove-subscription:
  *   post:
  *     summary: Remove a subscription from a book
  *     tags: [Books]
@@ -259,11 +260,11 @@ router.post("/:id/add-subscription", BookController.addSubscriptionToBook);
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: bookId
  *         schema:
  *           type: string
  *         required: true
- *         description: The book id
+ *         description: The ID of the book
  *     requestBody:
  *       required: true
  *       content:
@@ -273,7 +274,7 @@ router.post("/:id/add-subscription", BookController.addSubscriptionToBook);
  *             properties:
  *               subscriptionId:
  *                 type: string
- *                 description: The subscription ID to be removed
+ *                 description: The ID of the subscription to be removed
  *             required:
  *               - subscriptionId
  *     responses:
@@ -288,9 +289,7 @@ router.post("/:id/add-subscription", BookController.addSubscriptionToBook);
  *       404:
  *         description: Book not found
  */
-router.post(
-  "/:id/remove-subscription",
-  BookController.removeSubscriptionFromBook
-);
+router.post("/:bookId/remove-subscription", BookController.removeSubscriptionFromBook);
+
 
 export default router;

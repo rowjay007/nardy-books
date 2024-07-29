@@ -105,54 +105,50 @@ export const deleteBookById = catchAsync(
   }
 );
 
-
 /**
  * Controller function to add a subscription to a book
- * @param {Request} req - Express request object with body containing book ID and subscription ID
+ * @param {Request} req - Express request object with path parameter for book ID and body containing subscription ID
  * @param {Response} res - Express response object
  * @returns {Promise<void>} - Returns a JSON object with the updated book data
  * @throws {AppError} - Throws 404 if the book is not found or 400 for invalid IDs
  */
 export const addSubscriptionToBook = catchAsync(async (req: Request, res: Response) => {
-  try {
-    const { bookId, subscriptionId } = req.body;
-    const updatedBook = await BookService.addSubscriptionToBook(bookId, subscriptionId);
+  const bookId = req.params.bookId;
+  const { subscriptionId } = req.body;
 
-    if (!updatedBook) {
-      throw new AppError("Book not found", 404);
-    }
-
-    res.status(200).json(updatedBook);
-  } catch (error) {
-    if (error instanceof AppError && error.statusCode === 400) {
-      throw new AppError("Invalid ID", 400);
-    }
-    throw new AppError("Error adding subscription", 400);
+  if (!bookId || !subscriptionId) {
+    throw new AppError("Invalid ID", 400);
   }
+
+  const updatedBook = await BookService.addSubscriptionToBook(bookId, subscriptionId);
+
+  if (!updatedBook) {
+    throw new AppError("Book not found", 404);
+  }
+
+  res.status(200).json(updatedBook);
 });
 
 /**
  * Controller function to remove a subscription from a book
- * @param {Request} req - Express request object with body containing book ID and subscription ID
+ * @param {Request} req - Express request object with path parameter for book ID and body containing subscription ID
  * @param {Response} res - Express response object
  * @returns {Promise<void>} - Returns a JSON object with the updated book data
  * @throws {AppError} - Throws 404 if the book is not found or 400 for invalid IDs
  */
 export const removeSubscriptionFromBook = catchAsync(async (req: Request, res: Response) => {
-  try {
-    const { bookId, subscriptionId } = req.body;
-    const updatedBook = await BookService.removeSubscriptionFromBook(bookId, subscriptionId);
+  const bookId = req.params.bookId;
+  const { subscriptionId } = req.body;
 
-    if (!updatedBook) {
-      throw new AppError("Book not found", 404);
-    }
-
-    res.status(200).json(updatedBook);
-  } catch (error) {
-    if (error instanceof AppError && error.statusCode === 400) {
-      throw new AppError("Invalid ID", 400);
-    }
-    throw new AppError("Error removing subscription", 400);
+  if (!bookId || !subscriptionId) {
+    throw new AppError("Invalid ID", 400);
   }
-});
 
+  const updatedBook = await BookService.removeSubscriptionFromBook(bookId, subscriptionId);
+
+  if (!updatedBook) {
+    throw new AppError("Book not found", 404);
+  }
+
+  res.status(200).json(updatedBook);
+});
