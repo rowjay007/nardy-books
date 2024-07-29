@@ -5,7 +5,7 @@ import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 
 export const createBook = async (bookData: Partial<IBook>): Promise<IBook> => {
   const book = await BookRepository.createBook(bookData);
-  cache.flushAll(); 
+  cache.flushAll();
   return book;
 };
 
@@ -48,7 +48,7 @@ export const updateBookById = async (
 ): Promise<IBook | null> => {
   const book = await BookRepository.updateBookById(id, bookData);
   if (book) {
-    cache.flushAll(); 
+    cache.flushAll();
   }
   return book;
 };
@@ -58,7 +58,7 @@ export const deleteBookById = async (
 ): Promise<IBook | null> => {
   const book = await BookRepository.deleteBookById(id);
   if (book) {
-    cache.flushAll(); 
+    cache.flushAll();
   }
   return book;
 };
