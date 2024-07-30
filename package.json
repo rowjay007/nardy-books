@@ -44,6 +44,7 @@
     "http-status": "^1.7.4",
     "husky": "^9.0.11",
     "jsonwebtoken": "^9.0.2",
+    "kafkajs": "^2.2.4",
     "mailtrap": "^3.3.0",
     "mongodb-memory-server": "^9.4.1",
     "mongoose": "^8.4.1",
