@@ -27,8 +27,8 @@ export const register = async (
   next: NextFunction
 ) => {
   try {
-    const { username, email, password } = req.body;
-    const user = await userService.register(username, email, password);
+    const { name, username, email, password } = req.body;
+    const user = await userService.register(name, username, email, password);
     res.status(httpStatus.CREATED).json({
       message:
         "Registration successful. Please check your email for verification.",

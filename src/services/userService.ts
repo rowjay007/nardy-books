@@ -25,22 +25,24 @@ const generateRefreshToken = (userId: string) => {
 };
 
 export const register = async (
+  name: string,
   username: string,
   email: string,
   password: string
 ): Promise<IUser> => {
   const verificationToken = crypto.randomBytes(32).toString("hex");
   const user = new User({
+    name,
     username,
     email,
-    password, 
+    password,
     verificationToken,
   });
   await user.save();
 
   const verificationLink = `${env.EMAIL_VERIFICATION_URL}/${verificationToken}`;
   await Promise.all([
-    sendWelcomeEmail(email, username, verificationLink),
+    sendWelcomeEmail(email, name, verificationLink),
     sendVerificationEmail(email, verificationLink),
   ]);
 
