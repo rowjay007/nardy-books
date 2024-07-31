@@ -4,7 +4,7 @@ dotenv.config();
 
 const env = {
   NODE_ENV: process.env.NODE_ENV || "development",
-  PORT: process.env.PORT || "",
+  PORT: process.env.PORT || "3000",
   MONGO_URI: process.env.MONGO_URI || "mongodb://localhost:27017/nardy-books",
   JWT_SECRET: process.env.JWT_SECRET || "",
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
@@ -23,10 +23,7 @@ const env = {
   SENTRY_DSN: process.env.SENTRY_DSN || "",
   GITHUB_TOKEN: process.env.GITHUB_TOKEN || "",
   NARDY_SENTRY_AUTH_TOKEN: process.env.NARDY_SENTRY_AUTH_TOKEN || "",
-  CRON_ENABLED: process.env.CRON_ENABLED === "true" || false,
-  KAFKA_CLIENT_ID: process.env.KAFKA_CLIENT_ID || "booking-management-client",
-  KAFKA_BROKERS: process.env.KAFKA_BROKERS || "localhost:9092",
-  KAFKA_GROUP_ID: process.env.KAFKA_GROUP_ID || "booking-management-group",
+  CRON_ENABLED: process.env.CRON_ENABLED === "true",
 };
 
 export default env;
