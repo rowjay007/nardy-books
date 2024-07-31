@@ -4,12 +4,7 @@ import { IBook } from "../models/bookModel";
 import cache, { CACHE_TTL_SECONDS } from "../utils/cache";
 import AppError from "../utils/appError";
 
-/**
- * Create a new book
- * @param {Partial<IBook>} bookData - Data to create the book
- * @returns {Promise<IBook>} - Returns the created book
- * @throws {AppError} - Throws 400 if there's an error creating the book
- */
+
 export const createBook = async (bookData: Partial<IBook>): Promise<IBook> => {
   try {
     const book = await BookRepository.createBook(bookData);
@@ -20,12 +15,6 @@ export const createBook = async (bookData: Partial<IBook>): Promise<IBook> => {
   }
 };
 
-/**
- * Get a book by ID
- * @param {Types.ObjectId} id - ID of the book
- * @returns {Promise<IBook | null>} - Returns the book if found, else null
- * @throws {AppError} - Throws 400 if there's an error fetching the book
- */
 export const getBookById = async (
   id: Types.ObjectId
 ): Promise<IBook | null> => {
@@ -49,12 +38,6 @@ export const getBookById = async (
   return book;
 };
 
-/**
- * Get all books with filtering, sorting, and pagination
- * @param {any} queryParams - Query parameters for filtering, sorting, and pagination
- * @returns {Promise<{ books: IBook[]; total: number }>} - Returns books and total count
- * @throws {AppError} - Throws 400 if there's an error fetching books
- */
 export const getAllBooks = async (
   queryParams: any
 ): Promise<{ books: IBook[]; total: number }> => {
@@ -73,13 +56,7 @@ export const getAllBooks = async (
   return cachedData;
 };
 
-/**
- * Update a book by ID
- * @param {Types.ObjectId} id - ID of the book
- * @param {Partial<IBook>} bookData - Data to update the book
- * @returns {Promise<IBook | null>} - Returns the updated book if found, else null
- * @throws {AppError} - Throws 400 if there's an error updating the book
- */
+
 export const updateBookById = async (
   id: Types.ObjectId,
   bookData: Partial<IBook>
@@ -87,7 +64,7 @@ export const updateBookById = async (
   try {
     const book = await BookRepository.updateBookById(id, bookData);
     if (book) {
-      cache.flushAll(); // Flush cache on update
+      cache.flushAll(); 
     }
     return book;
   } catch (error) {
@@ -95,19 +72,14 @@ export const updateBookById = async (
   }
 };
 
-/**
- * Delete a book by ID
- * @param {Types.ObjectId} id - ID of the book
- * @returns {Promise<IBook | null>} - Returns the deleted book if found, else null
- * @throws {AppError} - Throws 400 if there's an error deleting the book
- */
+
 export const deleteBookById = async (
   id: Types.ObjectId
 ): Promise<IBook | null> => {
   try {
     const book = await BookRepository.deleteBookById(id);
     if (book) {
-      cache.flushAll(); // Flush cache on delete
+      cache.flushAll(); 
     }
     return book;
   } catch (error) {
@@ -115,13 +87,7 @@ export const deleteBookById = async (
   }
 };
 
-/**
- * Add a subscription to a book
- * @param {string} bookId - ID of the book
- * @param {string} subscriptionId - ID of the subscription
- * @returns {Promise<IBook | null>} - Returns the updated book if found, else null
- * @throws {AppError} - Throws 400 if there's an error adding the subscription or invalid ID
- */
+
 export const addSubscriptionToBook = async (
   bookId: string,
   subscriptionId: string

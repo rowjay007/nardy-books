@@ -4,7 +4,7 @@ services:
   app:
     build: .
     container_name: booking-management-api
-    command: sh -c "crond && npm start"
+    command: npm run dev
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
