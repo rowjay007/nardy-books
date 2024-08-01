@@ -1,3 +1,7 @@
+import Sentry from "./config/sentry"; 
+
+Sentry.init(); 
+
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -8,7 +12,6 @@ import hpp from "hpp";
 import httpStatus from "http-status";
 import morgan from "morgan";
 import limiter from "./config/rateLimiter";
-import Sentry from "./config/sentry";
 import errorMiddleware from "./middlewares/errorMiddleware";
 import router from "./routes";
 import AppError from "./utils/appError";
@@ -22,8 +25,6 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
-
-Sentry.setupExpressErrorHandler(app);
 
 app.use(morgan("dev"));
 app.use(helmet());
@@ -66,5 +67,7 @@ app.all("*", (req, res, next) => {
 app.use(errorMiddleware);
 
 setupCronJobs();
+
+Sentry.setupExpressErrorHandler(app); 
 
 export default app;
