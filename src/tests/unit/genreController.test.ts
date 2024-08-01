@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
-import * as genreController from "../controllers/genreController";
-import * as GenreService from "../services/genreService";
-import AppError from "../utils/appError";
-import { mockRequest, mockResponse } from "../utils/testHelpers";
+import * as genreController from "../../controllers/genreController";
+import * as GenreService from "../../services/genreService";
+import AppError from "../../utils/appError";
+import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
 jest.mock("../services/genreService");
 

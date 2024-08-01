@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
-import * as authorController from "../controllers/authorController";
-import * as AuthorService from "../services/authorService";
-import AppError from "../utils/appError";
-import { mockRequest, mockResponse } from "../utils/testHelpers";
+import * as authorController from "../../controllers/authorController";
+import * as AuthorService from "../../services/authorService";
+import AppError from "../../utils/appError";
+import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
 jest.mock("../services/authorService");
 
@@ -36,7 +36,7 @@ describe("Author Controller", () => {
       const authorId = new Types.ObjectId();
       const author = { _id: authorId, name: "Test Author" };
 
-      req.params = { id: authorId.toHexString() }; 
+      req.params = { id: authorId.toHexString() };
       (AuthorService.getAuthorById as jest.Mock).mockResolvedValue(author);
 
       await authorController.getAuthorById(req as any, res as any, next);
@@ -54,7 +54,7 @@ describe("Author Controller", () => {
       const res = mockResponse();
       const authorId = new Types.ObjectId();
 
-      req.params = { id: authorId.toHexString() }; 
+      req.params = { id: authorId.toHexString() };
       (AuthorService.getAuthorById as jest.Mock).mockResolvedValue(null);
 
       await authorController.getAuthorById(req as any, res as any, next);
@@ -104,7 +104,7 @@ describe("Author Controller", () => {
       const authorId = new Types.ObjectId();
       const updatedAuthor = { _id: authorId, name: "Updated Author" };
 
-      req.params = { id: authorId.toHexString() }; 
+      req.params = { id: authorId.toHexString() };
       req.body = { name: "Updated Author" };
       (AuthorService.updateAuthorById as jest.Mock).mockResolvedValue(
         updatedAuthor
@@ -128,7 +128,7 @@ describe("Author Controller", () => {
       const res = mockResponse();
       const authorId = new Types.ObjectId();
 
-      req.params = { id: authorId.toHexString() }; 
+      req.params = { id: authorId.toHexString() };
       req.body = { name: "Updated Author" };
       (AuthorService.updateAuthorById as jest.Mock).mockResolvedValue(null);
 
@@ -150,7 +150,7 @@ describe("Author Controller", () => {
       const res = mockResponse();
       const authorId = new Types.ObjectId();
 
-      req.params = { id: authorId.toHexString() }; 
+      req.params = { id: authorId.toHexString() };
       (AuthorService.deleteAuthorById as jest.Mock).mockResolvedValue({});
 
       await authorController.deleteAuthorById(req as any, res as any, next);
@@ -169,7 +169,7 @@ describe("Author Controller", () => {
       const res = mockResponse();
       const authorId = new Types.ObjectId();
 
-      req.params = { id: authorId.toHexString() }; 
+      req.params = { id: authorId.toHexString() };
       (AuthorService.deleteAuthorById as jest.Mock).mockResolvedValue(null);
 
       await authorController.deleteAuthorById(req as any, res as any, next);
@@ -192,7 +192,7 @@ describe("Author Controller", () => {
       req.params = {
         authorId: authorId.toHexString(),
         bookId: bookId.toHexString(),
-      }; 
+      };
       (AuthorService.addBookToAuthor as jest.Mock).mockResolvedValue(
         updatedAuthor
       );
@@ -219,7 +219,7 @@ describe("Author Controller", () => {
       req.params = {
         authorId: authorId.toHexString(),
         bookId: bookId.toHexString(),
-      }; 
+      };
       (AuthorService.addBookToAuthor as jest.Mock).mockResolvedValue(null);
 
       await authorController.addBookToAuthor(req as any, res as any, next);

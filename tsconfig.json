@@ -27,6 +27,10 @@
     // This improves issue grouping in Sentry.
     "sourceRoot": "/"
   },
-  "include": ["src/**/*.ts", "src/config/sentry.ts", "src/tests/authController.test.ts"],
+  "include": [
+    "src/**/*.ts",
+    "src/config/sentry.ts",
+    "src/tests/unit/authController.test.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

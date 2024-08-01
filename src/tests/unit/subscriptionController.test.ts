@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import * as subscriptionService from "../services/subscriptionService";
-import * as subscriptionController from "../controllers/subscriptionController";
-import AppError from "../utils/appError";
-import { mockRequest, mockResponse } from "../utils/testHelpers";
+import { Request, Response } from "express";
+import * as subscriptionController from "../../controllers/subscriptionController";
+import * as subscriptionService from "../../services/subscriptionService";
+import AppError from "../../utils/appError";
+import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
 jest.mock("../services/subscriptionService");
 

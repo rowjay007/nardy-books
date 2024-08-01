@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
-import * as userController from "../controllers/userController";
-import * as userService from "../services/userService";
-import AppError from "../utils/appError";
-import { mockRequest, mockResponse } from "../utils/testHelpers";
+import * as userController from "../../controllers/userController";
+import * as userService from "../../services/userService";
+import AppError from "../../utils/appError";
+import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
 jest.mock("../services/userService");
 
@@ -14,7 +14,7 @@ describe("User Controller", () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      req.params = {}; 
+      req.params = {};
 
       await userController.getUserById(req as any, res as any, next);
 
@@ -66,7 +66,7 @@ describe("User Controller", () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      req.params = {}; 
+      req.params = {};
       req.body = { username: "JaneDoe" };
 
       await userController.updateUserById(req as any, res as any, next);
@@ -123,7 +123,7 @@ describe("User Controller", () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      req.params = {}; 
+      req.params = {};
 
       await userController.deleteUserById(req as any, res as any, next);
 

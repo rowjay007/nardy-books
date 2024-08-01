@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
-import * as reviewController from "../controllers/reviewController";
-import * as ReviewService from "../services/reviewService";
-import AppError from "../utils/appError";
-import { mockRequest, mockResponse } from "../utils/testHelpers";
+import * as reviewController from "../../controllers/reviewController";
+import * as ReviewService from "../../services/reviewService";
+import AppError from "../../utils/appError";
+import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
 jest.mock("../services/reviewService");
 
@@ -53,7 +53,7 @@ describe("Review Controller", () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      req.params = {}; 
+      req.params = {};
 
       await reviewController.getReviewById(req as any, res as any, next);
 
@@ -113,7 +113,7 @@ describe("Review Controller", () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      req.params = {}; 
+      req.params = {};
       req.body = { content: "Updated review!" };
 
       await reviewController.updateReviewById(req as any, res as any, next);
@@ -168,7 +168,7 @@ describe("Review Controller", () => {
       const req = mockRequest();
       const res = mockResponse();
 
-      req.params = {}; 
+      req.params = {};
 
       await reviewController.deleteReviewById(req as any, res as any, next);
 

@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import * as PaymentService from "../services/paymentService";
-import * as paymentController from "../controllers/paymentController";
+import { Request, Response } from "express";
 import httpStatus from "http-status";
-import AppError from "../utils/appError";
+import * as paymentController from "../../controllers/paymentController";
+import * as PaymentService from "../../services/paymentService";
+import AppError from "../../utils/appError";
 
 jest.mock("../services/paymentService");
 
