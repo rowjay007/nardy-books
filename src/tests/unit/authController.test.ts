@@ -4,7 +4,7 @@ import * as userService from "../../services/userService";
 import AppError from "../../utils/appError";
 import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
-jest.mock("../services/userService");
+jest.mock("../../services/userService");
 jest.mock("jsonwebtoken");
 
 describe("Auth Controller", () => {

@@ -4,7 +4,7 @@ import * as PublisherService from "../../services/publisherService";
 import AppError from "../../utils/appError";
 import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
-jest.mock("../services/publisherService");
+jest.mock("../../services/publisherService");
 
 describe("Publisher Controller", () => {
   let next: jest.Mock;

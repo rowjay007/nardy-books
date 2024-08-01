@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { closeDB, connectDB } from "../../config/db";
+import { closeDB, connectDB } from "../config/db";
 
 beforeAll(async () => {
   await connectDB();

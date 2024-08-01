@@ -4,7 +4,7 @@ import * as GenreService from "../../services/genreService";
 import AppError from "../../utils/appError";
 import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
-jest.mock("../services/genreService");
+jest.mock("../../services/genreService");
 
 describe("Genre Controller", () => {
   const next = jest.fn();

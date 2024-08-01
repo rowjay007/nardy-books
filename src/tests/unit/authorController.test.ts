@@ -4,7 +4,7 @@ import * as AuthorService from "../../services/authorService";
 import AppError from "../../utils/appError";
 import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
-jest.mock("../services/authorService");
+jest.mock("../../services/authorService");
 
 describe("Author Controller", () => {
   const next = jest.fn();

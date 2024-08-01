@@ -8,4 +8,8 @@ module.exports = {
   transform: {
     "^.+\\.tsx?$": ["ts-jest", { tsconfig: "tsconfig.json" }],
   },
+  testMatch: [
+    "<rootDir>/src/tests/unit/**/*.test.ts",
+    "<rootDir>/src/tests/integration/**/*.test.ts",
+  ],
 };

@@ -4,7 +4,7 @@ import * as BookService from "../../services/bookService";
 import AppError from "../../utils/appError";
 import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
-jest.mock("../services/bookService");
+jest.mock("../../services/bookService");
 
 describe("Book Controller", () => {
   const next = jest.fn();

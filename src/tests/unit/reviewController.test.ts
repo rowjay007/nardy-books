@@ -4,7 +4,7 @@ import * as ReviewService from "../../services/reviewService";
 import AppError from "../../utils/appError";
 import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
-jest.mock("../services/reviewService");
+jest.mock("../../services/reviewService");
 
 describe("Review Controller", () => {
   const next = jest.fn();

@@ -4,7 +4,7 @@ import * as subscriptionService from "../../services/subscriptionService";
 import AppError from "../../utils/appError";
 import { mockRequest, mockResponse } from "../../utils/testHelpers";
 
-jest.mock("../services/subscriptionService");
+jest.mock("../../services/subscriptionService");
 
 describe("Subscription Controller", () => {
   const next = jest.fn();

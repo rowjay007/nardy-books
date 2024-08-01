@@ -4,7 +4,7 @@ import * as paymentController from "../../controllers/paymentController";
 import * as PaymentService from "../../services/paymentService";
 import AppError from "../../utils/appError";
 
-jest.mock("../services/paymentService");
+jest.mock("../../services/paymentService");
 
 const mockRequest = (body = {}, params = {}, query = {}) => {
   return { body, params, query } as Request;
