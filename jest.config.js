@@ -9,7 +9,8 @@ module.exports = {
     "^.+\\.tsx?$": ["ts-jest", { tsconfig: "tsconfig.json" }],
   },
   testMatch: [
-    "<rootDir>/src/tests/unit/**/*.test.ts",
-    "<rootDir>/src/tests/integration/**/*.test.ts",
+    "**/tests/unit/**/*.test.ts",
+    "**/tests/integration/**/*.test.ts",
+    "**/tests/e2e/**/*.test.ts",
   ],
 };
