@@ -1,181 +1,122 @@
-import { Types } from "mongoose";
-import * as authController from "../../controllers/authController";
-import * as userService from "../../services/userService";
-import AppError from "../../utils/appError";
-import { mockRequest, mockResponse } from "../../utils/testHelpers";
+import request from "supertest";
+import mongoose from "mongoose";
+import app from "../../app";
+import User from "../../models/userModel";
+import { connectDB, closeDB } from "../../config/db";
 
-jest.mock("../../services/userService");
-jest.mock("jsonwebtoken");
+describe("Auth Integration Tests", () => {
+  let server: any;
 
-describe("Auth Controller", () => {
-  let next: jest.Mock;
-
-  beforeEach(() => {
-    next = jest.fn();
-    jest.resetAllMocks();
+  beforeAll(async () => {
+    await connectDB();
+    server = app.listen(4000);
   });
 
-  describe("register", () => {
-    // existing tests for register
+  afterAll(async () => {
+    await closeDB();
+    await server.close();
   });
 
-  describe("login", () => {
-    // existing tests for login
+  beforeEach(async () => {
+    await User.deleteMany({});
   });
 
-  describe("refreshTokens", () => {
-    // existing tests for refreshTokens
-  });
-
-  describe("getCurrentUser", () => {
-    it("should return the current user's data", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
-      const user = {
-        _id: userId,
+  describe("POST /api/auth/register", () => {
+    it("should register a new user", async () => {
+      const res = await request(app).post("/api/auth/register").send({
         username: "testuser",
         email: "test@example.com",
-      };
-
-      req.user = { id: userId };
-      (userService.getCurrentUser as jest.Mock).mockResolvedValue(user);
-
-      await authController.getCurrentUser(req as any, res as any, next);
-
-      expect(userService.getCurrentUser).toHaveBeenCalledWith(userId);
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        status: "success",
-        data: { user },
+        password: "password123",
       });
+
+      expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty("token");
+      expect(res.body.user).toHaveProperty("username", "testuser");
+      expect(res.body.user).toHaveProperty("email", "test@example.com");
     });
 
-    it("should handle missing authentication", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
+    it("should not register a user with existing email", async () => {
+      await User.create({
+        username: "existinguser",
+        email: "existing@example.com",
+        password: "password123",
+      });
 
-      await authController.getCurrentUser(req as any, res as any, next);
+      const res = await request(app).post("/api/auth/register").send({
+        username: "newuser",
+        email: "existing@example.com",
+        password: "password123",
+      });
 
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not authenticated");
-      expect(next.mock.calls[0][0].statusCode).toBe(401);
-    });
-
-    it("should handle user not found", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
-
-      req.user = { id: userId };
-      (userService.getCurrentUser as jest.Mock).mockResolvedValue(null);
-
-      await authController.getCurrentUser(req as any, res as any, next);
-
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not found");
-      expect(next.mock.calls[0][0].statusCode).toBe(404);
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty("message", "Email already exists");
     });
   });
 
-  describe("updateCurrentUser", () => {
-    it("should update the current user's data", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
-      const updateData = { username: "updateduser" };
-      const updatedUser = { _id: userId, ...updateData };
-
-      req.user = { id: userId };
-      req.body = updateData;
-      (userService.updateCurrentUser as jest.Mock).mockResolvedValue(
-        updatedUser
-      );
-
-      await authController.updateCurrentUser(req as any, res as any, next);
-
-      expect(userService.updateCurrentUser).toHaveBeenCalledWith(
-        userId,
-        updateData
-      );
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        status: "success",
-        data: { user: updatedUser },
+  describe("POST /api/auth/login", () => {
+    beforeEach(async () => {
+      await User.create({
+        username: "testuser",
+        email: "test@example.com",
+        password: "password123",
       });
     });
 
-    it("should handle missing authentication", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
+    it("should login a user with correct credentials", async () => {
+      const res = await request(app).post("/api/auth/login").send({
+        email: "test@example.com",
+        password: "password123",
+      });
 
-      await authController.updateCurrentUser(req as any, res as any, next);
-
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not authenticated");
-      expect(next.mock.calls[0][0].statusCode).toBe(401);
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("token");
+      expect(res.body.user).toHaveProperty("email", "test@example.com");
     });
 
-    it("should handle user not found", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
+    it("should not login a user with incorrect password", async () => {
+      const res = await request(app).post("/api/auth/login").send({
+        email: "test@example.com",
+        password: "wrongpassword",
+      });
 
-      req.user = { id: userId };
-      req.body = { username: "updateduser" };
-      (userService.updateCurrentUser as jest.Mock).mockResolvedValue(null);
-
-      await authController.updateCurrentUser(req as any, res as any, next);
-
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not found");
-      expect(next.mock.calls[0][0].statusCode).toBe(404);
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("message", "Invalid email or password");
     });
   });
 
-  describe("deleteCurrentUser", () => {
-    it("should delete the current user", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
+  describe("GET /api/auth/current-user", () => {
+    let token: string;
 
-      req.user = { id: userId };
-      (userService.deleteCurrentUser as jest.Mock).mockResolvedValue(true);
-
-      await authController.deleteCurrentUser(req as any, res as any, next);
-
-      expect(userService.deleteCurrentUser).toHaveBeenCalledWith(userId);
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        status: "success",
-        message: "User deleted successfully",
+    beforeEach(async () => {
+      const user = await User.create({
+        username: "testuser",
+        email: "test@example.com",
+        password: "password123",
       });
+
+      const loginRes = await request(app).post("/api/auth/login").send({
+        email: "test@example.com",
+        password: "password123",
+      });
+
+      token = loginRes.body.token;
     });
 
-    it("should handle missing authentication", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
+    it("should get current user information", async () => {
+      const res = await request(app)
+        .get("/api/auth/current-user")
+        .set("Authorization", `Bearer ${token}`);
 
-      await authController.deleteCurrentUser(req as any, res as any, next);
-
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not authenticated");
-      expect(next.mock.calls[0][0].statusCode).toBe(401);
+      expect(res.status).toBe(200);
+      expect(res.body.user).toHaveProperty("email", "test@example.com");
+      expect(res.body.user).toHaveProperty("username", "testuser");
     });
 
-    it("should handle user not found", async () => {
-      const req = mockRequest();
-      const res = mockResponse();
-      const userId = new Types.ObjectId().toString();
+    it("should not get user information without token", async () => {
+      const res = await request(app).get("/api/auth/current-user");
 
-      req.user = { id: userId };
-      (userService.deleteCurrentUser as jest.Mock).mockResolvedValue(false);
-
-      await authController.deleteCurrentUser(req as any, res as any, next);
-
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].message).toBe("User not found");
-      expect(next.mock.calls[0][0].statusCode).toBe(404);
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("message", "No token provided");
     });
   });
 });

@@ -4,7 +4,7 @@ import env from "../config/env";
 import AppError from "../utils/appError";
 
 interface AuthenticatedRequest extends Request {
-  user?: jwt.JwtPayload;
+  user?: string | jwt.JwtPayload; 
 }
 
 export const protect = (
@@ -27,11 +27,17 @@ export const protect = (
   }
 };
 
-const extractTokenFromHeader = (
-  req: AuthenticatedRequest
-): string | undefined => {
+/**
+ * Extracts JWT token from Authorization header
+ * @param req Express request object
+ * @returns JWT token string or undefined
+ */
+const extractTokenFromHeader = (req: AuthenticatedRequest): string | undefined => {
   const authHeader = req.headers.authorization;
-  return authHeader && authHeader.startsWith("Bearer ")
-    ? authHeader.split(" ")[1]
-    : undefined;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.split(" ")[1];
+  }
+
+  return undefined;
 };
