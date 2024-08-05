@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import Book from "../../models/bookModel"; // Import the Book model
-import Author from "../../models/authorModel"; // Import the Author model
+import mongoose from "mongoose";
+import Author from "../../models/authorModel";
+import Book from "../../models/bookModel";
 
 let mongoServer: MongoMemoryServer;
 
