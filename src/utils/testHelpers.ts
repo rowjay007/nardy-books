@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 
 export const mockRequest = (): Partial<Request> => ({
   body: {},
-  params: {}, 
+  params: {},
   query: {},
   headers: {},
+  cookies: {},
 });
 
 export const mockResponse = () => {
@@ -12,5 +13,6 @@ export const mockResponse = () => {
   res.status = jest.fn().mockReturnValue(res);
   res.json = jest.fn().mockReturnValue(res);
   res.cookie = jest.fn().mockReturnValue(res);
+  res.clearCookie = jest.fn().mockReturnValue(res);
   return res;
 };

@@ -53,10 +53,10 @@ export const login = async (
 ) => {
   try {
     const { email, password } = req.body;
-    const { user } = await userService.login(email, password);
-
-    const accessToken = generateAccessToken(user.id);
-    const refreshToken = generateRefreshToken(user.id);
+    const { user, accessToken, refreshToken } = await userService.login(
+      email,
+      password
+    );
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
