@@ -66,10 +66,11 @@ export const login = async (email: string, password: string) => {
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
   if (!isPasswordCorrect) throw new AppError("Invalid email or password", 401);
 
-  const accessToken = generateAccessToken(user._id as string);
-  const refreshToken = generateRefreshToken(user._id as string);
+  const userId = String(user._id);
+  const accessToken = generateAccessToken(userId);
+  const refreshToken = generateRefreshToken(userId);
 
-  await userRepository.setRefreshToken(user._id as string, refreshToken);
+  await userRepository.setRefreshToken(userId, refreshToken);
 
   return { user, accessToken, refreshToken };
 };
@@ -87,7 +88,7 @@ export const requestPasswordReset = async (email: string) => {
   const expires = new Date(Date.now() + 3600000);
 
   await userRepository.setResetPasswordToken(
-    user._id as string,
+    String(user._id),
     token,
     expires
   );
